@@ -48,10 +48,10 @@ def run_scalability():
     #                 print("\n===============================================================================================================================================================================================")
     #                 print("===============================================================================================================================================================================================\n")
 
-    execute(20, 21, 250, 0, 15, file)
+    execute(20, 21, 250, 0, 15)
 
 
-def execute(GRID_SIZE, NUM_PAIRS_PER_QUADRANT, MAX_CLUSTER_SIZE, OFFSET, k, file_path):
+def execute(GRID_SIZE, NUM_PAIRS_PER_QUADRANT, MAX_CLUSTER_SIZE, OFFSET, k):
     env = Environment(GRID_SIZE, MAX_CLUSTER_SIZE, NUM_PAIRS_PER_QUADRANT, OFFSET, k)
 
     complete_solver = Heuristic_Solver(env.G, env.od_pairs, env.T)
@@ -62,11 +62,6 @@ def execute(GRID_SIZE, NUM_PAIRS_PER_QUADRANT, MAX_CLUSTER_SIZE, OFFSET, k, file
         print(f"T = {complete_solver.starting_T + i}  ->   Model created   Time = {complete_solver.model_times[i]}    status = {"INFEASIBLE" if i < offset else complete_solver.status}     Time = {complete_solver.resolution_times[i]}")
 
     print(f"\nResolution delay by solving all pairs = {sum(a.delay for a in complete_solver.A)}    objVal (LB) = {complete_solver.m.ObjVal}    objBound (UB) = {complete_solver.m.ObjBound}")
-
-    with open(file_path, "w") as file:
-        file.write(f"\nResolution delay by solving all pairs = {sum(a.delay for a in complete_solver.A)}    objVal (LB) = {complete_solver.m.ObjVal}    objBound (UB) = {complete_solver.m.ObjBound}")
-
-
 
 
     env.compute_clusters()
