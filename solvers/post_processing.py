@@ -1,3 +1,4 @@
+import time
 from collections import defaultdict
 from typing import List
 import networkx as nx
@@ -14,6 +15,7 @@ class Critical_Resources:
         od_pairs: List[OD_Pair],
         tol: int = 0
     ):
+        start = time.time()
         self.G = G
         self.od_pairs = od_pairs
         self.tol = tol
@@ -47,6 +49,9 @@ class Critical_Resources:
 
         self._heap = []
         self._build_heap()
+
+        self.creation_time = time.time() - start
+        self.unassigning_time = None
 
 
 
@@ -85,6 +90,7 @@ class Critical_Resources:
 
 
     def unassign_agents(self):
+        start = time.time()
         while self.critical_resources:
             worst_v, worst_t = self._pop_worst()
             candidate_agents = self.agents_per_resource.get((worst_v, worst_t), ())
@@ -94,6 +100,7 @@ class Critical_Resources:
 
             self.assign_score(candidate_agents)
             self.recompute(max(self.scores, key=self.scores.get))
+        self.unassigning_time = time.time() - start
 
 
     def recompute(self, agent):
@@ -120,19 +127,8 @@ class Critical_Resources:
 
     def increment_tol(self, delta: int = 1) -> None:
         self.tol += delta
-
         self.residuals = {key: (self.cap[key[0]] - len(agents)) for key, agents in self.agents_per_resource.items()}
         self.critical_resources = {key for key, res in self.residuals.items() if res < self.tol}
         self.critical_agents = {a for (v, t) in self.critical_resources for a in self.agents_per_resource[(v, t)]}
-
-
-        # self.critical_resources = {
-        #     key for key, agents in self.agents_per_resource.items()
-        #     if agents and self.residuals.get(key, self.cap[key[0]] - len(agents)) < self.tol
-        # }
-        #
-        # self.critical_agents = {
-        #     a for key in self.critical_resources for a in self.agents_per_resource.get(key, ())
-        # }
         self._build_heap()
 

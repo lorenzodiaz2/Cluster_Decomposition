@@ -1,3 +1,4 @@
+import time
 from collections import defaultdict
 from typing import List
 import gurobipy as gp
@@ -15,32 +16,26 @@ class Heuristic_Solver(General_Solver):
         self,
         G: nx.Graph,
         od_pairs: List[OD_Pair],
-        T: int
+        T: int,
+        critical_resources: Critical_Resources | None = None,
+        max_time: int | None = 12000
     ):
-        super().__init__(G, od_pairs, T)
+        super().__init__(G, od_pairs, T, max_time)
 
         self.P = {}
         self.K = {}
         self.E = {}
         self.x = None
-        self.z = None
-        self.critical_resources = None
+        self.critical_resources = critical_resources
         self.lb = {}
 
 
-    def solve(
-        self,
-        critical_resources: Critical_Resources | None = None
-    ):
-        if critical_resources:
-            self.critical_resources = critical_resources
 
+    def solve(self):
         self.set_model()
         self.optimize_model()
-        while self.status != "OPTIMAL":
+        while self.status == "INFEASIBLE":
             if self.critical_resources:
-                # new_tol = self.critical_resources.tol + 1
-                # self.critical_resources = Critical_Resources(self.G, self.od_pairs, new_tol)
                 self.critical_resources.increment_tol()
                 self.critical_resources.unassign_agents()
             else:
@@ -53,6 +48,7 @@ class Heuristic_Solver(General_Solver):
 
 
     def set_model(self):
+        start = time.time()
         self.P = {(od_pair, j): p for od_pair in self.od_pairs for j, p in enumerate(od_pair.all_paths)}
         self.K = defaultdict(list) # K[od] = {1, 2, ...}
         self.E = defaultdict(list)
@@ -72,6 +68,7 @@ class Heuristic_Solver(General_Solver):
         self.m.addConstrs(gp.quicksum(self.x[od_pair.id, j] for (od_pair, j) in self.E[v, t]) <= self.G.nodes[v]["capacity"] for (v, t) in self.E.keys())
 
         self.m.setObjective(gp.quicksum(self.x[od_pair.id, j] * (len(self.P[od_pair, j].visits) - 1 - self.SP[od_pair.src, od_pair.dst]) for od_pair, j in self.P.keys()), GRB.MINIMIZE)
+        self.model_times.append(time.time() - start)
 
 
     def compute_lb(self):
