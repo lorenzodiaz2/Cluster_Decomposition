@@ -103,7 +103,8 @@ def save_results(env, complete_solver, cluster_solvers, critical_resources, fina
         f.write(f"\nEnvironment Created     Time: {env.set_time}\n")
         diff = complete_solver.T - complete_solver.starting_T
         for i in range(diff + 1):
-            f.write(f"\nT = {complete_solver.starting_T + i}  ->   Model created   Time = {complete_solver.model_times[i]}    status = {"INFEASIBLE" if i < diff else complete_solver.status}     Time = {complete_solver.resolution_times[i]}")
+            status = "INFEASIBLE" if i < diff else complete_solver.status
+            f.write(f"\nT = {complete_solver.starting_T + i}  ->   Model created   Time = {complete_solver.model_times[i]}    status = {status}     Time = {complete_solver.resolution_times[i]}")
             hs_all_time += complete_solver.model_times[i] + complete_solver.resolution_times[i]
         f.write(f"\n\nResolution delay by solving all pairs     --->     objVal (LB) = {complete_solver.m.ObjVal}    objBound (UB) = {complete_solver.m.ObjBound}     Time = {hs_all_time}\n")
         f.write(f"\nCreated {len(env.clusters)} clusters.  Time = {env.cluster_time}\n")
