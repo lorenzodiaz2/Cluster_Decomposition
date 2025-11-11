@@ -44,7 +44,7 @@ def set_capacities(G, od_pairs, seed: int | None = 42):
 # Scelta di sorgenti e destinazioni
 # -------------------------------------
 
-def get_grid_size(G: nx.Graph) -> int:
+def get_grid_side(G: nx.Graph) -> int:
     return int(math.isqrt(G.number_of_nodes()))
 
 
@@ -74,7 +74,7 @@ def choose_pairs(
 ) -> List[OD_Pair]:
 
     rng = random.Random(seed)
-    n = get_grid_size(G)
+    n = get_grid_side(G)
     od_pairs: List[OD_Pair] = []
     seen_pairs: set[Tuple] = set()
     total_agents = 0

@@ -5,7 +5,7 @@ from utils.environment import Environment
 
 
 def run_scalability():
-    GRID_SIZE_values = [10, 30, 50, 70, 90, 100, 120, 150, 180, 200, 250]
+    GRID_SIDE_values = [10, 30, 50, 70, 90, 100, 120, 150, 180, 200, 250]
 
     k_values = {
         10: 12,
@@ -49,10 +49,10 @@ def run_scalability():
         250: [-80, -65, -30, -10, 0, 10, 30, 65, 80, 125]
     }
 
-    MAX_CLUSTER_SIZE_values = {(g, n): [int(n * 4 * 12 / d) for d in (8, 6, 4, 2)] for g in GRID_SIZE_values for n in NUM_PAIRS_PER_QUADRANT_values[g]}
+    MAX_CLUSTER_SIZE_values = {(g, n): [int(n * 4 * 12 / d) for d in (8, 6, 4, 2)] for g in GRID_SIDE_values for n in NUM_PAIRS_PER_QUADRANT_values[g]}
 
 
-    for g in GRID_SIZE_values:
+    for g in GRID_SIDE_values:
         for n in NUM_PAIRS_PER_QUADRANT_values[g]:
             if not os.path.isdir(f"results/grid/{g * g}/{n * 4}"):
                 os.makedirs(f"results/grid/{g * g}/{n * 4}")
@@ -65,8 +65,8 @@ def run_scalability():
 
 
 
-def solve_complete(grid_size, num_pairs_per_quadrant, offset, k):
-    env = Environment(grid_size, 0, num_pairs_per_quadrant, offset, k)
+def solve_complete(grid_side, num_pairs_per_quadrant, offset, k):
+    env = Environment(grid_side, 0, num_pairs_per_quadrant, offset, k)
     complete_solver = Heuristic_Solver(env.G, env.od_pairs, env.T)
     complete_solver.solve()
     return env, complete_solver
@@ -92,14 +92,14 @@ def execute(env, complete_solver):
 
 
 def save_results(env, complete_solver, cluster_solvers, critical_resources, final_solver):
-    file_path = f"results/grid/{env.grid_size * env.grid_size}/{env.num_pairs_per_quadrant * 4}"
+    file_path = f"results/grid/{env.grid_side * env.grid_side}/{env.num_pairs_per_quadrant * 4}"
     file_name = file_path + f"/{int(env.max_cluster_size)}_{env.offset}_{env.k}"
 
     hs_all_time = 0
     hs_cluster_time = 0
 
     with open(file_name, "w") as f:
-        f.write(f"GRID SIZE = {env.grid_size * env.grid_size}     NUMBER OF TOTAL PAIRS = {env.num_pairs_per_quadrant * 4}     MAX CLUSTER SIZE = {env.max_cluster_size}    OFFSET = {env.offset}     k = {env.k}     NUMBER OF AGENTS = {len(env.agents)}\n")
+        f.write(f"GRID SIZE = {env.grid_side * env.grid_side}     NUMBER OF TOTAL PAIRS = {env.num_pairs_per_quadrant * 4}     MAX CLUSTER SIZE = {env.max_cluster_size}    OFFSET = {env.offset}     k = {env.k}     NUMBER OF AGENTS = {len(env.agents)}\n")
         f.write(f"\nEnvironment Created     Time: {env.set_time}\n")
         diff = complete_solver.T - complete_solver.starting_T
         for i in range(diff + 1):
@@ -127,5 +127,5 @@ def save_results(env, complete_solver, cluster_solvers, critical_resources, fina
             f.write(f"\nFinale solver: T = {final_solver.T}  ->   Model created   Time = {final_solver.model_times[0]}   status = {final_solver.status}     Time = {final_solver.resolution_times[0]}\n")
             hs_cluster_time += final_solver.model_times[0] + final_solver.resolution_times[0]
 
-            f.write(f"\nFinal resolution delay     --->     objVal (LB) = {final_solver.m.ObjVal}    objBound (UB) = {final_solver.m.ObjBound}     Total time cluster heuristic = {hs_cluster_time}\n")
+            f.write(f"\nFinal resolution delay     --->     objVal (LB) = {final_solver.m.ObjVal}    objBound (UB) = {final_solver.m.ObjBound}     Total time cluster heuristic = {hs_cluster_time}")
 
