@@ -92,7 +92,7 @@ class Heuristic_Solver(General_Solver):
         if self.status == "OPTIMAL" and self.m.SolCount > 0:
             non_assigned_agents = {od_pair.id: [a for a in od_pair.agents] for od_pair in self.od_pairs}
             for (od_pair, j), p in self.P.items():
-                n_agents = int(self.x[od_pair.id, j].X)
+                n_agents = round(self.x[od_pair.id, j].X)
                 if n_agents > 0:
                     delay = len(p.visits) - 1 - self.SP[od_pair.src, od_pair.dst]
                     for i in range(n_agents):

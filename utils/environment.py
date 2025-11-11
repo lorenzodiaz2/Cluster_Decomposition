@@ -40,15 +40,11 @@ class Environment:
         self.od_pairs = choose_pairs(self.G, self.num_pairs_per_quadrant, self.offset)
         for od_pair in self.od_pairs:
             od_pair.compute_k_shortest_paths(self.G, self.k)
-        self.T = max(len(od_pair.k_shortest_paths[self.k - 1].visits) - 1 for od_pair in self.od_pairs)
+        self.T = max(len(od_pair.k_shortest_paths[self.k - 1].visits) - 1 for od_pair in self.od_pairs) + 10
         for od_pair in self.od_pairs:
             od_pair.delay_shortest_paths(self.T)
         self.agents = [a for od_pair in self.od_pairs for a in od_pair.agents]
         self.set_time = time.time() - start
-
-        print(f"\nGRID SIZE = {self.grid_size}     PAIRS PER QUADRANT = {self.num_pairs_per_quadrant}     MAX CLUSTER SIZE = {self.max_cluster_size}     k = {self.k}     NUMBER OF AGENTS = {len(self.agents)}")
-        print(f"\nEnvironment Created     Time: {self.set_time}\n")
-
 
 
     def compute_clusters(self):
@@ -57,8 +53,3 @@ class Environment:
         tree = TreePartition(similarity_matrix, self.od_pairs, self.max_cluster_size)
         self.clusters = tree.compute_clusters()
         self.cluster_time = time.time() - start
-        print(f"\nCreated {len(self.clusters)} clusters.  Time = {self.cluster_time}")
-        for cluster in self.clusters:
-            print("    ", cluster)
-            # plot_paths(self.G, cluster.od_pairs)
-        print()
