@@ -44,4 +44,5 @@ class General_Solver:
             GRB.SUBOPTIMAL: "SUBOPTIMAL",
         }
         self.status = status_map.get(self.m.Status, str(self.m.Status))
+        print(self.status, end="  ")
         self.resolution_times.append(time.time() - start)

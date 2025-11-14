@@ -13,9 +13,10 @@ class CMAPF_Solver(General_Solver):
         self,
         G: nx.Graph,
         od_pairs: List[OD_Pair],
-        T: int
+        T: int,
+        max_time: int | None = 1200
     ):
-        super().__init__(G, od_pairs, T)
+        super().__init__(G, od_pairs, T, max_time)
 
         self.V = list(self.G.nodes())
         self.x = None

@@ -79,8 +79,6 @@ def choose_pairs(
     seen_pairs: set[Tuple] = set()
     total_agents = 0
 
-    # ids = [i for i in range(pairs_per_quadrant * 4)]
-
     for x in range(2):
         for y in range(2):
             generated = 0
@@ -95,8 +93,6 @@ def choose_pairs(
                 agents = [Agent(i, src, dst) for i in range(total_agents, total_agents + number_of_agents)]
 
                 pair_id = generated + pairs_per_quadrant * (2 * x + y)
-                # pair_id = random.choice(ids)
-                # ids.remove(pair_id)
                 od_pair = OD_Pair(pair_id, src, dst, agents)
 
                 od_pairs.append(od_pair)

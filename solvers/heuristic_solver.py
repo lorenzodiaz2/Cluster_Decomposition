@@ -36,6 +36,7 @@ class Heuristic_Solver(General_Solver):
         self.optimize_model()
         while self.status == "INFEASIBLE":
             if self.critical_resources:
+                print("aumento la tolleranza")
                 self.critical_resources.increment_tol()
                 self.critical_resources.unassign_agents()
             else:

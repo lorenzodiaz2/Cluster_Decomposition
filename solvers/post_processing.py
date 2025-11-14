@@ -19,6 +19,7 @@ class Critical_Resources:
         self.G = G
         self.od_pairs = od_pairs
         self.tol = tol
+        self.starting_tol = tol if tol >= 0 else 0
 
         self.cap = {v: G.nodes[v]["capacity"] for v in G.nodes}
         self.agents_per_resource = defaultdict(set)
