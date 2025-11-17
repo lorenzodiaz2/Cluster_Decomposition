@@ -1,5 +1,4 @@
 import os
-import time
 
 from solvers.heuristic_solver import Heuristic_Solver
 from solvers.post_processing import Critical_Resources
@@ -7,7 +6,7 @@ from utils.environment import Environment
 
 # todo stampare anche le volte in cui viene aumentata la tolleranza e i vari tempi
 def run_scalability():
-    GRID_SIDE_values = [20] #, 20, 30, 50, 70] # , 90, 100, 120, 150, 180, 200, 250]
+    GRID_SIDE_values = [10, 20, 30] #, 50, 70] , 90, 100, 120, 150, 180, 200, 250]
 
     k_values = {
         10: 12,
@@ -56,40 +55,24 @@ def run_scalability():
 
     MAX_CLUSTER_SIZE_values = {(g, n): [int(n * 4 * 12 / d) for d in (8, 6, 4)] for g in GRID_SIDE_values for n in NUM_PAIRS_PER_QUADRANT_values[g]}
 
-    # solve_complete(10, 5, 0, 10)
-    # print()
-    # if not os.path.isdir(f"results/grid/{18 * 18}/{35 * 4}"):
-    #   os.makedirs(f"results/grid/{18 * 18}/{35 * 4}")
-    # env, complete_solver = solve_complete(18, 35, -4, 3)
-    # env.max_cluster_size = 90
-    # solve_clusters(env, complete_solver)
 
+    for g in GRID_SIDE_values:
+        for n in NUM_PAIRS_PER_QUADRANT_values[g]:
+            if not os.path.isdir(f"results/grid/{g * g}/{n * 4}"):
+                os.makedirs(f"results/grid/{g * g}/{n * 4}")
+            for offset in OFFSET_values[g]:
+                print()
+                env, complete_solver = solve_complete(g, n, offset, k_values[g])
+                for s in MAX_CLUSTER_SIZE_values[(g, n)]:
+                    print(f"results/grid/{g * g}/{n * 4}/{int(s)}_{offset}_{k_values[g]}")
+                    env.max_cluster_size = s
+                    solve_clusters(env, complete_solver)
 
-    # for g in GRID_SIDE_values:
-    #     for n in NUM_PAIRS_PER_QUADRANT_values[g]:
-    #         if not os.path.isdir(f"results/grid/{g * g}/{n * 4}"):
-    #             os.makedirs(f"results/grid/{g * g}/{n * 4}")
-    #         for offset in OFFSET_values[g]:
-    #             print()
-    #             env, complete_solver = solve_complete(g, n, offset, k_values[g])
-    #             for s in MAX_CLUSTER_SIZE_values[(g, n)]:
-    #                 print(f"results/grid/{g * g}/{n * 4}/{int(s)}_{offset}_{k_values[g]}", end="   ")
-    #                 env.max_cluster_size = s
-    #                 solve_clusters(env, complete_solver)
-
-    env = Environment(20, 180, 30, 5, 15)
-    for od in env.od_pairs:
-        od.delay_shortest_paths(24)
-    complete_solver = Heuristic_Solver(env.G, env.od_pairs, 24)
-    start = time.time()
-    final = solve_clusters(env, complete_solver)
-    print(f"Risolto in {time.time() - start} seconds. ObjVal = {final.m.ObjVal}   ObjBound = {final.m.ObjBound}")
 
 
 
 def solve_complete(grid_side, num_pairs_per_quadrant, offset, k):
     env = Environment(grid_side, 0, num_pairs_per_quadrant, offset, k)
-    print(f"env settato {len(env.agents)} agenti   risoluzione completa -> ", end="")
     complete_solver = Heuristic_Solver(env.G, env.od_pairs, env.T)
     complete_solver.solve()
     return env, complete_solver
@@ -97,30 +80,22 @@ def solve_complete(grid_side, num_pairs_per_quadrant, offset, k):
 
 def solve_clusters(env, complete_solver):
     env.compute_clusters()
-    print(f"{len(env.clusters)} cluster creati", end="   ")
     cluster_solvers = []
     for cluster in env.clusters:
         hs = Heuristic_Solver(env.G, [od_pair for od_pair in cluster.od_pairs], complete_solver.current_T)
         hs.solve()
         hs.assign_solutions()
         cluster_solvers.append(hs)
-    print("cluster risolti", end="   ")
 
-    critical_resources = Critical_Resources(env.G, env.od_pairs, 0)
+    critical_resources = Critical_Resources(env.G, env.od_pairs, 2)
     if critical_resources.is_initially_feasible:
-        print("finito")
-        return 0 # todo da rimuovere
-        # save_results(env, complete_solver, cluster_solvers, critical_resources, None)
+        save_results(env, complete_solver, cluster_solvers, critical_resources, None)
     else:
-        print(f"{len(critical_resources.critical_resources)} critical resources", end="  ")
         critical_resources.unassign_agents()
-        print(f"tolti {len(critical_resources.removed_agents)} agenti", end="   ")
         final_solver = Heuristic_Solver(env.G, env.od_pairs, complete_solver.current_T, critical_resources)
         final_solver.solve()
-        # final_solver.assign_solutions()
-        print("Finito")
-        return final_solver # todo da rimuovere
-        # save_results(env, complete_solver, cluster_solvers, critical_resources, final_solver)
+        final_solver.assign_solutions()
+        save_results(env, complete_solver, cluster_solvers, critical_resources, final_solver)
 
 
 
@@ -157,19 +132,19 @@ def save_results(env, complete_solver, cluster_solvers, critical_resources, fina
         if final_solver is None:
             f.write(f"\n\nSolution is already feasible    Total time cluster heuristic = {hs_cluster_time}")
         else:
-            f.write(f"Unassigned {critical_resources.removed_agents_per_tol[0]} Agents  Time {critical_resources.unassigning_times[0]}")
+            f.write(f"Unassigned {critical_resources.removed_agents_per_tol[0]} Agents    Time {critical_resources.unassigning_times[0]}")
             hs_cluster_time += critical_resources.unassigning_times[0]
 
 
             diff = critical_resources.current_tol - critical_resources.starting_tol
             for i in range(1, diff + 1):
                 f.write(f"\nNo solution found   ->   Augmented tolerance\n")
-                f.write(f"\n{critical_resources.critical_resources_per_tol[i]} critical resources.  Time {critical_resources.creation_times[i]}     ")
-                f.write(f"Unassigned {critical_resources.removed_agents_per_tol[i]} Agents.  Time {critical_resources.unassigning_times[i]}")
+                f.write(f"\n{critical_resources.critical_resources_per_tol[i]} critical resources    Time {critical_resources.creation_times[i]}     ")
+                f.write(f"Unassigned {critical_resources.removed_agents_per_tol[i]} Agents    Time {critical_resources.unassigning_times[i]}")
 
 
             f.write(f"\n\nFinale solver: T = {final_solver.current_T}  ->   Model created   Time = {final_solver.model_times[0]}   status = {final_solver.status}     Time = {final_solver.resolution_times[0]}\n")
             hs_cluster_time += final_solver.model_times[0] + final_solver.resolution_times[0]
-
-            f.write(f"\nFinal Delay     --->     objVal (UB) = {final_solver.m.ObjVal}    objBound (LB) = {final_solver.m.ObjBound}     Total time cluster heuristic = {hs_cluster_time}")
+            delay_assigned_agents = sum(a.delay for a in env.agents if a not in final_solver.critical_resources.removed_agents)
+            f.write(f"\nFinal Delay     --->     objVal (UB) = {final_solver.m.ObjVal + delay_assigned_agents}    objBound (LB) = {final_solver.m.ObjBound + delay_assigned_agents}    Total time cluster heuristic = {hs_cluster_time}")
 

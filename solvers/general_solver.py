@@ -14,7 +14,7 @@ class General_Solver:
         G: nx.Graph,
         od_pairs: List[OD_Pair],
         T: int,
-        max_time: int | None = 1200
+        max_time: int | None = 1800
     ):
         self.G = G
         self.od_pairs = od_pairs
