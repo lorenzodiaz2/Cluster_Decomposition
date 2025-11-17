@@ -13,10 +13,9 @@ class CMAPF_Solver(General_Solver):
         self,
         G: nx.Graph,
         od_pairs: List[OD_Pair],
-        T: int,
-        max_time: int | None = 1200
+        T: int
     ):
-        super().__init__(G, od_pairs, T, max_time)
+        super().__init__(G, od_pairs, T)
 
         self.V = list(self.G.nodes())
         self.x = None
@@ -27,11 +26,11 @@ class CMAPF_Solver(General_Solver):
 
     def solve(self):
         self.set_model()
-        self.optimize_model()
+        self._optimize_model()
         while self.status != "OPTIMAL":
-            self.T += 1
+            self.current_T += 1
             self.set_model()
-            self.optimize_model()
+            self._optimize_model()
         self.assign_solutions()
 
 
@@ -43,10 +42,10 @@ class CMAPF_Solver(General_Solver):
         self.m.Params.OutputFlag = 0
 
         self.compute_ub()
-        IDXs = [(a.id, v, t) for a in self.A for v in self.V for t in range(self.T + 1)]
+        IDXs = [(a.id, v, t) for a in self.A for v in self.V for t in range(self.current_T + 1)]
         self.x = self.m.addVars(IDXs, vtype=GRB.BINARY, ub=self.ub)
-        self.y = self.m.addVars(A_ids, range(self.T + 1), vtype=GRB.BINARY)
-        self.tau = self.m.addVars(A_ids, vtype=GRB.CONTINUOUS, lb=0, ub=self.T)
+        self.y = self.m.addVars(A_ids, range(self.current_T + 1), vtype=GRB.BINARY)
+        self.tau = self.m.addVars(A_ids, vtype=GRB.CONTINUOUS, lb=0, ub=self.current_T)
 
         for a in self.A:
             s, d = a.src, a.dst
@@ -56,10 +55,10 @@ class CMAPF_Solver(General_Solver):
             self.m.addConstr(self.y[a.id, 0] == 1)
 
             # Unicità di posizione
-            self.m.addConstrs(gp.quicksum(self.x[a.id, v, t] for v in self.V) == self.y[a.id, t] for t in range(self.T + 1))
+            self.m.addConstrs(gp.quicksum(self.x[a.id, v, t] for v in self.V) == self.y[a.id, t] for t in range(self.current_T + 1))
 
             # Transizione con attesa solo in src(a)
-            for t in range(self.T):
+            for t in range(self.current_T):
                 for u in self.V:
                     Ns = N[u] if u != s else N[u] + [s]
                     self.m.addConstr(self.x[a.id, u, t + 1] <= gp.quicksum(self.x[a.id, w, t] for w in Ns))
@@ -68,22 +67,22 @@ class CMAPF_Solver(General_Solver):
                     self.m.addConstr(self.x[a.id, u, t] <= gp.quicksum(self.x[a.id, w, t + 1] for w in Ns))
 
             # No cicli / stazionarietà tranne nella sorgente e destinazione
-            self.m.addConstrs(gp.quicksum(self.x[a.id, v, t] for t in range(self.T + 1)) <= 1 for v in self.V if v != s and v != d)
+            self.m.addConstrs(gp.quicksum(self.x[a.id, v, t] for t in range(self.current_T + 1)) <= 1 for v in self.V if v != s and v != d)
 
             # Niente rientro in sorgente
-            self.m.addConstrs(self.x[a.id, s, t + 1] <= self.x[a.id, s, t] for t in range(self.T))
+            self.m.addConstrs(self.x[a.id, s, t + 1] <= self.x[a.id, s, t] for t in range(self.current_T))
 
             # Aggiornamento della y
-            self.m.addConstrs(self.y[a.id, t + 1] == self.y[a.id, t] - self.x[a.id, d, t] for t in range(self.T))
+            self.m.addConstrs(self.y[a.id, t + 1] == self.y[a.id, t] - self.x[a.id, d, t] for t in range(self.current_T))
 
             # tau e ritardi
-            self.m.addConstr(self.tau[a.id] == gp.quicksum(self.x[a.id, d, t] * t for t in range(self.T + 1)))
+            self.m.addConstr(self.tau[a.id] == gp.quicksum(self.x[a.id, d, t] * t for t in range(self.current_T + 1)))
 
             # Arrivo solo una volta
-            self.m.addConstr(gp.quicksum(self.x[a.id, d, t] for t in range(self.T + 1)) == 1)
+            self.m.addConstr(gp.quicksum(self.x[a.id, d, t] for t in range(self.current_T + 1)) == 1)
 
         # Capacità dei nodi
-        self.m.addConstrs(gp.quicksum(self.x[a, v, t] for a in A_ids) <= self.G.nodes[v]["capacity"] for v in self.V for t in range(self.T + 1))
+        self.m.addConstrs(gp.quicksum(self.x[a, v, t] for a in A_ids) <= self.G.nodes[v]["capacity"] for v in self.V for t in range(self.current_T + 1))
 
         # Obiettivo
         self.m.setObjective(gp.quicksum(self.tau[a.id] - self.SP[a.src, a.dst] for a in self.A), GRB.MINIMIZE)
@@ -118,10 +117,10 @@ class CMAPF_Solver(General_Solver):
             for v in self.V:
                 ds = src_to_node[s, v]
                 dd = dst_to_node[d, v]
-                for t in range(self.T + 1):
+                for t in range(self.current_T + 1):
                     ban = (
                         ds == float('inf') or dd == float('inf') or
-                        ds > t or dd > (self.T - t)
+                        ds > t or dd > (self.current_T - t)
                     )
                     # corridor (opzionale): setta, e.g., self.W = 2 o 3
                     if hasattr(self, "W"):

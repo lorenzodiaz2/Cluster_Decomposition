@@ -40,7 +40,7 @@ class Environment:
         self.od_pairs = choose_pairs(self.G, self.num_pairs_per_quadrant, self.offset)
         for od_pair in self.od_pairs:
             od_pair.compute_k_shortest_paths(self.G, self.k)
-        self.T = max(len(od_pair.k_shortest_paths[self.k - 1].visits) - 1 for od_pair in self.od_pairs) + 10
+        self.T = max(len(od_pair.k_shortest_paths[self.k - 1].visits) - 1 for od_pair in self.od_pairs)
         for od_pair in self.od_pairs:
             od_pair.delay_shortest_paths(self.T)
         self.agents = [a for od_pair in self.od_pairs for a in od_pair.agents]
@@ -49,7 +49,14 @@ class Environment:
 
     def compute_clusters(self):
         start = time.time()
-        similarity_matrix = np.array([[0 if od_pair1.id == od_pair2.id else od_pair1.compute_similarity(od_pair2) for od_pair2 in self.od_pairs] for od_pair1 in self.od_pairs])
+        n = len(self.od_pairs)
+        similarity_matrix = np.array([[0 for _ in range(n)] for _ in range(n)])
+        for i in range(n):
+            for j in range(i + 1, n):
+                sim = self.od_pairs[i].compute_similarity(self.od_pairs[j])
+                similarity_matrix[i, j] = sim
+                similarity_matrix[j, i] = sim
+
         tree = TreePartition(similarity_matrix, self.od_pairs, self.max_cluster_size)
         self.clusters = tree.compute_clusters()
         self.cluster_time = time.time() - start

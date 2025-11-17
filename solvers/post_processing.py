@@ -18,8 +18,7 @@ class Critical_Resources:
         start = time.time()
         self.G = G
         self.od_pairs = od_pairs
-        self.tol = tol
-        self.starting_tol = tol if tol >= 0 else 0
+        self.current_tol = tol if tol >= 0 else 0
 
         self.cap = {v: G.nodes[v]["capacity"] for v in G.nodes}
         self.agents_per_resource = defaultdict(set)
@@ -29,7 +28,7 @@ class Critical_Resources:
                 self.agents_per_resource[(v, t)].add(a)
 
         self.residuals = {key: (self.cap[key[0]] - len(agents)) for key, agents in self.agents_per_resource.items()}
-        self.critical_resources = {key for key, res in self.residuals.items() if res < self.tol}
+        self.critical_resources = {key for key, res in self.residuals.items() if res < self.current_tol}
         self.critical_agents = {a for (v, t) in self.critical_resources for a in self.agents_per_resource[(v, t)]}
 
         self.od_by_agent = {}  # od_by_agent[a] -> od
@@ -44,16 +43,22 @@ class Critical_Resources:
                 self.od_by_agent[a] = od
 
         self.scores: dict[Agent, float] = {}
-        self.removed_agents = []
-        self.critical_pairs = {}
+        self.removed_agents = set()
         self.is_initially_feasible = all(res >= 0 for res in self.residuals.values())
+        self.left_od_pairs = set()
+        self.left_caps = None
 
         self._heap = []
         self._build_heap()
 
-        self.creation_time = time.time() - start
-        self.unassigning_time = None
-
+        # queste variabili mi servono solo per il salvataggio dei risultati, non per l'algoritmo
+        self.creation_times = []
+        self.creation_times.append(time.time() - start)
+        self.unassigning_times = []
+        self.starting_tol = tol if tol >= 0 else 0
+        self.removed_agents_per_tol = []
+        self.critical_resources_per_tol = []
+        self.critical_resources_per_tol.append(len(self.critical_resources))
 
 
     def assign_score(self, agents):
@@ -101,7 +106,17 @@ class Critical_Resources:
 
             self.assign_score(candidate_agents)
             self.recompute(max(self.scores, key=self.scores.get))
-        self.unassigning_time = time.time() - start
+
+        fixed = set(self.agents) - self.removed_agents
+        used_caps = defaultdict(int)
+        for agent in fixed:
+            for t, v in enumerate(agent.path.visits):
+                used_caps[v, t] += 1
+        self.left_caps = {(v, t): self.G.nodes[v]["capacity"] - used_cap for (v, t), used_cap in used_caps.items()}
+        self.left_od_pairs = set(od_pair for od_pair in self.od_pairs if any(agent in self.removed_agents for agent in od_pair.agents))
+
+        self.unassigning_times.append(time.time() - start)
+        self.removed_agents_per_tol.append(len(self.removed_agents))
 
 
     def recompute(self, agent):
@@ -114,7 +129,7 @@ class Critical_Resources:
             new_residual = self.residuals[key] + 1
             self.residuals[key] = new_residual
 
-            if new_residual < self.tol:
+            if new_residual < self.current_tol:
                 heapq.heappush(self._heap, (new_residual, key))
             else:
                 self.critical_resources.discard(key)
@@ -123,13 +138,16 @@ class Critical_Resources:
                 self.residuals.pop(key, None)
 
         self.critical_agents.discard(agent)
-        self.removed_agents.append(agent)
+        self.removed_agents.add(agent)
 
 
     def increment_tol(self, delta: int = 1) -> None:
-        self.tol += delta
+        start = time.time()
+        self.current_tol += delta
         self.residuals = {key: (self.cap[key[0]] - len(agents)) for key, agents in self.agents_per_resource.items()}
-        self.critical_resources = {key for key, res in self.residuals.items() if res < self.tol}
+        self.critical_resources = {key for key, res in self.residuals.items() if res < self.current_tol}
         self.critical_agents = {a for (v, t) in self.critical_resources for a in self.agents_per_resource[(v, t)]}
         self._build_heap()
 
+        self.creation_times.append(time.time() - start)
+        self.critical_resources_per_tol.append(len(self.critical_resources))

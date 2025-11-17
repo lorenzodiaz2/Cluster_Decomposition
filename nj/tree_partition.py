@@ -84,13 +84,8 @@ class TreePartition(NjTree):
         self.last_step(self.root)
         self.clusters = sorted(self.clusters, key=lambda x: x.n_paths, reverse=True)
 
-        clusters_list = sorted({
-            Cluster(idx, [pair for pair in self.od_pairs if pair.id in cluster_node.cluster])
-            for idx, cluster_node in enumerate(self.clusters)
-        }, key=lambda c: c.n_agents, reverse=True)
+        return [Cluster(idx, [pair for pair in self.od_pairs if pair.id in cluster_node.cluster]) for idx, cluster_node in enumerate(self.clusters)]
 
-        # self.merge_lightest(clusters_list)
-        return clusters_list
 
     def merge_lightest(self, clusters_list: List[Cluster]):
         last_but_one, last = clusters_list[-2:]

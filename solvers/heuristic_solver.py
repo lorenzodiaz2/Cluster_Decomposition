@@ -17,76 +17,77 @@ class Heuristic_Solver(General_Solver):
         G: nx.Graph,
         od_pairs: List[OD_Pair],
         T: int,
-        critical_resources: Critical_Resources | None = None,
-        max_time: int | None = 12000
+        critical_resources: Critical_Resources | None = None
     ):
-        super().__init__(G, od_pairs, T, max_time)
+        super().__init__(G, od_pairs, T)
 
         self.P = {}
-        self.K = {}
-        self.E = {}
+        self.K = defaultdict(list) # K[od] = {1, 2, ...}
+        self.E = defaultdict(list) # E[v, t] = [(od, j), ...]
         self.x = None
         self.critical_resources = critical_resources
-        self.lb = {}
 
 
 
     def solve(self):
-        self.set_model()
-        self.optimize_model()
+        self._set_model()
+        self._optimize_model()
         while self.status == "INFEASIBLE":
             if self.critical_resources:
-                print("aumento la tolleranza")
+                print("(tol+1)")
                 self.critical_resources.increment_tol()
+                print(f"{len(self.critical_resources.critical_resources)} critical resources", end="   ")
                 self.critical_resources.unassign_agents()
+                print(f"tolti {len(self.critical_resources.removed_agents)} agenti", end="   ")
             else:
-                self.T += 1
+                self.current_T += 1
                 for od_pair in self.od_pairs:
-                    od_pair.delay_shortest_paths(self.T)
-            self.set_model()
-            self.optimize_model()
-        self.assign_solutions()
+                    od_pair.delay_shortest_paths(self.current_T)
+            self._set_model()
+            self._optimize_model()
 
 
-    def set_model(self):
+    def _set_model(self):
         start = time.time()
-        self.P = {(od_pair, j): p for od_pair in self.od_pairs for j, p in enumerate(od_pair.all_paths)}
+        self._set_helper_variables()
+
+        self.m = gp.Model("heuristic")
+        self.m.Params.OutputFlag = 0
+
+        self._set_model_variables()
+
+        self.m.setObjective(gp.quicksum(self.x[od_pair.id, j] * (len(p.visits) - self.SP[od_pair.src, od_pair.dst]) for (od_pair, j), p in self.P.items()), GRB.MINIMIZE)
+        self.model_times.append(time.time() - start)
+        print("model created", end="   ")
+
+
+
+    def _set_helper_variables(self):
+        if self.critical_resources:
+            self.P = {(od_pair, j): p for od_pair in self.critical_resources.left_od_pairs for j, p in enumerate(od_pair.all_paths) if all(self.critical_resources.left_caps.get((v, t), self.G.nodes[v]["capacity"]) > 0 for t, v in enumerate(p.visits))}
+        else:
+            self.P = {(od_pair, j): p for od_pair in self.od_pairs for j, p in enumerate(od_pair.all_paths)}
+
         self.K = defaultdict(list) # K[od] = {1, 2, ...}
-        self.E = defaultdict(list)
+        self.E = defaultdict(list) # E[v, t] = [(od, j), ...]
 
         for od_pair, j in self.P.keys():
             self.K[od_pair].append(j)
             for t, v in enumerate(self.P[od_pair, j].visits):
                 self.E[v, t].append((od_pair, j))
 
-        self.m = gp.Model("heuristic")
-        self.m.Params.OutputFlag = 0
-
-        keys = [(od.id, j) for (od, j) in self.P.keys()]
-        self.compute_lb()
-        self.x = self.m.addVars(keys, vtype=GRB.INTEGER, lb=self.lb)
-        self.m.addConstrs(gp.quicksum(self.x[od_pair.id, j] for j in self.K[od_pair]) == len(od_pair.agents) for od_pair in self.od_pairs)
-        self.m.addConstrs(gp.quicksum(self.x[od_pair.id, j] for (od_pair, j) in self.E[v, t]) <= self.G.nodes[v]["capacity"] for (v, t) in self.E.keys())
-
-        self.m.setObjective(gp.quicksum(self.x[od_pair.id, j] * (len(self.P[od_pair, j].visits) - 1 - self.SP[od_pair.src, od_pair.dst]) for od_pair, j in self.P.keys()), GRB.MINIMIZE)
-        self.model_times.append(time.time() - start)
 
 
-    def compute_lb(self):
+    def _set_model_variables(self):
         if self.critical_resources:
-            removed = set(self.critical_resources.removed_agents)
-            keys = []
-            path_to_j = {}
-            lb = {}
-
-            for (od, j), p in self.P.items():
-                keys.append((od.id, j))
-                path_to_j[od, tuple(p.visits)] = j
-                lb[(od.id, j)] = 0
-
-            self.lb = {(od.id, path_to_j[od, tuple(a.path.visits)]): 0 if a in removed else 1 for od in self.od_pairs for a in od.agents}
+            self.x = self.m.addVars([(od.id, j) for (od, j) in self.P.keys()], vtype=GRB.INTEGER)
+            self.m.addConstrs(gp.quicksum(self.x[od_pair.id, j] for j in self.K[od_pair]) == sum(1 for a in od_pair.agents if a in self.critical_resources.removed_agents) for od_pair in self.critical_resources.left_od_pairs)
+            self.m.addConstrs(gp.quicksum(self.x[od_pair.id, j] for (od_pair, j) in self.E[v, t]) <= self.critical_resources.left_caps.get((v, t), self.G.nodes[v]["capacity"]) for (v, t) in self.E.keys())
         else:
-            self.lb = 0
+            self.x = self.m.addVars([(od.id, j) for (od, j) in self.P.keys()], vtype=GRB.INTEGER)
+            self.m.addConstrs(gp.quicksum(self.x[od_pair.id, j] for j in self.K[od_pair]) == len(od_pair.agents) for od_pair in self.od_pairs)
+            self.m.addConstrs(gp.quicksum(self.x[od_pair.id, j] for (od_pair, j) in self.E[v, t]) <= self.G.nodes[v]["capacity"] for (v, t) in self.E.keys())
+
 
 
     def assign_solutions(self):
@@ -95,7 +96,7 @@ class Heuristic_Solver(General_Solver):
             for (od_pair, j), p in self.P.items():
                 n_agents = round(self.x[od_pair.id, j].X)
                 if n_agents > 0:
-                    delay = len(p.visits) - 1 - self.SP[od_pair.src, od_pair.dst]
+                    delay = len(p.visits) - self.SP[od_pair.src, od_pair.dst]
                     for i in range(n_agents):
                         a = non_assigned_agents[od_pair.id][i]
                         a.path = Path(list(p.visits))

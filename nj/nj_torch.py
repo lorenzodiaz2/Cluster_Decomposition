@@ -58,7 +58,6 @@ class NjTree:
         # Prepara la matrice di distanza
         d = torch.tensor(self.d, device=self.device, dtype=torch.double)
         d = torch.max(d) + 1 - d
-        # d = 1 - (d - torch.min(d)) / (torch.max(d) - torch.min(d))
         d.fill_diagonal_(0)
 
         # Setup per NJ
