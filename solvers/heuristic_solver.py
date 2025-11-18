@@ -34,11 +34,9 @@ class Heuristic_Solver(General_Solver):
         self._optimize_model()
         while self.status == "INFEASIBLE":
             if self.critical_resources:
-                print("(tol+1)")
+                print("  (tol+1)  ")
                 self.critical_resources.increment_tol()
-                print(f"{len(self.critical_resources.critical_resources)} critical resources", end="   ")
                 self.critical_resources.unassign_agents()
-                print(f"tolti {len(self.critical_resources.removed_agents)} agenti", end="   ")
             else:
                 self.current_T += 1
                 for od_pair in self.od_pairs:
