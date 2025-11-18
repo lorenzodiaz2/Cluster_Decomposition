@@ -6,7 +6,7 @@ from utils.environment import Environment
 
 def run_scalability():
     # GRID_SIDE_values = [10, 20, 30, 50, 70, 90] #, 100, 120, 150, 180, 200, 250]
-    GRID_SIDE_values = [50, 70, 90] #, 100, 120, 150, 180, 200, 250]
+    GRID_SIDE_values = [30, 50, 70, 90] #, 100, 120, 150, 180, 200, 250]
 
 
     k_values = {
@@ -73,9 +73,11 @@ def run_scalability():
 
 
 def solve_complete(grid_side, num_pairs_per_quadrant, offset, k):
+    print("COMPLETA...", end="   ")
     env = Environment(grid_side, 0, num_pairs_per_quadrant, offset, k)
     complete_solver = Heuristic_Solver(env.G, env.od_pairs, env.T)
     complete_solver.solve()
+    print("RISOLTA")
     return env, complete_solver
 
 
