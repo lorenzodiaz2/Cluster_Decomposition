@@ -1,4 +1,5 @@
 import os
+import time
 
 from solvers.heuristic_solver import Heuristic_Solver
 from solvers.post_processing import Critical_Resources
@@ -27,7 +28,8 @@ def run_scalability():
     NUM_PAIRS_PER_QUADRANT_values = {
         10: [3, 5, 8, 10, 15],
         20: [8, 12, 15, 20, 30],
-        30: [10, 15, 25, 30, 45],
+        # 30: [10, 15, 25, 30, 45],
+        30: [30, 45],
         50: [20, 30, 40, 50, 65, 75],
         70: [30, 45, 60, 70, 80, 90, 100],
         90: [40, 60, 80, 90, 100, 120],
@@ -42,7 +44,8 @@ def run_scalability():
     OFFSET_values = {
         10: [-2, 0, 2, 5],
         20: [-5, -2, 0, 2, 5, 10],
-        30: [-7, -3, 0, 3, 7, 15],
+        # 30: [-7, -3, 0, 3, 7, 15],
+        30: [7, 15],
         50: [-12, -5, 0, 5, 12, 25],
         70: [-20, -12, -5, 0, 5, 12, 20, 35],
         90: [-25, -18, -12, -5, 0, 5, 12, 18, 25, 45],
@@ -73,11 +76,12 @@ def run_scalability():
 
 
 def solve_complete(grid_side, num_pairs_per_quadrant, offset, k):
-    print("COMPLETA...", end="   ")
+    print(f"COMPLETA results/grid/{grid_side * grid_side}/{num_pairs_per_quadrant * 4}/offset={offset}...", end=" ")
+    start = time.time()
     env = Environment(grid_side, 0, num_pairs_per_quadrant, offset, k)
     complete_solver = Heuristic_Solver(env.G, env.od_pairs, env.T)
     complete_solver.solve()
-    print("RISOLTA")
+    print(f"RISOLTA in {time.time() - start}")
     return env, complete_solver
 
 
@@ -130,20 +134,20 @@ def save_results(env, complete_solver, cluster_solvers, critical_resources, fina
 
 
 
-        f.write(f"\n{critical_resources.critical_resources_per_tol[0]} critical resources  Time {critical_resources.creation_times[0]}     ")
+        f.write(f"\n{critical_resources.critical_resources_per_tol[0]} critical resources  Time = {critical_resources.creation_times[0]}     ")
         hs_cluster_time += critical_resources.creation_times[0]
         if final_solver is None:
             f.write(f"\n\nSolution is already feasible    Total time cluster heuristic = {hs_cluster_time}")
         else:
-            f.write(f"Unassigned {critical_resources.removed_agents_per_tol[0]} Agents    Time {critical_resources.unassigning_times[0]}")
+            f.write(f"Unassigned {critical_resources.removed_agents_per_tol[0]} Agents    Time = {critical_resources.unassigning_times[0]}")
             hs_cluster_time += critical_resources.unassigning_times[0]
 
 
             diff = critical_resources.current_tol - critical_resources.starting_tol
             for i in range(1, diff + 1):
                 f.write(f"\nNo solution found     Time = {final_solver.resolution_times[i - 1]}   ->   Augmented tolerance\n")
-                f.write(f"\n{critical_resources.critical_resources_per_tol[i]} critical resources    Time {critical_resources.creation_times[i]}")
-                f.write(f"Unassigned {critical_resources.removed_agents_per_tol[i]} Agents    Time {critical_resources.unassigning_times[i]}")
+                f.write(f"\n{critical_resources.critical_resources_per_tol[i]} critical resources    Time = {critical_resources.creation_times[i]}     ")
+                f.write(f"Unassigned {critical_resources.removed_agents_per_tol[i]} Agents    Time = {critical_resources.unassigning_times[i]}")
                 hs_cluster_time += critical_resources.creation_times[i] + critical_resources.unassigning_times[i]
 
 
