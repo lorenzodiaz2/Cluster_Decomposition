@@ -5,7 +5,9 @@ from solvers.post_processing import Critical_Resources
 from utils.environment import Environment
 
 def run_scalability():
-    GRID_SIDE_values = [10, 20] #, 30] #, 50, 70] , 90, 100, 120, 150, 180, 200, 250]
+    # GRID_SIDE_values = [10, 20, 30, 50, 70, 90] #, 100, 120, 150, 180, 200, 250]
+    GRID_SIDE_values = [50, 70, 90] #, 100, 120, 150, 180, 200, 250]
+
 
     k_values = {
         10: 12,
@@ -55,23 +57,17 @@ def run_scalability():
     MAX_CLUSTER_SIZE_values = {(g, n): [int(n * 4 * 12 / d) for d in (8, 6, 4)] for g in GRID_SIDE_values for n in NUM_PAIRS_PER_QUADRANT_values[g]}
 
 
-    # for g in GRID_SIDE_values:
-    #     for n in NUM_PAIRS_PER_QUADRANT_values[g]:
-    #         if not os.path.isdir(f"results/grid/{g * g}/{n * 4}"):
-    #             os.makedirs(f"results/grid/{g * g}/{n * 4}")
-    #         for offset in OFFSET_values[g]:
-    #             print()
-    #             env, complete_solver = solve_complete(g, n, offset, k_values[g])
-    #             for s in MAX_CLUSTER_SIZE_values[(g, n)]:
-    #                 print(f"results/grid/{g * g}/{n * 4}/{int(s)}_{offset}_{k_values[g]}")
-    #                 env.max_cluster_size = s
-    #                 solve_clusters(env, complete_solver)
-    print("COMPLETO")
-    env, complete_solver = solve_complete(20, 30, 10, 15)
-
-    print("TERZO")
-    env.max_cluster_size = 360
-    solve_clusters(env, complete_solver)
+    for g in GRID_SIDE_values:
+        for n in NUM_PAIRS_PER_QUADRANT_values[g]:
+            if not os.path.isdir(f"results/grid/{g * g}/{n * 4}"):
+                os.makedirs(f"results/grid/{g * g}/{n * 4}")
+            for offset in OFFSET_values[g]:
+                print()
+                env, complete_solver = solve_complete(g, n, offset, k_values[g])
+                for s in MAX_CLUSTER_SIZE_values[(g, n)]:
+                    print(f"results/grid/{g * g}/{n * 4}/{int(s)}_{offset}_{k_values[g]}")
+                    env.max_cluster_size = s
+                    solve_clusters(env, complete_solver)
 
 
 
@@ -144,8 +140,9 @@ def save_results(env, complete_solver, cluster_solvers, critical_resources, fina
             diff = critical_resources.current_tol - critical_resources.starting_tol
             for i in range(1, diff + 1):
                 f.write(f"\nNo solution found     Time = {final_solver.resolution_times[i - 1]}   ->   Augmented tolerance\n")
-                f.write(f"\n{critical_resources.critical_resources_per_tol[i]} critical resources    Time {critical_resources.creation_times[i]}     ")
+                f.write(f"\n{critical_resources.critical_resources_per_tol[i]} critical resources    Time {critical_resources.creation_times[i]}")
                 f.write(f"Unassigned {critical_resources.removed_agents_per_tol[i]} Agents    Time {critical_resources.unassigning_times[i]}")
+                hs_cluster_time += critical_resources.creation_times[i] + critical_resources.unassigning_times[i]
 
 
             f.write(f"\n\nFinale solver: T = {final_solver.current_T}  ->   Model created   Time = {final_solver.model_times[critical_resources.current_tol]}   status = {final_solver.status}     Time = {final_solver.resolution_times[critical_resources.current_tol]}\n")
