@@ -47,19 +47,19 @@ class Heuristic_Solver(General_Solver):
 
     def _set_model(self):
         start = time.time()
-        self._set_helper_variables()
 
         self.m = gp.Model("heuristic")
         self.m.Params.OutputFlag = 0
 
-        self._set_model_variables()
+        self._set_variables()
+        self._set_constraints()
 
         self.m.setObjective(gp.quicksum(self.x[od_pair.id, j] * (len(p.visits) - self.SP[od_pair.src, od_pair.dst]) for (od_pair, j), p in self.P.items()), GRB.MINIMIZE)
         self.model_times.append(time.time() - start)
 
 
 
-    def _set_helper_variables(self):
+    def _set_variables(self):
         if self.critical_resources:
             self.P = {(od_pair, j): p for od_pair in self.critical_resources.critical_od_pairs for j, p in enumerate(od_pair.all_paths) if all(self.critical_resources.left_caps.get((v, t), self.G.nodes[v]["capacity"]) > 0 for t, v in enumerate(p.visits))}
         else:
@@ -73,10 +73,10 @@ class Heuristic_Solver(General_Solver):
             for t, v in enumerate(self.P[od_pair, j].visits):
                 self.E[v, t].append((od_pair, j))
 
-
-
-    def _set_model_variables(self):
         self.x = self.m.addVars([(od.id, j) for (od, j) in self.P.keys()], vtype=GRB.INTEGER)
+
+
+    def _set_constraints(self):
         if self.critical_resources:
             self.m.addConstrs(gp.quicksum(self.x[od_pair.id, j] for j in self.K[od_pair]) == sum(1 for a in od_pair.agents if a in self.critical_resources.removed_agents) for od_pair in self.critical_resources.critical_od_pairs)
             self.m.addConstrs(gp.quicksum(self.x[od_pair.id, j] for (od_pair, j) in self.E[v, t]) <= self.critical_resources.left_caps.get((v, t), self.G.nodes[v]["capacity"]) for (v, t) in self.E.keys())
@@ -88,13 +88,13 @@ class Heuristic_Solver(General_Solver):
 
     def assign_solutions(self):
         if self.status == "OPTIMAL" and self.m.SolCount > 0:
-            non_assigned_agents = {od_pair.id: [a for a in od_pair.agents] for od_pair in self.od_pairs} if not self.critical_resources else {od_pair.id: [a for a in od_pair.agents if a in self.critical_resources.removed_agents] for od_pair in self.critical_resources.critical_od_pairs}
+            not_assigned_agents = {od_pair.id: [a for a in od_pair.agents] for od_pair in self.od_pairs} if not self.critical_resources else {od_pair.id: [a for a in od_pair.agents if a in self.critical_resources.removed_agents] for od_pair in self.critical_resources.critical_od_pairs}
             for (od_pair, j), p in self.P.items():
                 n_agents = round(self.x[od_pair.id, j].X)
                 if n_agents > 0:
                     delay = len(p.visits) - self.SP[od_pair.src, od_pair.dst]
                     for i in range(n_agents):
-                        a = non_assigned_agents[od_pair.id][i]
+                        a = not_assigned_agents[od_pair.id][i]
                         a.path = Path(list(p.visits))
                         a.delay = delay
-                    del non_assigned_agents[od_pair.id][:n_agents]
+                    del not_assigned_agents[od_pair.id][:n_agents]
