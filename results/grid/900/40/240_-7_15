@@ -1,0 +1,7 @@
+GRID SIZE = 900     NUMBER OF TOTAL PAIRS = 40     MAX CLUSTER SIZE = 120    OFFSET = -7     k = 15     NUMBER OF AGENTS = 470
+
+Environment created     Time: 0.15446257591247559
+
+T = 10  ->   Model created   Time = 0.05250906944274902    status = OPTIMAL     Time = 0.06406784057617188
+
+Delay by solving all pairs     --->     objVal (UB) = 205.0    objBound (LB) = 205.0     Time = 0.1165769100189209
