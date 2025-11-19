@@ -1,0 +1,46 @@
+GRID SIZE = 2500     NUMBER OF TOTAL PAIRS = 260     MAX CLUSTER SIZE = 520    OFFSET = 12     k = 20     NUMBER OF AGENTS = 3102
+
+Environment created     Time: 62.630616426467896
+
+T = 61  ->   Model created   Time = 16.079854726791382    status = INFEASIBLE     Time = 3.567641019821167
+T = 62  ->   Model created   Time = 19.95823049545288    status = INFEASIBLE     Time = 5.532839298248291
+T = 63  ->   Model created   Time = 19.016961097717285    status = TIME_LIMIT     Time = 1800.4733107089996
+
+Delay by solving all pairs     --->     objVal (UB) = 2263.0    objBound (LB) = 2239.0     Time = 1864.6288373470306
+
+Created 10 clusters.  Time = 29.517503023147583
+     Cluster 0   number of agents = 508     pairs = [0, 1, 32, 40, 41, 42, 55, 56, 64, 96, 123, 134, 135, 138, 139, 142, 144, 145, 149, 152, 154, 155, 158, 159, 167, 168, 178, 179, 182, 185, 189, 190, 191, 193, 194, 198, 205, 210, 227, 228, 229, 249, 251]
+     Cluster 1   number of agents = 472     pairs = [13, 18, 30, 35, 45, 52, 54, 61, 67, 73, 85, 108, 121, 125, 129, 131, 141, 143, 147, 148, 157, 165, 176, 177, 180, 209, 212, 214, 217, 231, 232, 233, 238, 240, 246, 250, 253, 254, 259]
+     Cluster 2   number of agents = 458     pairs = [2, 5, 14, 16, 22, 25, 26, 27, 33, 38, 50, 58, 62, 71, 75, 86, 91, 92, 101, 105, 110, 120, 124, 130, 136, 137, 146, 150, 161, 162, 171, 173, 192, 201, 208, 215, 224, 243, 252]
+     Cluster 3   number of agents = 384     pairs = [4, 19, 43, 44, 48, 80, 90, 98, 99, 100, 104, 116, 119, 122, 126, 132, 153, 160, 195, 203, 206, 207, 216, 220, 222, 226, 235, 244, 247, 248, 255, 256]
+     Cluster 4   number of agents = 376     pairs = [6, 8, 11, 17, 21, 23, 24, 31, 36, 49, 72, 79, 82, 84, 94, 97, 102, 114, 115, 127, 133, 163, 169, 172, 175, 181, 184, 213, 239]
+     Cluster 5   number of agents = 338     pairs = [34, 46, 51, 53, 59, 65, 68, 77, 83, 88, 106, 107, 140, 151, 166, 183, 186, 188, 196, 199, 211, 218, 219, 221, 223, 225, 241, 242, 245, 257]
+     Cluster 6   number of agents = 286     pairs = [3, 12, 28, 70, 76, 81, 87, 89, 93, 95, 103, 109, 113, 118, 128, 156, 174, 197, 200, 202, 204, 230, 234, 237, 258]
+     Cluster 7   number of agents = 162     pairs = [10, 15, 20, 29, 47, 57, 63, 69, 111, 112, 164, 170, 187, 236]
+     Cluster 8   number of agents = 99     pairs = [7, 9, 39, 60, 66, 74, 78, 117]
+     Cluster 9   number of agents = 19     pairs = [37]
+
+Cluster 0: T = 63  ->   Model created   Time = 2.1737682819366455    status = OPTIMAL     Time = 4.246258020401001     --->     objVal (LB) = 315.0    objBound (UB) = 315.0
+Cluster 1: T = 63  ->   Model created   Time = 1.842069387435913    status = OPTIMAL     Time = 4.029412269592285     --->     objVal (LB) = 291.0    objBound (UB) = 291.0
+Cluster 2: T = 63  ->   Model created   Time = 1.8254156112670898    status = OPTIMAL     Time = 3.2461600303649902     --->     objVal (LB) = 288.0    objBound (UB) = 288.0
+Cluster 3: T = 63  ->   Model created   Time = 4.228347063064575    status = OPTIMAL     Time = 3.2042856216430664     --->     objVal (LB) = 260.0    objBound (UB) = 260.0
+Cluster 4: T = 63  ->   Model created   Time = 1.4588510990142822    status = OPTIMAL     Time = 2.776881456375122     --->     objVal (LB) = 197.0    objBound (UB) = 197.0
+Cluster 5: T = 63  ->   Model created   Time = 1.581425428390503    status = OPTIMAL     Time = 1.6865391731262207     --->     objVal (LB) = 120.0    objBound (UB) = 120.0
+Cluster 6: T = 63  ->   Model created   Time = 4.422543525695801    status = OPTIMAL     Time = 1.7100131511688232     --->     objVal (LB) = 151.0    objBound (UB) = 151.0
+Cluster 7: T = 63  ->   Model created   Time = 0.7498562335968018    status = OPTIMAL     Time = 0.7809574604034424     --->     objVal (LB) = 62.0    objBound (UB) = 62.0
+Cluster 8: T = 63  ->   Model created   Time = 0.45886993408203125    status = OPTIMAL     Time = 0.44630932807922363     --->     objVal (LB) = 44.0    objBound (UB) = 44.0
+Cluster 9: T = 63  ->   Model created   Time = 0.04553723335266113    status = OPTIMAL     Time = 0.03136873245239258     --->     objVal (LB) = 4.0    objBound (UB) = 4.0
+
+Delay by solving clusters = 1732.0     Time (without cluster creation) = 40.94486904144287
+
+1279 critical resources  Time = 1.307420015335083     Unassigned 1146 Agents    Time = 16.914384365081787
+No solution found     Time = 1.7765421867370605   ->   Augmented tolerance
+
+2847 critical resources    Time = 0.009377241134643555     Unassigned 1545 Agents    Time = 4.57102108001709
+No solution found     Time = 33.0306179523468   ->   Augmented tolerance
+
+3201 critical resources    Time = 0.009108304977416992     Unassigned 1948 Agents    Time = 5.155193090438843
+
+Finale solver: T = 63  ->   Model created   Time = 22.770076274871826   status = TIME_LIMIT     Time = 1800.2404963970184
+
+Final Delay     --->     objVal (UB) = 2575.0    objBound (LB) = 2564.0    Total time cluster heuristic = 1985.6653792858124

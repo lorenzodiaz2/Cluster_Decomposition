@@ -1,3 +1,5 @@
+# todo spostare la classe in OD_Pair
+
 class Agent:
     def __init__(self, agent_id, src, dst):
         self.id = agent_id

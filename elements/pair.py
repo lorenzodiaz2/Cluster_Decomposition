@@ -22,6 +22,7 @@ class OD_Pair:
         gen = nx.shortest_simple_paths(G, self.src, self.dst)
         self.k_shortest_paths = [Path(next(gen)) for _ in range(k)]
 
+    # todo provare a calcolare la similarità aggiungendo anche i delayed paths
     def compute_similarity(self, other) -> int:
         other_k_paths = other.k_shortest_paths
         similarity = sum(path1.compare(path2) for path1 in self.k_shortest_paths for path2 in other_k_paths) # * len(self.agents) * len(other.agents)
