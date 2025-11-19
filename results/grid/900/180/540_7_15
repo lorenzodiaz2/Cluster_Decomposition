@@ -1,0 +1,43 @@
+GRID SIZE = 900     NUMBER OF TOTAL PAIRS = 180     MAX CLUSTER SIZE = 540    OFFSET = 7     k = 15     NUMBER OF AGENTS = 2205
+
+Environment created     Time: 6.277470350265503
+
+T = 36  ->   Model created   Time = 3.369624614715576    status = INFEASIBLE     Time = 0.8364577293395996
+T = 37  ->   Model created   Time = 3.220304012298584    status = INFEASIBLE     Time = 0.9760034084320068
+T = 38  ->   Model created   Time = 3.801814079284668    status = TIME_LIMIT     Time = 1800.1006219387054
+
+Delay by solving all pairs     --->     objVal (UB) = 2272.0    objBound (LB) = 2231.0     Time = 1812.3048257827759
+
+Created 7 clusters.  Time = 5.971446990966797
+     Cluster 0   number of agents = 459     pairs = [3, 9, 15, 16, 18, 22, 24, 25, 26, 28, 31, 38, 45, 46, 51, 52, 53, 57, 58, 59, 60, 61, 62, 70, 72, 73, 81, 83, 87, 92, 101, 112, 124, 126, 141, 161, 176]
+     Cluster 1   number of agents = 457     pairs = [6, 11, 19, 29, 32, 35, 41, 65, 80, 94, 95, 97, 98, 99, 100, 106, 110, 116, 117, 120, 122, 123, 127, 130, 133, 135, 148, 149, 151, 155, 156, 158, 167, 168, 170, 173]
+     Cluster 2   number of agents = 398     pairs = [5, 7, 12, 23, 42, 43, 49, 56, 64, 66, 76, 77, 78, 82, 88, 90, 91, 103, 107, 108, 109, 114, 115, 118, 119, 128, 131, 132, 134, 137, 144, 152, 165, 172]
+     Cluster 3   number of agents = 354     pairs = [0, 2, 4, 8, 10, 13, 14, 20, 21, 27, 30, 33, 34, 37, 39, 40, 47, 48, 50, 55, 67, 69, 74, 75, 85, 86, 89, 111, 113, 139, 150, 153, 163]
+     Cluster 4   number of agents = 224     pairs = [1, 17, 44, 68, 96, 102, 105, 129, 136, 142, 143, 147, 159, 162, 164, 171, 175, 179]
+     Cluster 5   number of agents = 165     pairs = [54, 71, 79, 93, 104, 140, 145, 146, 154, 160, 169, 177]
+     Cluster 6   number of agents = 148     pairs = [36, 63, 84, 121, 125, 138, 157, 166, 174, 178]
+
+Cluster 0: T = 38  ->   Model created   Time = 0.5302913188934326    status = OPTIMAL     Time = 0.909876823425293     --->     objVal (LB) = 318.0    objBound (UB) = 318.0
+Cluster 1: T = 38  ->   Model created   Time = 0.478848934173584    status = OPTIMAL     Time = 1.0870916843414307     --->     objVal (LB) = 291.0    objBound (UB) = 291.0
+Cluster 2: T = 38  ->   Model created   Time = 0.49938464164733887    status = OPTIMAL     Time = 0.5537822246551514     --->     objVal (LB) = 183.0    objBound (UB) = 183.0
+Cluster 3: T = 38  ->   Model created   Time = 1.1117782592773438    status = OPTIMAL     Time = 0.4884800910949707     --->     objVal (LB) = 193.0    objBound (UB) = 193.0
+Cluster 4: T = 38  ->   Model created   Time = 0.26793527603149414    status = OPTIMAL     Time = 0.2527792453765869     --->     objVal (LB) = 129.0    objBound (UB) = 129.0
+Cluster 5: T = 38  ->   Model created   Time = 0.16506433486938477    status = OPTIMAL     Time = 0.1619405746459961     --->     objVal (LB) = 134.0    objBound (UB) = 134.0
+Cluster 6: T = 38  ->   Model created   Time = 0.17641592025756836    status = OPTIMAL     Time = 0.18225955963134766     --->     objVal (LB) = 81.0    objBound (UB) = 81.0
+
+Delay by solving clusters = 1329.0     Time (without cluster creation) = 6.865928888320923
+
+701 critical resources  Time = 0.25153136253356934     Unassigned 802 Agents    Time = 4.754314661026001
+No solution found     Time = 0.03813982009887695   ->   Augmented tolerance
+
+1100 critical resources    Time = 0.0033860206604003906     Unassigned 1082 Agents    Time = 1.1745994091033936
+No solution found     Time = 5.667481422424316   ->   Augmented tolerance
+
+1097 critical resources    Time = 0.0032753944396972656     Unassigned 1350 Agents    Time = 1.2049121856689453
+No solution found     Time = 0.9938466548919678   ->   Augmented tolerance
+
+1280 critical resources    Time = 0.0031075477600097656     Unassigned 1628 Agents    Time = 1.2628428936004639
+
+Finale solver: T = 38  ->   Model created   Time = 3.9463491439819336   status = TIME_LIMIT     Time = 1800.055139541626
+
+Final Delay     --->     objVal (UB) = 2489.0    objBound (LB) = 2450.0    Total time cluster heuristic = 1843.0779132843018
