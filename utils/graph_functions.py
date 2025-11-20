@@ -36,7 +36,7 @@ def set_capacities(G, od_pairs, seed: int | None = 42):
 
     for v in V:
         if v not in od_nodes:
-            G.nodes[v]["capacity"] = rng.randrange(5, 6) #############
+            G.nodes[v]["capacity"] = rng.randrange(3, 4) #############
 
 
 

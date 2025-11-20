@@ -6,8 +6,9 @@ from solvers.post_processing import Critical_Resources
 from utils.environment import Environment
 from utils.results_io import save_results
 
-# todo gestire il cado in cui i cluster non vengono risolti
+# todo gestire il caso in cui i cluster non vengono risolti
 # todo update solo del caso griglia = 50, 75 pairs per quadrant, offset -12 e -5
+# todo vedere dove crea la cartella dei results
 
 def run_scalability():
     # GRID_SIDE_values = [10, 20, 30, 50, 70, 90] #, 100, 120, 150, 180, 200, 250]

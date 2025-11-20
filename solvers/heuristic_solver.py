@@ -38,6 +38,7 @@ class Heuristic_Solver(General_Solver):
                 self.critical_resources.increment_tol()
                 self.critical_resources.unassign_agents()
             else:
+                print("  (T+1)  ", end="")
                 self.current_T += 1
                 for od_pair in self.od_pairs:
                     od_pair.delay_shortest_paths(self.current_T)
