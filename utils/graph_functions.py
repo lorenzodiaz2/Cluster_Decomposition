@@ -89,7 +89,7 @@ def choose_pairs(
                 if src == dst or ((src, dst) in seen_pairs) or src not in G.nodes or dst not in G.nodes:
                     continue
 
-                number_of_agents = rng.randrange(5, 20)
+                number_of_agents = rng.randrange(1, 2)
                 agents = [Agent(i, src, dst) for i in range(total_agents, total_agents + number_of_agents)]
 
                 pair_id = generated + pairs_per_quadrant * (2 * x + y)
