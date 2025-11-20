@@ -8,4 +8,22 @@ T = 63  ->   Model created   Time = 7.781737565994263    status = OPTIMAL     Ti
 
 Delay by solving all pairs     --->     objVal (UB) = 788.0    objBound (LB) = 788.0     Time = 46.58707547187805
 
-Created clusters
+Created 3 clusters.  Time = 6.4400389194488525
+     Cluster 0   number of agents = 625     pairs = [0, 1, 2, 3, 4, 6, 8, 11, 12, 17, 19, 21, 23, 24, 30, 33, 35, 38, 46, 47, 50, 51, 52, 53, 57, 58, 59, 60, 61, 62, 63, 70, 72, 76, 79, 80, 81, 82, 84, 87, 88, 89, 91, 92, 101, 105, 106, 108, 110, 111, 112, 117]
+     Cluster 1   number of agents = 589     pairs = [5, 7, 9, 10, 13, 14, 15, 16, 18, 20, 22, 25, 26, 29, 31, 32, 34, 36, 40, 41, 42, 44, 49, 55, 56, 64, 65, 66, 67, 68, 69, 73, 74, 75, 77, 78, 83, 85, 86, 90, 93, 95, 96, 97, 98, 99, 100, 102, 103, 104, 113, 114, 115, 116, 118, 119]
+     Cluster 2   number of agents = 168     pairs = [27, 28, 37, 39, 43, 45, 48, 54, 71, 94, 107, 109]
+
+Cluster 0: T = 63  ->   Model created   Time = 3.540673017501831    status = OPTIMAL     Time = 0.8746457099914551     --->     objVal (LB) = 387.0    objBound (UB) = 387.0
+Cluster 1: T = 63  ->   Model created   Time = 3.957383871078491    status = OPTIMAL     Time = 5.0026397705078125     --->     objVal (LB) = 281.0    objBound (UB) = 281.0
+Cluster 2: T = 63  ->   Model created   Time = 1.469529390335083    status = OPTIMAL     Time = 0.362593412399292     --->     objVal (LB) = 82.0    objBound (UB) = 82.0
+
+Delay by solving clusters = 750.0     Time (without cluster creation) = 15.207465171813965
+
+202 critical resources  Time = 0.5827059745788574     Unassigned 246 Agents    Time = 2.3965935707092285
+No solution found     Time = 0.661942720413208   ->   Augmented tolerance
+
+2140 critical resources    Time = 0.005687713623046875     Unassigned 471 Agents    Time = 1.948033094406128
+
+Finale solver: T = 63  ->   Model created   Time = 9.044099807739258   status = OPTIMAL     Time = 12.29946494102478
+
+Final Delay     --->     objVal (UB) = 876.0    objBound (LB) = 876.0    Total time cluster heuristic = 52.53498435020447

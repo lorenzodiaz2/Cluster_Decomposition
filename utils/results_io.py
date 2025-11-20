@@ -62,14 +62,9 @@ def read_files():
     for dir_grid_size in natsorted(os.listdir(results_dir)):
         for dir_n_od in natsorted(os.listdir(os.path.join(results_dir, dir_grid_size))):
             files_name = sorted(os.listdir(os.path.join(results_dir, dir_grid_size, dir_n_od)), key=key_fun)
-            for i in range(int(len(files_name) / 3)):
-                with open(os.path.join(results_dir, dir_grid_size, dir_n_od, files_name[i * 3]), "r") as f:
+            for i in range(int(len(files_name) / 4)):
+                with open(os.path.join(results_dir, dir_grid_size, dir_n_od, files_name[i * 4]), "r") as f:
                     lines = f.readlines()
-                split = f"MAX CLUSTER SIZE = {files_name[i * 3].split("_")[0]}"
-                sx = lines[0].split(split)[0]
-                dx = lines[0].split(split)[1].strip()
-                print()
-                print(f"\n{sx}{dx}")
 
                 for j in range(len(lines)):
                     if "Delay by solving all pairs" in lines[j]:
@@ -79,7 +74,7 @@ def read_files():
                         time_complete_solver = float(lines[j].split("Time = ")[1].strip().split()[0])
                         print(f"Heuristic to all pairs                 ->                                           status = {status_complete_solver}  objValue = {obj_value_complete}  objBound = {obj_bound_complete}  Time = {time_complete_solver}")
 
-                for j in range(i * 3, i * 3 + 3):
+                for j in range(i * 4, i * 4 + 4):
                     n_clusters = 0
                     n_unassigned_agents = 0
                     status = ""
@@ -112,7 +107,9 @@ def read_files():
                             total_time = lines[z].split("Total time cluster heuristic = ")[1].split()[0]
 
                     if not is_already_feasible:
-                        print(f"Heuristic to cluster (max size = {files_name[j].split("_")[0]})  ->  {n_clusters} clusters ({"OK" if all_cluster_feasible else "NOT OK"})  {n_unassigned_agents} unassigned agents  status = {status}  objValue = {obj_val}  objBound = {obj_bound}  Time = {total_time}")
+                        size = files_name[j].split("_")[0]
+                        cluster_status = "OK" if all_cluster_feasible else "NOT OK"
+                        print(f"Heuristic to cluster (max size = {size})  ->  {n_clusters} clusters ({cluster_status})  {n_unassigned_agents} unassigned agents  status = {status}  objValue = {obj_val}  objBound = {obj_bound}  Time = {total_time}")
 
 
 
@@ -123,4 +120,4 @@ def key_fun(s):
     return a2, a1, a3
 
 
-# read_files()
+read_files()

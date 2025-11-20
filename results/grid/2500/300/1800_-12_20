@@ -8,5 +8,3 @@ T = 23  ->   Model created   Time = 2.1361300945281982    status = INFEASIBLE   
 T = 24  ->   Model created   Time = 2.317702531814575    status = TIME_LIMIT     Time = 1800.1598048210144
 
 Delay by solving all pairs     --->     objVal (UB) = 3605.0    objBound (LB) = 3604.0     Time = 1810.4815347194672
-
-Created clusters

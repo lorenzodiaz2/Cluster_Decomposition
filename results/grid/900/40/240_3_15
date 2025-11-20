@@ -6,3 +6,20 @@ T = 28  ->   Model created   Time = 0.5268471240997314    status = INFEASIBLE   
 T = 29  ->   Model created   Time = 0.5808925628662109    status = OPTIMAL     Time = 0.4570751190185547
 
 Delay by solving all pairs     --->     objVal (UB) = 257.0    objBound (LB) = 257.0     Time = 1.623790979385376
+
+Created 3 clusters.  Time = 0.2953922748565674
+     Cluster 0   number of agents = 225     pairs = [12, 13, 14, 17, 18, 21, 25, 26, 27, 28, 29, 30, 31, 34, 35, 36, 37, 38]
+     Cluster 1   number of agents = 224     pairs = [0, 1, 2, 3, 4, 5, 6, 7, 9, 11, 15, 16, 19, 20, 22, 23, 24, 32, 33, 39]
+     Cluster 2   number of agents = 28     pairs = [8, 10]
+
+Cluster 0: T = 29  ->   Model created   Time = 0.25443100929260254    status = OPTIMAL     Time = 0.02200007438659668     --->     objVal (LB) = 136.0    objBound (UB) = 136.0
+Cluster 1: T = 29  ->   Model created   Time = 0.3013293743133545    status = OPTIMAL     Time = 0.24282073974609375     --->     objVal (LB) = 95.0    objBound (UB) = 95.0
+Cluster 2: T = 29  ->   Model created   Time = 0.02392745018005371    status = OPTIMAL     Time = 0.006743192672729492     --->     objVal (LB) = 16.0    objBound (UB) = 16.0
+
+Delay by solving clusters = 247.0     Time (without cluster creation) = 0.8512518405914307
+
+19 critical resources  Time = 0.03402376174926758     Unassigned 30 Agents    Time = 0.0562593936920166
+
+Finale solver: T = 29  ->   Model created   Time = 0.17148065567016602   status = OPTIMAL     Time = 0.009856462478637695
+
+Final Delay     --->     objVal (UB) = 298.0    objBound (LB) = 298.0    Total time cluster heuristic = 1.418264389038086

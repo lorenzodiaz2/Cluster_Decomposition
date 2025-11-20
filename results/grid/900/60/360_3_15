@@ -7,3 +7,26 @@ T = 29  ->   Model created   Time = 0.8392319679260254    status = INFEASIBLE   
 T = 30  ->   Model created   Time = 0.8921053409576416    status = OPTIMAL     Time = 0.7553107738494873
 
 Delay by solving all pairs     --->     objVal (UB) = 302.0    objBound (LB) = 302.0     Time = 3.4071788787841797
+
+Created 3 clusters.  Time = 0.669623851776123
+     Cluster 0   number of agents = 331     pairs = [0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 14, 17, 21, 22, 25, 26, 31, 34, 35, 36, 37, 42, 45, 47, 48, 50, 52, 55, 56, 57]
+     Cluster 1   number of agents = 326     pairs = [8, 13, 15, 16, 18, 19, 20, 23, 24, 27, 28, 29, 30, 32, 33, 38, 39, 40, 41, 43, 44, 46, 49, 51, 53, 54, 58, 59]
+     Cluster 2   number of agents = 36     pairs = [7, 11]
+
+Cluster 0: T = 30  ->   Model created   Time = 0.26116323471069336    status = OPTIMAL     Time = 0.30837488174438477     --->     objVal (LB) = 143.0    objBound (UB) = 143.0
+Cluster 1: T = 30  ->   Model created   Time = 0.41707944869995117    status = OPTIMAL     Time = 0.030462980270385742     --->     objVal (LB) = 146.0    objBound (UB) = 146.0
+Cluster 2: T = 30  ->   Model created   Time = 0.02229762077331543    status = OPTIMAL     Time = 0.010147809982299805     --->     objVal (LB) = 8.0    objBound (UB) = 8.0
+
+Delay by solving clusters = 297.0     Time (without cluster creation) = 1.0495259761810303
+
+35 critical resources  Time = 0.24042201042175293     Unassigned 52 Agents    Time = 0.13532280921936035
+No solution found     Time = 0.0014643669128417969   ->   Augmented tolerance
+
+916 critical resources    Time = 0.0015413761138916016     Unassigned 171 Agents    Time = 0.2260735034942627
+No solution found     Time = 0.23425674438476562   ->   Augmented tolerance
+
+903 critical resources    Time = 0.00171661376953125     Unassigned 292 Agents    Time = 0.20664453506469727
+
+Finale solver: T = 30  ->   Model created   Time = 1.03682279586792   status = OPTIMAL     Time = 0.5501236915588379
+
+Final Delay     --->     objVal (UB) = 317.0    objBound (LB) = 317.0    Total time cluster heuristic = 5.291516304016113

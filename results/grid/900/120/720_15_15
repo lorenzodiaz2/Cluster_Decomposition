@@ -8,3 +8,23 @@ T = 46  ->   Model created   Time = 3.1277003288269043    status = INFEASIBLE   
 T = 47  ->   Model created   Time = 3.6678905487060547    status = TIME_LIMIT     Time = 1800.112723350525
 
 Delay by solving all pairs     --->     objVal (UB) = 1343.0    objBound (LB) = 1338.0     Time = 1815.6711993217468
+
+Created 3 clusters.  Time = 3.4078407287597656
+     Cluster 0   number of agents = 711     pairs = [0, 3, 4, 5, 7, 10, 13, 15, 17, 20, 32, 33, 34, 35, 36, 38, 39, 41, 42, 43, 44, 46, 47, 48, 51, 55, 56, 59, 61, 66, 69, 70, 75, 76, 80, 82, 83, 84, 85, 86, 87, 89, 90, 92, 94, 95, 96, 100, 105, 106, 107, 108, 109, 111, 112, 114, 115, 117]
+     Cluster 1   number of agents = 635     pairs = [1, 2, 6, 9, 12, 14, 16, 18, 19, 21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 37, 40, 45, 52, 53, 54, 57, 58, 62, 63, 64, 65, 67, 68, 71, 72, 73, 74, 77, 78, 79, 81, 91, 93, 97, 99, 102, 103, 104, 110, 116, 118, 119]
+     Cluster 2   number of agents = 134     pairs = [8, 11, 24, 49, 50, 60, 88, 98, 101, 113]
+
+Cluster 0: T = 47  ->   Model created   Time = 1.4928300380706787    status = OPTIMAL     Time = 0.29425764083862305     --->     objVal (LB) = 560.0    objBound (UB) = 560.0
+Cluster 1: T = 47  ->   Model created   Time = 1.3980121612548828    status = OPTIMAL     Time = 1.8880088329315186     --->     objVal (LB) = 395.0    objBound (UB) = 395.0
+Cluster 2: T = 47  ->   Model created   Time = 0.7625339031219482    status = OPTIMAL     Time = 0.033388376235961914     --->     objVal (LB) = 104.0    objBound (UB) = 104.0
+
+Delay by solving clusters = 1059.0     Time (without cluster creation) = 5.869030952453613
+
+495 critical resources  Time = 0.2511012554168701     Unassigned 403 Agents    Time = 2.196298599243164
+No solution found     Time = 0.23690176010131836   ->   Augmented tolerance
+
+1033 critical resources    Time = 0.004639387130737305     Unassigned 647 Agents    Time = 1.0865364074707031
+
+Finale solver: T = 47  ->   Model created   Time = 3.8501992225646973   status = OPTIMAL     Time = 15.599317073822021
+
+Final Delay     --->     objVal (UB) = 1603.0    objBound (LB) = 1603.0    Total time cluster heuristic = 34.308961391448975
