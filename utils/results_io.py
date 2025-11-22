@@ -4,14 +4,14 @@ from natsort import natsorted
 
 
 def save_results(env, complete_solver, cluster_solvers, critical_resources, final_solver):
-    file_path = f"results/grid/{env.grid_side * env.grid_side}/{env.num_pairs_per_quadrant * 4}"
+    file_path = f"results/grid/{env.grid_side * env.grid_side}/{env.n_pairs_per_quadrant * 4}"
     file_name = file_path + f"/{int(env.max_cluster_size)}_{env.offset}_{env.k}"
 
     hs_all_time = 0
     hs_cluster_time = 0
 
     with open(file_name, "w") as f:
-        f.write(f"GRID SIZE = {env.grid_side * env.grid_side}     NUMBER OF TOTAL PAIRS = {env.num_pairs_per_quadrant * 4}     MAX CLUSTER SIZE = {env.max_cluster_size}    OFFSET = {env.offset}     k = {env.k}     NUMBER OF AGENTS = {len(env.agents)}\n")
+        f.write(f"GRID SIZE = {env.grid_side * env.grid_side}     NUMBER OF TOTAL PAIRS = {env.n_pairs_per_quadrant * 4}     MAX CLUSTER SIZE = {env.max_cluster_size}    OFFSET = {env.offset}     k = {env.k}     NUMBER OF AGENTS = {len(env.agents)}\n")
         f.write(f"\nEnvironment created     Time: {env.set_time}\n")
         diff = complete_solver.current_T - complete_solver.starting_T
         for i in range(diff + 1):
