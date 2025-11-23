@@ -3,15 +3,13 @@ import os
 from natsort import natsorted
 
 
-def save_results(env, complete_solver, cluster_solvers, critical_resources, final_solver):
-    file_path = f"results/grid/{env.grid_side * env.grid_side}/{env.n_pairs_per_quadrant * 4}"
-    file_name = file_path + f"/{int(env.max_cluster_size)}_{env.offset}_{env.k}"
-
+def save_results(env, complete_solver, cluster_solvers, critical_resources, final_solver, i):
     hs_all_time = 0
     hs_cluster_time = 0
 
-    with open(file_name, "w") as f:
-        f.write(f"GRID SIZE = {env.grid_side * env.grid_side}     NUMBER OF TOTAL PAIRS = {env.n_pairs_per_quadrant * 4}     MAX CLUSTER SIZE = {env.max_cluster_size}    OFFSET = {env.offset}     k = {env.k}     NUMBER OF AGENTS = {len(env.agents)}\n")
+    with open("scalability_results", "a") as f:
+        f.write(f"NUMBER OF QUADRANTS = {env.n_quadrants}     NUMBER OF TOTAL PAIRS = {env.n_pairs_per_quadrant * env.n_quadrants}     MAX CLUSTER SIZE = {env.max_cluster_size}     k = {env.k}\n")
+        f.write(f"Iteration {i}\n")
         f.write(f"\nEnvironment created     Time: {env.set_time}\n")
         diff = complete_solver.current_T - complete_solver.starting_T
         for i in range(diff + 1):
@@ -53,6 +51,9 @@ def save_results(env, complete_solver, cluster_solvers, critical_resources, fina
                 hs_cluster_time += final_solver.model_times[i] + final_solver.resolution_times[i]
             delay_assigned_agents = sum(a.delay for a in env.agents if a not in final_solver.critical_resources.removed_agents)
             f.write(f"\nFinal Delay     --->     objVal (UB) = {final_solver.m.ObjVal + delay_assigned_agents}    objBound (LB) = {final_solver.m.ObjBound + delay_assigned_agents}    Total time cluster heuristic = {hs_cluster_time}")
+
+        f.write("\n\n========================================================================================\n")
+        f.write("========================================================================================\n\n")
 
 
 def read_files():
@@ -119,5 +120,3 @@ def key_fun(s):
     a1, a2, a3 = map(int, s.split("_"))
     return a2, a1, a3
 
-
-read_files()

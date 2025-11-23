@@ -9,7 +9,6 @@ from elements.agent import Agent
 from elements.cluster import Cluster
 from elements.pair import OD_Pair
 from nj.tree_partition import TreePartition
-from utils.plot_functions import plot_graph
 
 Coord = tuple[int, int]
 Quadrant = tuple[Coord, Coord]
@@ -105,7 +104,6 @@ class Environment:
                 self.od_pairs.append(od_pair)
                 i += 1
                 n_tot_agents += len(od_pair.agents)
-            plot_graph(self.G, self.od_pairs[-self.n_pairs_per_quadrant:])
 
 
     def _choose_pair(
