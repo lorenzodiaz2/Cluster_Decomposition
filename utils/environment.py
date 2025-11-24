@@ -9,6 +9,7 @@ from elements.agent import Agent
 from elements.cluster import Cluster
 from elements.pair import OD_Pair
 from nj.tree_partition import TreePartition
+from utils.plot_functions import plot_graph
 
 Coord = tuple[int, int]
 Quadrant = tuple[Coord, Coord]
@@ -45,6 +46,7 @@ class Environment:
         self.remove_rnd_nodes_flag = remove_rnd_nodes_flag
         self.remove_percentage = remove_percentage
         self.quadrants: List[Quadrant] = []
+        self.quadrant_by_od: dict[int, Quadrant] = {}
 
         self._set_environment()
 
@@ -55,7 +57,10 @@ class Environment:
         self._choose_pairs()
         self._set_capacities()
         for od_pair in self.od_pairs:
-            od_pair.compute_k_shortest_paths(self.G, self.k)
+            quadrant = self.quadrant_by_od[od_pair.id]
+            sub_graph = self._subgraph_for_quadrant(quadrant)
+            od_pair.compute_k_shortest_paths(sub_graph, self.k)
+
         self.T = max(len(od_pair.k_shortest_paths[self.k - 1].visits) - 1 for od_pair in self.od_pairs)
         for od_pair in self.od_pairs:
             od_pair.delay_shortest_paths(self.T)
@@ -75,6 +80,7 @@ class Environment:
 
         tree = TreePartition(similarity_matrix, self.od_pairs, self.max_cluster_size)
         self.clusters = tree.compute_clusters()
+        # self.clusters = [Cluster(idx, [od for od in self.od_pairs if self.quadrant_by_od[od.id] == quadrant]) for idx, quadrant in enumerate(self.quadrants)]
         self.cluster_time = time.time() - start
 
 
@@ -106,6 +112,8 @@ class Environment:
                 i += 1
                 n_tot_agents += len(od_pair.agents)
                 seen.add((od_pair.src, od_pair.dst))
+                self.quadrant_by_od[od_pair.id] = quadrant
+            # plot_graph(self.G, self.od_pairs[-self.n_pairs_per_quadrant:])
 
 
     def _choose_pair(
@@ -194,6 +202,14 @@ class Environment:
         for v in V:
             if v not in od_nodes:
                 self.G.nodes[v]["capacity"] = self.rng.randrange(5, 6)  #############
+
+
+    def _subgraph_for_quadrant(self, quadrant: Quadrant) -> nx.Graph:
+        (top, left), (bottom, right) = quadrant
+        nodes = [(i, j) for i in range(top, bottom + 1) for j in range(left, right + 1)]
+
+        return self.G.subgraph(nodes).copy()
+
 
 
     @staticmethod

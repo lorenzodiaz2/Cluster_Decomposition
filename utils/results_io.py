@@ -56,6 +56,79 @@ def save_results(env, complete_solver, cluster_solvers, critical_resources, fina
         f.write("========================================================================================\n\n")
 
 
+def read_scalability_results():
+    with open("scalability_results", "r") as f:
+        lines = f.readlines()
+
+    n_clusters = 0
+    n_unassigned_agents = 0
+    status = ""
+    iteration = ""
+    is_already_feasible = False
+    all_cluster_feasible = True
+
+    for j in range(len(lines)):
+        if "NUMBER OF QUADRANTS = " in lines[j]:
+            n_quadrants = lines[j].split("NUMBER OF QUADRANTS = ")[1].split()[0]
+            n_pairs = lines[j].split("NUMBER OF TOTAL PAIRS = ")[1].split()[0]
+            n_agents = lines[j].split("NUMBER OF TOTAL AGENTS = ")[1].split()[0]
+            cluster_size = lines[j].split("MAX CLUSTER SIZE = ")[1].split()[0]
+            iteration = lines[j + 1].split()[1]
+            if iteration == "0":
+                print(f"NUMBER OF QUADRANTS = {n_quadrants}     NUMBER OF TOTAL PAIRS = {n_pairs}     NUMBER OF TOTAL AGENTS = {n_agents}     MAX CLUSTER SIZE = {cluster_size}\n")
+            print(f"    ITERATION {iteration}")
+
+
+        if "Delay by solving all pairs" in lines[j]:
+            read_delay(lines[j - 2], lines[j])
+
+
+        if "Created" in lines[j] and "clusters" in lines[j]:
+            n_clusters = lines[j].split()[1]
+
+        if "Cluster 0:" in lines[j]:
+            for c in range(int(n_clusters)):
+                cluster_status = lines[j + c].split("status = ")[1].split()[0]
+                if cluster_status != "OPTIMAL":
+                    all_cluster_feasible = False
+                    break
+
+        if "Solution is already feasible" in lines[j]:
+            is_already_feasible = True
+
+        if "Finale solver" in lines[j]:
+            status = lines[j].split("status = ")[1].split()[0]
+            n_unassigned_agents = lines[j - 2].split("Unassigned ")[1].split()[0]
+        if "Final Delay" in lines[j]:
+            obj_val, obj_bound, total_time = read_val_time(lines[j])
+
+            if not is_already_feasible:
+                cluster_status = "OK" if all_cluster_feasible else "NOT OK"
+                print(f"        Heuristic to cluster ({n_clusters} clusters ({cluster_status}))          ->         {n_unassigned_agents} unassigned agents  status = {status}  objValue = {obj_val}  objBound = {obj_bound}  Time = {total_time}")
+            else:
+                print(f"        Cluster solution is already feasible")
+            print()
+
+            if iteration == "4":
+                print("\n================================================================================================================================================================================\n\n")
+
+
+
+def read_delay(status_line, val_time_line):
+    status_complete_solver = status_line.split("status = ")[1].strip().split()[0]
+    obj_value_complete = float(val_time_line.split("objVal (UB) = ")[1].strip().split()[0])
+    obj_bound_complete = float(val_time_line.split("objBound (LB) = ")[1].strip().split()[0])
+    time_complete_solver = float(val_time_line.split("Time = ")[1].strip().split()[0])
+    print(f"        Heuristic to all pairs                           ->                                 status = {status_complete_solver}  objValue = {obj_value_complete}  objBound = {obj_bound_complete}  Time = {time_complete_solver}")
+
+
+def read_val_time(line):
+    obj_val = line.split("objVal (UB) = ")[1].split()[0]
+    obj_bound = line.split("objBound (LB) = ")[1].split()[0]
+    total_time = line.split("Total time cluster heuristic = ")[1].split()[0]
+    return obj_val, obj_bound, total_time
+
+
 def read_files():
     project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     results_dir = os.path.join(project_dir, "results/grid")
@@ -69,12 +142,7 @@ def read_files():
 
                 for j in range(len(lines)):
                     if "Delay by solving all pairs" in lines[j]:
-                        status_complete_solver = lines[j - 2].split("status = ")[1].strip().split()[0]
-                        obj_value_complete = float(lines[j].split("objVal (UB) = ")[1].strip().split()[0])
-                        obj_bound_complete = float(lines[j].split("objBound (LB) = ")[1].strip().split()[0])
-                        time_complete_solver = float(lines[j].split("Time = ")[1].strip().split()[0])
-                        print(f"Heuristic to all pairs                 ->                                           status = {status_complete_solver}  objValue = {obj_value_complete}  objBound = {obj_bound_complete}  Time = {time_complete_solver}")
-
+                        read_delay(lines[j - 2], lines[j])
                 for j in range(i * 4, i * 4 + 4):
                     n_clusters = 0
                     n_unassigned_agents = 0
@@ -103,9 +171,8 @@ def read_files():
                             status = lines[z].split("status = ")[1].split()[0]
                             n_unassigned_agents = lines[z - 2].split("Unassigned ")[1].split()[0]
                         if "Final Delay" in lines[z]:
-                            obj_val = lines[z].split("objVal (UB) = ")[1].split()[0]
-                            obj_bound = lines[z].split("objBound (LB) = ")[1].split()[0]
-                            total_time = lines[z].split("Total time cluster heuristic = ")[1].split()[0]
+                            obj_val, obj_bound, total_time = read_val_time(lines[z])
+
 
                     if not is_already_feasible:
                         size = files_name[j].split("_")[0]
@@ -119,4 +186,3 @@ def read_files():
 def key_fun(s):
     a1, a2, a3 = map(int, s.split("_"))
     return a2, a1, a3
-
