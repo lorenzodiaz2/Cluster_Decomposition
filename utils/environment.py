@@ -98,19 +98,22 @@ class Environment:
 
         i = 0
         n_tot_agents = 0
+        seen = set()
         for quadrant in self.quadrants:
             for _ in range(self.n_pairs_per_quadrant):
-                od_pair = self._choose_pair(quadrant, i, n_tot_agents)
+                od_pair = self._choose_pair(quadrant, i, n_tot_agents, seen)
                 self.od_pairs.append(od_pair)
                 i += 1
                 n_tot_agents += len(od_pair.agents)
+                seen.add((od_pair.src, od_pair.dst))
 
 
     def _choose_pair(
         self,
         quadrant: Quadrant,
         id_pair: int,
-        n_tot_agents: int
+        n_tot_agents: int,
+        seen
     ) -> OD_Pair:
         top, left = quadrant[0]
         bottom, right = quadrant[1]
@@ -121,11 +124,11 @@ class Environment:
         while True:
             src = (self.rng.choice(row_range), self.rng.choice(col_range))
             dst = (self.rng.choice(row_range), self.rng.choice(col_range))
-            if src == dst or src not in self.G.nodes() or dst not in self.G.nodes():
+            if src == dst or src not in self.G.nodes() or dst not in self.G.nodes() or (src, dst) in seen:
                 continue
             break
 
-        number_of_agents = self.rng.randrange(1, 2)
+        number_of_agents = self.rng.randrange(5, 6)
         agents = [Agent(i, src, dst) for i in range(n_tot_agents, n_tot_agents + number_of_agents)]
 
         return OD_Pair(id_pair, src, dst, agents)
@@ -190,7 +193,7 @@ class Environment:
 
         for v in V:
             if v not in od_nodes:
-                self.G.nodes[v]["capacity"] = self.rng.randrange(3, 4)  #############
+                self.G.nodes[v]["capacity"] = self.rng.randrange(5, 6)  #############
 
 
     @staticmethod

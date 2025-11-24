@@ -8,7 +8,7 @@ def save_results(env, complete_solver, cluster_solvers, critical_resources, fina
     hs_cluster_time = 0
 
     with open("scalability_results", "a") as f:
-        f.write(f"NUMBER OF QUADRANTS = {env.n_quadrants}     NUMBER OF TOTAL PAIRS = {env.n_pairs_per_quadrant * env.n_quadrants}     MAX CLUSTER SIZE = {env.max_cluster_size}     k = {env.k}\n")
+        f.write(f"NUMBER OF QUADRANTS = {env.n_quadrants}     NUMBER OF TOTAL PAIRS = {env.n_pairs_per_quadrant * env.n_quadrants}     NUMBER OF TOTAL AGENTS = {len(env.agents)}     MAX CLUSTER SIZE = {env.max_cluster_size}     k = {env.k}\n")
         f.write(f"Iteration {i}\n")
         f.write(f"\nEnvironment created     Time: {env.set_time}\n")
         diff = complete_solver.current_T - complete_solver.starting_T

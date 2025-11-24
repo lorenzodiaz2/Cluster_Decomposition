@@ -3,15 +3,14 @@ from solvers.post_processing import Critical_Resources
 from utils.environment import Environment
 from utils.results_io import save_results
 
-# todo controllare il caso in cui i cluster non vengono risolti
 
 def run_scalability():
-    quadrant_range = range(3, 17)
+    quadrant_range = range(9, 17)
     for n_quadrants in quadrant_range:
         print()
         for i in range(5):
             print(f"n quadrant = {n_quadrants}    iteration {i} ->  Setting env... ", end="")
-            env = Environment(60, 700, n_quadrants, 700, 0, 12, False)
+            env = Environment(60, 750, n_quadrants, 150, 0, 12, False)
             print("Done.   Solving complete... ", end="")
             complete_solver = Heuristic_Solver(env.G, env.od_pairs, env.T)
             complete_solver.solve()
