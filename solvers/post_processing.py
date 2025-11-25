@@ -117,7 +117,6 @@ class Critical_Resources:
 
         self.unassigning_times.append(time.time() - start)
         self.removed_agents_per_tol.append(len(self.removed_agents))
-        print(f"rimossi {len(self.removed_agents)} agenti.")
 
 
     def _recompute(self, agent):

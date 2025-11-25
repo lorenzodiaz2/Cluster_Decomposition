@@ -66,7 +66,7 @@ class TreePartition(NjTree):
 
             cherry: Node = self.get_min_cherry()
             n_paths = cherry.compute_paths()
-            if n_paths < self.max_cluster_size:
+            if n_paths <= self.max_cluster_size:
                 cherry.merge(n_paths)
                 self.cherries.remove(cherry)
                 self.update_and_prune_leaves(cherry)

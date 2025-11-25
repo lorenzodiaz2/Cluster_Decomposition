@@ -18,7 +18,7 @@ def save_results(
     hs_all_time = 0
     hs_cluster_time = 0
 
-    with open("scalability_results", "a") as f:
+    with open("scalability_results_3", "a") as f:
         f.write(f"NUMBER OF QUADRANTS = {env.n_quadrants}     NUMBER OF TOTAL PAIRS = {env.n_pairs_per_quadrant * env.n_quadrants}     NUMBER OF TOTAL AGENTS = {len(env.agents)}     MAX CLUSTER SIZE = {env.max_cluster_size}     k = {env.k}\n")
         f.write(f"Iteration {i}\n")
         f.write(f"\nEnvironment created     Time: {env.set_time}\n")
@@ -28,7 +28,7 @@ def save_results(
             f.write(f"\nModel created   Time = {complete_solver.model_times[idx]}    status = {status}     Time = {complete_solver.resolution_times[idx]}")
             hs_all_time += complete_solver.model_times[i] + complete_solver.resolution_times[i]
         f.write(f"\n\nDelay by solving all pairs     --->     objVal (UB) = {complete_solver.m.ObjVal}    objBound (LB) = {complete_solver.m.ObjBound}     Time = {hs_all_time}\n")
-        f.write(f"\nCreated {len(env.clusters)} clusters.  Time = {env.cluster_time}\n")
+        f.write(f"\nCreated {len(env.clusters)} clusters.  Time = {env.matrix_time} + {env.cluster_time} = {env.matrix_time + env.cluster_time}\n")
         hs_cluster_time += env.cluster_time
         for cluster in env.clusters:
             f.write(f"     {cluster}\n")

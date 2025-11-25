@@ -5,7 +5,7 @@ from utils.results_io import save_results
 
 
 def run_scalability():
-    quadrant_range = range(9, 17)
+    quadrant_range = range(3, 17)
     for n_quadrants in quadrant_range:
         print()
         for i in range(5):
@@ -16,7 +16,7 @@ def run_scalability():
             complete_solver.solve()
             print("Done.   Solving clusters... ", end="")
 
-            env.compute_clusters()
+            env.compute_clusters(True)
             cluster_solvers = []
             for cluster in env.clusters:
                 hs = Heuristic_Solver(env.G, [od_pair for od_pair in cluster.od_pairs])
