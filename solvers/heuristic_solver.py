@@ -16,10 +16,9 @@ class Heuristic_Solver(General_Solver):
         self,
         G: nx.Graph,
         od_pairs: List[OD_Pair],
-        T: int,
         critical_resources: Critical_Resources | None = None
     ):
-        super().__init__(G, od_pairs, T)
+        super().__init__(G, od_pairs)
 
         self.P = None
         self.K = None
@@ -34,14 +33,14 @@ class Heuristic_Solver(General_Solver):
         self._optimize_model()
         while self.status == "INFEASIBLE":
             if self.critical_resources:
-                print("  (tol+1)  ")
+                print("  (tol+1)  ", end="")
                 self.critical_resources.increment_tol()
                 self.critical_resources.unassign_agents()
             else:
                 print("  (T+1)  ", end="")
-                self.current_T += 1
                 for od_pair in self.od_pairs:
-                    od_pair.delay_shortest_paths(self.current_T)
+                    od_pair.delay_shortest_paths(od_pair.T + 1)
+                    od_pair.T += 1
             self._set_model()
             self._optimize_model()
 

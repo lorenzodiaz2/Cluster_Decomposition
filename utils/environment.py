@@ -9,7 +9,6 @@ from elements.agent import Agent
 from elements.cluster import Cluster
 from elements.pair import OD_Pair
 from nj.tree_partition import TreePartition
-from utils.plot_functions import plot_graph
 
 Coord = tuple[int, int]
 Quadrant = tuple[Coord, Coord]
@@ -39,7 +38,6 @@ class Environment:
         self.od_pairs: List[OD_Pair] = []
         self.agents: List[Agent] = []
         self.clusters: List[Cluster] = []
-        self.T = 0
         self.set_time = None
         self.cluster_time = None
         self.rng = random.Random(seed if reproducibility_flag else None)
@@ -61,26 +59,22 @@ class Environment:
             sub_graph = self._subgraph_for_quadrant(quadrant)
             od_pair.compute_k_shortest_paths(sub_graph, self.k)
 
-        self.T = max(len(od_pair.k_shortest_paths[self.k - 1].visits) - 1 for od_pair in self.od_pairs)
-        for od_pair in self.od_pairs:
-            od_pair.delay_shortest_paths(self.T)
         self.agents = [a for od_pair in self.od_pairs for a in od_pair.agents]
         self.set_time = time.time() - start
 
 
-    def compute_clusters(self):
+    def compute_clusters(self, all_paths_flag: bool | None = False):
         start = time.time()
         n = len(self.od_pairs)
         similarity_matrix = np.array([[0 for _ in range(n)] for _ in range(n)])
         for i in range(n):
             for j in range(i + 1, n):
-                sim = self.od_pairs[i].compute_similarity(self.od_pairs[j])
+                sim = self.od_pairs[i].compute_similarity(self.od_pairs[j], all_paths_flag)
                 similarity_matrix[i, j] = sim
                 similarity_matrix[j, i] = sim
 
         tree = TreePartition(similarity_matrix, self.od_pairs, self.max_cluster_size)
         self.clusters = tree.compute_clusters()
-        # self.clusters = [Cluster(idx, [od for od in self.od_pairs if self.quadrant_by_od[od.id] == quadrant]) for idx, quadrant in enumerate(self.quadrants)]
         self.cluster_time = time.time() - start
 
 
@@ -113,7 +107,6 @@ class Environment:
                 n_tot_agents += len(od_pair.agents)
                 seen.add((od_pair.src, od_pair.dst))
                 self.quadrant_by_od[od_pair.id] = quadrant
-            # plot_graph(self.G, self.od_pairs[-self.n_pairs_per_quadrant:])
 
 
     def _choose_pair(

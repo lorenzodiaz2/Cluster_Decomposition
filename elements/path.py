@@ -7,6 +7,7 @@ class Path:
 
     def compare(self, other) -> int:
         return sum(self.visits[t] == other.visits[t] for t in range(min(len(self.visits), len(other.visits)))) # / min(len(other.nodes), len(self.nodes))
+        # return sum(1 for v in self.visits if v in other.visits)
 
     def get_or_default(self, t):
         return self.visits[t] if t <= len(self.visits) - 1 else None

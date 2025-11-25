@@ -12,14 +12,14 @@ def run_scalability():
             print(f"n quadrant = {n_quadrants}    iteration {i} ->  Setting env... ", end="")
             env = Environment(60, 750, n_quadrants, 150, 0, 12, False)
             print("Done.   Solving complete... ", end="")
-            complete_solver = Heuristic_Solver(env.G, env.od_pairs, env.T)
+            complete_solver = Heuristic_Solver(env.G, env.od_pairs)
             complete_solver.solve()
             print("Done.   Solving clusters... ", end="")
 
             env.compute_clusters()
             cluster_solvers = []
             for cluster in env.clusters:
-                hs = Heuristic_Solver(env.G, [od_pair for od_pair in cluster.od_pairs], complete_solver.current_T)
+                hs = Heuristic_Solver(env.G, [od_pair for od_pair in cluster.od_pairs])
                 hs.solve()
                 hs.assign_solutions()
                 cluster_solvers.append(hs)
@@ -28,17 +28,17 @@ def run_scalability():
             critical_resources = Critical_Resources(env.G, env.od_pairs)
             if critical_resources.is_initially_feasible:
                 print("Solution is already feasible.")
-                save_results(env, complete_solver, cluster_solvers, critical_resources, None, i)
+                save_results(env, complete_solver, cluster_solvers, critical_resources, i, None)
                 continue
             else:
                 print("Unassigning agents... ", end="")
                 critical_resources.unassign_agents()
                 print("Done.   Solving final... ", end="")
-                final_solver = Heuristic_Solver(env.G, env.od_pairs, complete_solver.current_T, critical_resources)
+                final_solver = Heuristic_Solver(env.G, env.od_pairs, critical_resources)
                 final_solver.solve()
                 final_solver.assign_solutions()
                 print("Done.")
-                save_results(env, complete_solver, cluster_solvers, critical_resources, final_solver, i)
+                save_results(env, complete_solver, cluster_solvers, critical_resources, i, final_solver)
 
 
 

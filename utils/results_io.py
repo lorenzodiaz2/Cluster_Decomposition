@@ -2,8 +2,19 @@ import os
 
 from natsort import natsorted
 
+from solvers.heuristic_solver import Heuristic_Solver
+from solvers.post_processing import Critical_Resources
+from utils.environment import Environment
 
-def save_results(env, complete_solver, cluster_solvers, critical_resources, final_solver, i):
+
+def save_results(
+    env: Environment,
+    complete_solver: Heuristic_Solver,
+    cluster_solvers: list[Heuristic_Solver],
+    critical_resources: Critical_Resources,
+    i: int,
+    final_solver: Heuristic_Solver | None = None,
+):
     hs_all_time = 0
     hs_cluster_time = 0
 
@@ -11,10 +22,10 @@ def save_results(env, complete_solver, cluster_solvers, critical_resources, fina
         f.write(f"NUMBER OF QUADRANTS = {env.n_quadrants}     NUMBER OF TOTAL PAIRS = {env.n_pairs_per_quadrant * env.n_quadrants}     NUMBER OF TOTAL AGENTS = {len(env.agents)}     MAX CLUSTER SIZE = {env.max_cluster_size}     k = {env.k}\n")
         f.write(f"Iteration {i}\n")
         f.write(f"\nEnvironment created     Time: {env.set_time}\n")
-        diff = complete_solver.current_T - complete_solver.starting_T
-        for i in range(diff + 1):
-            status = "INFEASIBLE" if i < diff else complete_solver.status
-            f.write(f"\nT = {complete_solver.starting_T + i}  ->   Model created   Time = {complete_solver.model_times[i]}    status = {status}     Time = {complete_solver.resolution_times[i]}")
+        diff = len(complete_solver.model_times)
+        for idx in range(diff):
+            status = "INFEASIBLE" if idx < diff - 1 else complete_solver.status
+            f.write(f"\nModel created   Time = {complete_solver.model_times[idx]}    status = {status}     Time = {complete_solver.resolution_times[idx]}")
             hs_all_time += complete_solver.model_times[i] + complete_solver.resolution_times[i]
         f.write(f"\n\nDelay by solving all pairs     --->     objVal (UB) = {complete_solver.m.ObjVal}    objBound (LB) = {complete_solver.m.ObjBound}     Time = {hs_all_time}\n")
         f.write(f"\nCreated {len(env.clusters)} clusters.  Time = {env.cluster_time}\n")
@@ -23,7 +34,7 @@ def save_results(env, complete_solver, cluster_solvers, critical_resources, fina
             f.write(f"     {cluster}\n")
 
         for i, hs in enumerate(cluster_solvers):
-            f.write(f"\nCluster {i}: T = {hs.starting_T}  ->   Model created   Time = {hs.model_times[0]}    status = {hs.status}     Time = {hs.resolution_times[0]}     --->     objVal (LB) = {hs.m.ObjVal}    objBound (UB) = {hs.m.ObjBound}")
+            f.write(f"\nCluster {i}:   Model created   Time = {hs.model_times[0]}    status = {hs.status}     Time = {hs.resolution_times[0]}     --->     objVal (UB) = {hs.m.ObjVal}    objBound (LB) = {hs.m.ObjBound}")
             hs_cluster_time += hs.model_times[0] + hs.resolution_times[0]
         f.write(f"\n\nDelay by solving clusters = {sum(hs.m.ObjVal for hs in cluster_solvers)}     Time (without cluster creation) = {sum(hs.model_times[0] + hs.resolution_times[0] for hs in cluster_solvers)}\n")
 
@@ -46,7 +57,7 @@ def save_results(env, complete_solver, cluster_solvers, critical_resources, fina
                 hs_cluster_time += critical_resources.creation_times[i] + critical_resources.unassigning_times[i]
 
 
-            f.write(f"\n\nFinale solver: T = {final_solver.current_T}  ->   Model created   Time = {final_solver.model_times[critical_resources.current_tol]}   status = {final_solver.status}     Time = {final_solver.resolution_times[critical_resources.current_tol]}\n")
+            f.write(f"\n\nFinale solver:   Model created   Time = {final_solver.model_times[critical_resources.current_tol]}   status = {final_solver.status}     Time = {final_solver.resolution_times[critical_resources.current_tol]}\n")
             for i in range(len(final_solver.model_times)):
                 hs_cluster_time += final_solver.model_times[i] + final_solver.resolution_times[i]
             delay_assigned_agents = sum(a.delay for a in env.agents if a not in final_solver.critical_resources.removed_agents)

@@ -13,6 +13,7 @@ class OD_Pair:
         self.delayed_shortest_paths: dict[int, list[Path]] = defaultdict(list)
         self.all_paths: List[Path] = []
         self.agents: List[Agent] = agents
+        self.T = 0
 
     def __str__(self) -> str:
         return f"id = {self.id}    {self.src} , {self.dst}    ->    {len(self.agents)} agents,    {len(self.k_shortest_paths)} shortest paths"
@@ -21,11 +22,21 @@ class OD_Pair:
     def compute_k_shortest_paths(self, G, k) -> None:
         gen = nx.shortest_simple_paths(G, self.src, self.dst)
         self.k_shortest_paths = [Path(next(gen)) for _ in range(k)]
+        self.T = len(self.k_shortest_paths[-1].visits) + 3
+        self.delay_shortest_paths(self.T)
 
-    # todo provare a calcolare la similarità aggiungendo anche i delayed paths
-    def compute_similarity(self, other) -> int:
+    def compute_similarity(
+        self,
+        other,
+        all_paths_flag
+    ) -> int:
         other_k_paths = other.k_shortest_paths
-        similarity = sum(path1.compare(path2) for path1 in self.k_shortest_paths for path2 in other_k_paths) # * len(self.agents) * len(other.agents)
+
+        if all_paths_flag:
+            similarity = sum(path1.compare(path2) for path1 in self.all_paths for path2 in other.all_paths)
+        else:
+            similarity = sum(path1.compare(path2) for path1 in self.k_shortest_paths for path2 in other_k_paths) # * len(self.agents) * len(other.agents)
+
         return similarity
 
     def delay_shortest_paths(self, T: int) -> None:

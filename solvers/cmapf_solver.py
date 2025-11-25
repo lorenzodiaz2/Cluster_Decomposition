@@ -15,7 +15,7 @@ class CMAPF_Solver(General_Solver):
         od_pairs: List[OD_Pair],
         T: int
     ):
-        super().__init__(G, od_pairs, T)
+        super().__init__(G, od_pairs)
 
         self.V = list(self.G.nodes())
         self.x = None

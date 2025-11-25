@@ -36,7 +36,7 @@ def run():
     while max_time_counter < max_count:
         print(f"i = {i}     grid side = {grid_side}   total number of pairs = {pairs_per_quadrant * 4}... ", end="")
         env = Environment(grid_side, 0, pairs_per_quadrant, offset, k)
-        solver = Heuristic_Solver(env.G, env.od_pairs, env.T)
+        solver = Heuristic_Solver(env.G, env.od_pairs)
         solver.solve()
 
         total_time = sum(m_times for m_times in solver.model_times) + sum(r_time for r_time in solver.resolution_times)
