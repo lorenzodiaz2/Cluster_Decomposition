@@ -36,7 +36,7 @@ def save_results(
             hs_cluster_time += hs.model_times[0] + hs.resolution_times[0]
 
         if not critical_resources:
-            f.write(f"\n\nClusters are not feasible")
+            f.write(f"\n\nClusters are not feasible     Time (without cluster creation) = {sum(hs.model_times[0] + hs.resolution_times[0] for hs in cluster_solvers)}")
             return
 
         f.write(f"\n\nDelay by solving clusters = {sum(hs.m.ObjVal for hs in cluster_solvers)}     Time (without cluster creation) = {sum(hs.model_times[0] + hs.resolution_times[0] for hs in cluster_solvers)}\n")
@@ -82,11 +82,8 @@ def read_scalability_results():
     all_cluster_feasible = True
 
     obj_value_complete = None
-    obj_bound_complete = None
     time_complete_solver = None
-    final_obj_val = None
-    final_obj_bound = None
-    total_time = None
+
 
     abs_gaps = []
     rel_gaps = []

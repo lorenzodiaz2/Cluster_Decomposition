@@ -68,7 +68,7 @@ class Environment:
         start = time.time()
         n = len(self.od_pairs)
         similarity_matrix = np.zeros((n, n), dtype=int)
-        for i in range(n):
+        for i in range(n - 1):
             for j in range(i + 1, n):
                 sim = self.od_pairs[i].compute_similarity(self.od_pairs[j], all_paths_flag)
                 similarity_matrix[i, j] = sim
