@@ -25,19 +25,18 @@ class OD_Pair:
         self.T = len(self.k_shortest_paths[-1].visits) + 3
         self.delay_shortest_paths(self.T)
 
-    def compute_similarity(
-        self,
-        other,
-        all_paths_flag
-    ) -> int:
-        other_k_paths = other.k_shortest_paths
 
-        if all_paths_flag:
-            similarity = sum(path1.compare(path2) for path1 in self.all_paths for path2 in other.all_paths)
-        else:
-            similarity = sum(path1.compare(path2) for path1 in self.k_shortest_paths for path2 in other_k_paths) # * len(self.agents) * len(other.agents)
+    @staticmethod
+    def compute_similarity(od1, od2, all_paths_flag: bool) -> int:
+        paths1 = od1.all_paths if all_paths_flag else od1.k_shortest_paths
+        paths2 = od2.all_paths if all_paths_flag else od2.k_shortest_paths
 
-        return similarity
+        return sum(
+            p1.compare(p2)
+            for p1 in paths1
+            for p2 in paths2
+        )
+
 
     def delay_shortest_paths(self, T: int) -> None:
         for idx, base_path in enumerate(self.k_shortest_paths):
@@ -53,9 +52,9 @@ class OD_Pair:
                 if tuple(visits_ext) in seen:
                     continue
                 self.delayed_shortest_paths[idx].append(Path(visits_ext))
-        self.all_paths = self.get_all_paths()
+        self.all_paths = self._get_all_paths()
 
-    def get_all_paths(self):
+    def _get_all_paths(self):
         all_paths = list(self.k_shortest_paths)
         for paths_list in self.delayed_shortest_paths.values():
             all_paths.extend(paths_list)
