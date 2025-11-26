@@ -1044,7 +1044,7 @@ Final Delay     --->     objVal (UB) = 1117.0    objBound (LB) = 1117.0    Total
 ========================================================================================
 
 NUMBER OF QUADRANTS = 7     NUMBER OF TOTAL PAIRS = 1050     NUMBER OF TOTAL AGENTS = 5250     MAX CLUSTER SIZE = 750     k = 12
-Iteration 0
+Iteration 2
 
 Environment created     Time: 41.780303955078125
 
@@ -1101,7 +1101,7 @@ Final Delay     --->     objVal (UB) = 1151.0    objBound (LB) = 1151.0    Total
 ========================================================================================
 
 NUMBER OF QUADRANTS = 7     NUMBER OF TOTAL PAIRS = 1050     NUMBER OF TOTAL AGENTS = 5250     MAX CLUSTER SIZE = 750     k = 12
-Iteration 1
+Iteration 3
 
 Environment created     Time: 38.55753302574158
 

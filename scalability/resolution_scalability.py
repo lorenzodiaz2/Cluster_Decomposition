@@ -3,7 +3,7 @@ from solvers.post_processing import Critical_Resources
 from utils.environment import Environment
 from utils.results_io import save_results
 
-
+# todo gestire il caso in cui un cluster non viene risolto
 def run_scalability():
     quadrant_range = range(3, 17)
     for n_quadrants in quadrant_range:

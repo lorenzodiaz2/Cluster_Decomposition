@@ -74,7 +74,6 @@ class Environment:
                 similarity_matrix[i, j] = sim
                 similarity_matrix[j, i] = sim
         self.matrix_time = time.time() - start
-        print(f"matrix computed in {time.time() - start}")
 
         start = time.time()
         tree = TreePartition(similarity_matrix, self.od_pairs, self.max_cluster_size)
