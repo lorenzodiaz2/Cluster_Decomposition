@@ -9,8 +9,8 @@ def save_results(
     env: Environment,
     complete_solver: Heuristic_Solver,
     cluster_solvers: list[Heuristic_Solver],
-    critical_resources: Critical_Resources,
     i: int,
+    critical_resources: Critical_Resources | None = None,
     final_solver: Heuristic_Solver | None = None,
 ):
     hs_all_time = 0
@@ -34,6 +34,11 @@ def save_results(
         for j, hs in enumerate(cluster_solvers):
             f.write(f"\nCluster {j}:   Model created   Time = {hs.model_times[0]}    status = {hs.status}     Time = {hs.resolution_times[0]}     --->     objVal (UB) = {hs.m.ObjVal}    objBound (LB) = {hs.m.ObjBound}")
             hs_cluster_time += hs.model_times[0] + hs.resolution_times[0]
+
+        if not critical_resources:
+            f.write(f"\n\nClusters are not feasible")
+            return
+
         f.write(f"\n\nDelay by solving clusters = {sum(hs.m.ObjVal for hs in cluster_solvers)}     Time (without cluster creation) = {sum(hs.model_times[0] + hs.resolution_times[0] for hs in cluster_solvers)}\n")
 
 
@@ -85,6 +90,8 @@ def read_scalability_results():
 
     abs_gaps = []
     rel_gaps = []
+    time_abs_gaps = []
+    time_rel_gaps = []
 
 
     for j in range(len(lines)):
@@ -134,22 +141,33 @@ def read_scalability_results():
                 abs_gap = final_obj_val - obj_value_complete
                 rel_gap = round(100 * (final_obj_val - obj_value_complete) / obj_value_complete, 2)
 
+                time_abs_gap = round(total_time - time_complete_solver, 2)
+                time_rel_gap = round(100 * (total_time - time_complete_solver) / time_complete_solver, 2)
 
                 abs_gaps.append(abs_gap)
                 rel_gaps.append(rel_gap)
+                time_abs_gaps.append(time_abs_gap)
+                time_rel_gaps.append(time_rel_gap)
 
                 print(f"        Heuristic to cluster ({n_clusters} clusters ({cluster_status}))          ->         {n_unassigned_agents} unassigned agents  status = {status}  objValue = {final_obj_val}  objBound = {final_obj_bound}  Time = {total_time}   ")
-                print(f"        abs gap = {abs_gap}     rel_gap = {rel_gap} %      ", end="")
+                print(f"        abs gap = {abs_gap}     rel_gap = {rel_gap} %      ")
+                print(f"        abs time gap = {time_abs_gap}     rel time gap = {time_rel_gap} %      ", end="")
             else:
                 print(f"        Cluster solution is already feasible")
 
 
 
             if iteration == "4":
-                print(f"\n\n    mean abs gap = {round(np.array(abs_gaps).mean(), 2)}    ->    std dev abs gap = {round(np.array(abs_gaps).std(ddof=1), 2)}")
-                print(f"    mean rel gap = {round(np.array(rel_gaps).mean(), 2)} %    ->    std dev rel gap = {round(np.array(rel_gaps).std(ddof=1), 2)} %")
+                print(f"\n\n    mean abs value gap = {round(np.array(abs_gaps).mean(), 2)}    ->    std dev abs value gap = {round(np.array(abs_gaps).std(ddof=1), 2)}")
+                print(f"    mean rel value gap = {round(np.array(rel_gaps).mean(), 2)} %    ->    std dev rel value gap = {round(np.array(rel_gaps).std(ddof=1), 2)} %")
+
+                print(f"    mean abs time gap = {round(np.array(time_abs_gaps).mean(), 2)}    ->    std dev abs time gap = {round(np.array(time_abs_gaps).std(ddof=1), 2)}")
+                print(f"    mean rel time gap = {round(np.array(time_rel_gaps).mean(), 2)} %    ->    std dev rel time gap = {round(np.array(time_rel_gaps).std(ddof=1), 2)} %")
+
                 abs_gaps = []
                 rel_gaps = []
+                time_abs_gaps = []
+                time_rel_gaps = []
 
                 print("\n================================================================================================================================================================================\n\n")
 
