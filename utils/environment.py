@@ -14,14 +14,6 @@ Coord = tuple[int, int]
 Quadrant = tuple[Coord, Coord]
 
 
-def compute_similarity_parallel(paths1, paths2) -> int:
-
-    return sum(
-        p1.compare(p2)
-        for p1 in paths1
-        for p2 in paths2
-    )
-
 class Environment:
     def __init__(
         self,
@@ -72,35 +64,36 @@ class Environment:
         self.set_time = time.time() - start
 
 
-    def compute_clusters(self, all_paths_flag: bool | None = True):
+    def compute_clusters(
+        self,
+        all_paths_flag: bool | None = True,
+        parallel_flag: bool | None = True
+    ):
         start = time.time()
         n = len(self.od_pairs)
-        # similarity_matrix = np.zeros((n, n), dtype=int)
         similarity_matrix = np.zeros((n, n), dtype=int)
 
-        if all_paths_flag:
-            pairs = [(self.od_pairs[i].all_paths, self.od_pairs[j].all_paths) for i in range(n - 1) for j in range(i + 1, n)]
+        if parallel_flag:
+            if all_paths_flag:
+                pairs = [(self.od_pairs[i].all_paths, self.od_pairs[j].all_paths) for i in range(n - 1) for j in range(i + 1, n)]
+            else:
+                pairs = [(self.od_pairs[i].k_shortest_paths, self.od_pairs[j].k_shortest_paths) for i in range(n - 1) for j in range(i + 1, n)]
+
+            with mp.Pool(mp.cpu_count()) as pool:
+                result = pool.starmap(compute_similarity_parallel, pairs)
+
+            k = 0
+            for i in range(n - 1):
+                for j in range(i + 1, n):
+                    similarity_matrix[i, j] = result[k]
+                    similarity_matrix[j, i] = result[k]
+                    k += 1
         else:
-            pairs = [(self.od_pairs[i].k_shortest_paths, self.od_pairs[j].k_shortest_paths) for i in range(n - 1) for j in range(i + 1, n)]
-
-        with mp.Pool(mp.cpu_count()) as pool:
-            result = pool.starmap(compute_similarity_parallel, pairs)
-
-        k = 0
-        for i in range(n - 1):
-            for j in range(i + 1, n):
-                similarity_matrix[i, j] = result[k]
-                similarity_matrix[j, i] = result[k]
-                k += 1
-
-
-        start = time.time()
-
-        # for i in range(n - 1):
-        #     for j in range(i + 1, n):
-        #         sim = OD_Pair.compute_similarity(self.od_pairs[i], self.od_pairs[j], all_paths_flag)
-        #         similarity_matrix[i, j] = sim
-        #         similarity_matrix[j, i] = sim
+            for i in range(n - 1):
+                for j in range(i + 1, n):
+                    sim = OD_Pair.compute_similarity(self.od_pairs[i], self.od_pairs[j], all_paths_flag)
+                    similarity_matrix[i, j] = sim
+                    similarity_matrix[j, i] = sim
 
         self.matrix_time = time.time() - start
 
@@ -286,3 +279,11 @@ class Environment:
         down_quadrant: Quadrant = ((mid + 1, left), br)
 
         return up_quadrant, down_quadrant
+
+
+def compute_similarity_parallel(paths1, paths2) -> int:
+    return sum(
+        p1.compare(p2)
+        for p1 in paths1
+        for p2 in paths2
+    )
