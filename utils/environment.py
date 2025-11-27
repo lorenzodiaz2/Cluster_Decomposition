@@ -1,5 +1,6 @@
 import random
 import time
+from collections import defaultdict
 from typing import List
 import multiprocessing as mp
 import networkx as nx
@@ -8,6 +9,7 @@ import numpy as np
 from elements.agent import Agent
 from elements.cluster import Cluster
 from elements.pair import OD_Pair
+from elements.path import Path
 from nj.tree_partition import TreePartition
 
 Coord = tuple[int, int]
@@ -29,6 +31,7 @@ class Environment:
         seed: int | None = 42
     ):
         self.grid_side = grid_side
+        Path.set_grid_side(grid_side)
         self.max_cluster_size = max_cluster_size
         self.n_quadrants = n_quadrants
         self.n_pairs_per_quadrant = n_pairs_per_quadrant
@@ -55,43 +58,54 @@ class Environment:
         self._create_grid_graph()
         self._choose_pairs()
         self._set_capacities()
-        for od_pair in self.od_pairs:
-            quadrant = self.quadrant_by_od[od_pair.id]
-            sub_graph = self._subgraph_for_quadrant(quadrant)
-            od_pair.compute_k_shortest_paths(sub_graph, self.k)
+
+        od_by_quadrant: dict[Quadrant, list[OD_Pair]] = defaultdict(list)
+        for od in self.od_pairs:
+            q = self.quadrant_by_od[od.id]
+            od_by_quadrant[q].append(od)
+
+        tasks = list(od_by_quadrant.items())
+
+        with mp.Pool(
+                processes=mp.cpu_count(),
+                initializer=_init_paths_pool,
+                initargs=(self.G, self.k)
+        ) as pool:
+            results = pool.map(_compute_paths_for_quadrant, tasks)
+
+        self.od_pairs = [od for group in results for od in group]
+
 
         self.agents = [a for od_pair in self.od_pairs for a in od_pair.agents]
         self.set_time = time.time() - start
 
 
     def compute_clusters(
-        self,
-        all_paths_flag: bool | None = True,
-        parallel_flag: bool | None = True
+            self,
+            parallel_flag: bool | None = True
     ):
         start = time.time()
         n = len(self.od_pairs)
         similarity_matrix = np.zeros((n, n), dtype=int)
 
-        if parallel_flag:
-            if all_paths_flag:
-                pairs = [(self.od_pairs[i].all_paths, self.od_pairs[j].all_paths) for i in range(n - 1) for j in range(i + 1, n)]
-            else:
-                pairs = [(self.od_pairs[i].k_shortest_paths, self.od_pairs[j].k_shortest_paths) for i in range(n - 1) for j in range(i + 1, n)]
+        if parallel_flag and n > 1:
+            with mp.Pool(
+                    processes=mp.cpu_count(),
+                    initializer=_init_pool,
+                    initargs=(self.od_pairs,)
+            ) as pool:
+                results = pool.map(_compute_row, range(n - 1))
 
-            with mp.Pool(mp.cpu_count()) as pool:
-                result = pool.starmap(compute_similarity_parallel, pairs)
-
-            k = 0
-            for i in range(n - 1):
-                for j in range(i + 1, n):
-                    similarity_matrix[i, j] = result[k]
-                    similarity_matrix[j, i] = result[k]
-                    k += 1
+            for i, row in results:
+                similarity_matrix[i, i + 1:] = row[i + 1:]
+                similarity_matrix[i + 1:, i] = row[i + 1:]
         else:
             for i in range(n - 1):
                 for j in range(i + 1, n):
-                    sim = OD_Pair.compute_similarity(self.od_pairs[i], self.od_pairs[j], all_paths_flag)
+                    sim = OD_Pair.compute_similarity(
+                        self.od_pairs[i],
+                        self.od_pairs[j],
+                    )
                     similarity_matrix[i, j] = sim
                     similarity_matrix[j, i] = sim
 
@@ -101,6 +115,44 @@ class Environment:
         tree = TreePartition(similarity_matrix, self.od_pairs, self.max_cluster_size)
         self.clusters = tree.compute_clusters()
         self.cluster_time = time.time() - start
+
+    # def compute_clusters(
+    #     self,
+    #     all_paths_flag: bool | None = True,
+    #     parallel_flag: bool | None = True
+    # ):
+    #     start = time.time()
+    #     n = len(self.od_pairs)
+    #     similarity_matrix = np.zeros((n, n), dtype=int)
+    #
+    #     if parallel_flag:
+    #         if all_paths_flag:
+    #             pairs = [(self.od_pairs[i].all_paths, self.od_pairs[j].all_paths) for i in range(n - 1) for j in range(i + 1, n)]
+    #         else:
+    #             pairs = [(self.od_pairs[i].k_shortest_paths, self.od_pairs[j].k_shortest_paths) for i in range(n - 1) for j in range(i + 1, n)]
+    #
+    #         with mp.Pool(processes=mp.cpu_count()) as pool:
+    #             result = pool.starmap(compute_similarity_parallel, pairs)
+    #
+    #         k = 0
+    #         for i in range(n - 1):
+    #             for j in range(i + 1, n):
+    #                 similarity_matrix[i, j] = result[k]
+    #                 similarity_matrix[j, i] = result[k]
+    #                 k += 1
+    #     else:
+    #         for i in range(n - 1):
+    #             for j in range(i + 1, n):
+    #                 sim = OD_Pair.compute_similarity(self.od_pairs[i], self.od_pairs[j], all_paths_flag)
+    #                 similarity_matrix[i, j] = sim
+    #                 similarity_matrix[j, i] = sim
+    #
+    #     self.matrix_time = time.time() - start
+    #
+    #     start = time.time()
+    #     tree = TreePartition(similarity_matrix, self.od_pairs, self.max_cluster_size)
+    #     self.clusters = tree.compute_clusters()
+    #     self.cluster_time = time.time() - start
 
 
     def _create_grid_graph(self):
@@ -281,9 +333,51 @@ class Environment:
         return up_quadrant, down_quadrant
 
 
-def compute_similarity_parallel(paths1, paths2) -> int:
-    return sum(
-        p1.compare(p2)
-        for p1 in paths1
-        for p2 in paths2
-    )
+_OD_PAIRS: list[OD_Pair] = []
+
+def _init_pool(od_pairs):
+    global _OD_PAIRS
+    _OD_PAIRS = od_pairs
+
+def _compute_row(i: int):
+    n = len(_OD_PAIRS)
+    row = np.zeros(n, dtype=int)
+    od_i = _OD_PAIRS[i]
+    for j in range(i + 1, n):
+        od_j = _OD_PAIRS[j]
+        row[j] = OD_Pair.compute_similarity(od_i, od_j)
+    return i, row
+
+
+
+
+
+_GLOBAL_G = None
+_GLOBAL_K = None
+
+def _init_paths_pool(G: nx.Graph, k: int):
+    global _GLOBAL_G, _GLOBAL_K
+    _GLOBAL_G = G
+    _GLOBAL_K = k
+
+
+def _subgraph_for_quadrant_global(quadrant):
+    (top, left), (bottom, right) = quadrant
+    nodes = [(i, j) for i in range(top, bottom + 1) for j in range(left, right + 1)]
+    return _GLOBAL_G.subgraph(nodes).copy()
+
+
+def _compute_paths_for_quadrant(args):
+    quadrant, od_list = args
+    sub_g = _subgraph_for_quadrant_global(quadrant)
+    for od in od_list:
+        od.compute_k_shortest_paths(sub_g, _GLOBAL_K)
+    return od_list
+
+
+# def compute_similarity_parallel(paths1, paths2) -> int:
+#     return sum(
+#         p1.compare(p2)
+#         for p1 in paths1
+#         for p2 in paths2
+#     )

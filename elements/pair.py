@@ -14,6 +14,7 @@ class OD_Pair:
         self.all_paths: List[Path] = []
         self.agents: List[Agent] = agents
         self.T = 0
+        self.signature = None
 
     def __str__(self) -> str:
         return f"id = {self.id}    {self.src} , {self.dst}    ->    {len(self.agents)} agents,    {len(self.k_shortest_paths)} shortest paths"
@@ -24,19 +25,34 @@ class OD_Pair:
         self.k_shortest_paths = [Path(next(gen)) for _ in range(k)]
         self.T = len(self.k_shortest_paths[-1].visits) + 3
         self.delay_shortest_paths(self.T)
+        self.build_signature()
 
+
+    # @staticmethod
+    # def compute_similarity(od1, od2, all_paths_flag: bool) -> int:
+    #     paths1 = od1.all_paths if all_paths_flag else od1.k_shortest_paths
+    #     paths2 = od2.all_paths if all_paths_flag else od2.k_shortest_paths
+    #
+    #     return sum(
+    #         p1.compare(p2)
+    #         for p1 in paths1
+    #         for p2 in paths2
+    #     )
 
     @staticmethod
-    def compute_similarity(od1, od2, all_paths_flag: bool) -> int:
-        paths1 = od1.all_paths if all_paths_flag else od1.k_shortest_paths
-        paths2 = od2.all_paths if all_paths_flag else od2.k_shortest_paths
+    def compute_similarity(od1, od2) -> int:
+        s1 = od1.signature
+        s2 = od2.signature
 
-        return sum(
-            p1.compare(p2)
-            for p1 in paths1
-            for p2 in paths2
-        )
+        if len(s1) > len(s2):
+            s1, s2 = s2, s1
 
+        sim = 0
+        for key, c1 in s1.items():
+            c2 = s2.get(key)
+            if c2:
+                sim += c1 * c2
+        return sim
 
     def delay_shortest_paths(self, T: int) -> None:
         for idx, base_path in enumerate(self.k_shortest_paths):
@@ -59,3 +75,16 @@ class OD_Pair:
         for paths_list in self.delayed_shortest_paths.values():
             all_paths.extend(paths_list)
         return all_paths
+
+
+    def build_signature(self, use_all_paths: bool = True):
+        paths = self.all_paths if use_all_paths else self.k_shortest_paths
+
+        # chiave = (t, node_id)  ->  value = conteggio
+        sig = defaultdict(int)
+        for path in paths:
+            enc = path.encoded  # array di int (node_id)
+            for t, node_id in enumerate(enc):
+                sig[(t, int(node_id))] += 1
+
+        self.signature = sig
