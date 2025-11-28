@@ -55,7 +55,7 @@ class Critical_Resources:
         self.creation_times.append(time.time() - start)
         self.unassigning_times = []
         self.starting_tol = tol if tol >= 0 else 0
-        self.removed_agents_per_tol = []
+        self.unassigned_agents_per_tol = []
         self.critical_resources_per_tol = []
         self.critical_resources_per_tol.append(len(self.critical_resources))
 
@@ -116,7 +116,7 @@ class Critical_Resources:
         self.critical_od_pairs = set(od_pair for od_pair in self.od_pairs if any(agent in self.removed_agents for agent in od_pair.agents))
 
         self.unassigning_times.append(time.time() - start)
-        self.removed_agents_per_tol.append(len(self.removed_agents))
+        self.unassigned_agents_per_tol.append(len(self.removed_agents))
 
 
     def _recompute(self, agent):

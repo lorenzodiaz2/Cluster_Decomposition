@@ -1,25 +1,13 @@
-from pandas.core.interchange.from_dataframe import primitive_column_to_ndarray
-
+from scalability.resolution_scalability import run_scalability
 from solvers.heuristic_solver import Heuristic_Solver
 from solvers.post_processing import Critical_Resources
-from utils.environment import Environment
-from utils.plot_functions import plot_paths
+from elements.environment import Environment
 
 if __name__ == '__main__':
 
-    # iteration, obj, time, other = [], [] ,[], []
-    #
-    # for i in range(10):
-    #     iteration.append(i)
-    #     obj.append(2)
-    #     time.append(4)
-    #     other.append(np.zeros((4, 4)))
-    #
-    #
-    # df = pd.DataFrame({'iter': iteration, 'obj': obj, 'time': time, 'other': other})
-    # df.to_csv('test.csv', index=False)
-    #
-    # df = pd.read_csv("test.csv")
+    run_scalability()
+
+    exit(0)
 
     parallel_times = {}
     no_parallel_times = {}

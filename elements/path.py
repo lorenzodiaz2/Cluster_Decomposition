@@ -21,13 +21,3 @@ class Path:
 
     def __str__(self):
         return self.visits.__str__()
-
-    def compare(self, other) -> int:
-        a = self.encoded
-        b = other.encoded
-        m = min(len(a), len(b))
-        return int(np.sum(a[:m] == b[:m]))
-        # return sum(1 for v in self.visits if v in other.visits)
-
-    def get_or_default(self, t):
-        return self.visits[t] if t <= len(self.visits) - 1 else None

@@ -2,7 +2,7 @@ import os
 import matplotlib.pyplot as plt
 
 from solvers.heuristic_solver import Heuristic_Solver
-from utils.environment import Environment
+from elements.environment import Environment
 
 
 def save_img(results, i: int | None = None):

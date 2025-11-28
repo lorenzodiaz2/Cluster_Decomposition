@@ -1,8 +1,9 @@
 import numpy as np
+from pandas import DataFrame
 
 from solvers.heuristic_solver import Heuristic_Solver
 from solvers.post_processing import Critical_Resources
-from utils.environment import Environment
+from elements.environment import Environment
 
 
 def save_results(
@@ -10,64 +11,131 @@ def save_results(
     complete_solver: Heuristic_Solver,
     cluster_solvers: list[Heuristic_Solver],
     i: int,
+    df: DataFrame,
     critical_resources: Critical_Resources | None = None,
     final_solver: Heuristic_Solver | None = None,
 ):
-    hs_all_time = 0
-    hs_cluster_time = 0
+    grid_side = env.grid_side
+    n_quadrants = env.n_quadrants
+    n_pairs = len(env.od_pairs)
+    n_agents = len(env.agents)
+    max_cluster_size = env.max_cluster_size
+    offset = env.offset
+    k = env.k
+    env_time = env.set_time
 
-    with open("scalability_results_3", "a") as f:
-        f.write(f"NUMBER OF QUADRANTS = {env.n_quadrants}     NUMBER OF TOTAL PAIRS = {env.n_pairs_per_quadrant * env.n_quadrants}     NUMBER OF TOTAL AGENTS = {len(env.agents)}     MAX CLUSTER SIZE = {env.max_cluster_size}     k = {env.k}\n")
-        f.write(f"Iteration {i}\n")
-        f.write(f"\nEnvironment created     Time: {env.set_time}\n")
-        diff = len(complete_solver.model_times)
-        for j in range(diff):
-            status = "INFEASIBLE" if j < diff - 1 else complete_solver.status
-            f.write(f"\nModel created   Time = {complete_solver.model_times[j]}    status = {status}     Time = {complete_solver.resolution_times[j]}")
-            hs_all_time += complete_solver.model_times[j] + complete_solver.resolution_times[j]
-        f.write(f"\n\nDelay by solving all pairs     --->     objVal (UB) = {complete_solver.m.ObjVal}    objBound (LB) = {complete_solver.m.ObjBound}     Time = {hs_all_time}\n")
-        f.write(f"\nCreated {len(env.clusters)} clusters.  Time = {env.matrix_time} + {env.cluster_time} = {env.matrix_time + env.cluster_time}\n")
-        hs_cluster_time += env.matrix_time + env.cluster_time
-        for cluster in env.clusters:
-            f.write(f"     {cluster}\n")
+    model_times_complete = complete_solver.model_times
+    resolution_times_complete = complete_solver.resolution_times
+    status_complete = complete_solver.status
+    UB_complete = complete_solver.m.ObjVal
+    LB_complete = complete_solver.m.ObjBound
 
-        for j, hs in enumerate(cluster_solvers):
-            f.write(f"\nCluster {j}:   Model created   Time = {hs.model_times[0]}    status = {hs.status}     Time = {hs.resolution_times[0]}     --->     objVal (UB) = {hs.m.ObjVal}    objBound (LB) = {hs.m.ObjBound}")
-            hs_cluster_time += hs.model_times[0] + hs.resolution_times[0]
+    n_clusters = len(env.clusters)
+    similarity_matrix_time = env.matrix_time
+    nj_time = env.nj_time
+    n_agents_per_cluster = [c.n_agents for c in env.clusters]
 
-        if not critical_resources:
-            f.write(f"\n\nClusters are not feasible     Time (without cluster creation) = {sum(hs.model_times[0] + hs.resolution_times[0] for hs in cluster_solvers)}")
-            return
+    model_times_clusters = []
+    resolution_times_clusters = []
+    clusters_status = []
+    UBs_clusters = []
+    LBs_clusters = []
 
-        f.write(f"\n\nDelay by solving clusters = {sum(hs.m.ObjVal for hs in cluster_solvers)}     Time (without cluster creation) = {sum(hs.model_times[0] + hs.resolution_times[0] for hs in cluster_solvers)}\n")
+    critical_resources_creation_times = None
+    unassigned_agents = None
+    unassigning_times = None
+    model_times_final = None
+    resolution_times_final = None
+    status_final = None
+    UB_final = None
+    LB_final = None
 
+    for hs in cluster_solvers:
+        model_times_clusters.append(hs.model_times[0])
+        resolution_times_clusters.append(hs.resolution_times[0])
+        clusters_status.append(hs.status)
+        UBs_clusters.append(hs.m.ObjVal)
+        LBs_clusters.append(hs.m.ObjBound)
 
+    if critical_resources is not None:
+        critical_resources_creation_times = critical_resources.creation_times
+        if final_solver is not None:
+            unassigned_agents = critical_resources.unassigned_agents_per_tol
+            unassigning_times = critical_resources.unassigning_times
 
-        f.write(f"\n{critical_resources.critical_resources_per_tol[0]} critical resources  Time = {critical_resources.creation_times[0]}     ")
-        hs_cluster_time += critical_resources.creation_times[0]
-        if final_solver is None:
-            f.write(f"\n\nSolution is already feasible    Total time cluster heuristic = {hs_cluster_time}")
-        else:
-            f.write(f"Unassigned {critical_resources.removed_agents_per_tol[0]} Agents    Time = {critical_resources.unassigning_times[0]}")
-            hs_cluster_time += critical_resources.unassigning_times[0]
+            model_times_final = final_solver.model_times
+            resolution_times_final = final_solver.resolution_times
+            status_final = final_solver.status
+            UB_final = final_solver.m.ObjVal
+            LB_final = final_solver.m.ObjBound
 
+    df.loc[len(df)] = [
+        grid_side, n_quadrants, n_pairs, n_agents, max_cluster_size, offset, k, env_time,
+        model_times_complete, resolution_times_complete, status_complete, UB_complete, LB_complete,
+        n_clusters, similarity_matrix_time, nj_time, n_agents_per_cluster, model_times_clusters, resolution_times_clusters,
+        clusters_status, UBs_clusters, LBs_clusters,
+        critical_resources_creation_times, unassigned_agents, unassigning_times,
+        model_times_final, resolution_times_final, status_final, UB_final, LB_final
+    ]
 
-            diff = critical_resources.current_tol - critical_resources.starting_tol
-            for j in range(1, diff + 1):
-                f.write(f"\nNo solution found     Time = {final_solver.resolution_times[j - 1]}   ->   Augmented tolerance\n")
-                f.write(f"\n{critical_resources.critical_resources_per_tol[j]} critical resources    Time = {critical_resources.creation_times[j]}     ")
-                f.write(f"Unassigned {critical_resources.removed_agents_per_tol[j]} Agents    Time = {critical_resources.unassigning_times[j]}")
-                hs_cluster_time += critical_resources.creation_times[j] + critical_resources.unassigning_times[j]
-
-
-            f.write(f"\n\nFinale solver:   Model created   Time = {final_solver.model_times[critical_resources.current_tol]}   status = {final_solver.status}     Time = {final_solver.resolution_times[critical_resources.current_tol]}\n")
-            for j in range(len(final_solver.model_times)):
-                hs_cluster_time += final_solver.model_times[j] + final_solver.resolution_times[j]
-            delay_assigned_agents = sum(a.delay for a in env.agents if a not in final_solver.critical_resources.removed_agents)
-            f.write(f"\nFinal Delay     --->     objVal (UB) = {final_solver.m.ObjVal + delay_assigned_agents}    objBound (LB) = {final_solver.m.ObjBound + delay_assigned_agents}    Total time cluster heuristic = {hs_cluster_time}")
-
-        f.write("\n\n========================================================================================\n")
-        f.write("========================================================================================\n\n")
+    #
+    #
+    #
+    # hs_all_time = 0
+    # hs_cluster_time = 0
+    #
+    # with open("scalability_results_3", "a") as f:
+    #     f.write(f"NUMBER OF QUADRANTS = {env.n_quadrants}     NUMBER OF TOTAL PAIRS = {env.n_pairs_per_quadrant * env.n_quadrants}     NUMBER OF TOTAL AGENTS = {len(env.agents)}     MAX CLUSTER SIZE = {env.max_cluster_size}     k = {env.k}\n")
+    #     f.write(f"Iteration {i}\n")
+    #     f.write(f"\nEnvironment created     Time: {env.set_time}\n")
+    #     diff = len(complete_solver.model_times)
+    #     for j in range(diff):
+    #         status = "INFEASIBLE" if j < diff - 1 else complete_solver.status
+    #         f.write(f"\nModel created   Time = {complete_solver.model_times[j]}    status = {status}     Time = {complete_solver.resolution_times[j]}")
+    #         hs_all_time += complete_solver.model_times[j] + complete_solver.resolution_times[j]
+    #     f.write(f"\n\nDelay by solving all pairs     --->     objVal (UB) = {complete_solver.m.ObjVal}    objBound (LB) = {complete_solver.m.ObjBound}     Time = {hs_all_time}\n")
+    #     f.write(f"\nCreated {len(env.clusters)} clusters.  Time = {env.matrix_time} + {env.nj_time} = {env.matrix_time + env.nj_time}\n")
+    #     hs_cluster_time += env.matrix_time + env.nj_time
+    #     for cluster in env.clusters:
+    #         f.write(f"     {cluster}\n")
+    #
+    #     for j, hs in enumerate(cluster_solvers):
+    #         f.write(f"\nCluster {j}:   Model created   Time = {hs.model_times[0]}    status = {hs.status}     Time = {hs.resolution_times[0]}     --->     objVal (UB) = {hs.m.ObjVal}    objBound (LB) = {hs.m.ObjBound}")
+    #         hs_cluster_time += hs.model_times[0] + hs.resolution_times[0]
+    #
+    #     if not critical_resources:
+    #         f.write(f"\n\nClusters are not feasible     Time (without cluster creation) = {sum(hs.model_times[0] + hs.resolution_times[0] for hs in cluster_solvers)}")
+    #         return
+    #
+    #     f.write(f"\n\nDelay by solving clusters = {sum(hs.m.ObjVal for hs in cluster_solvers)}     Time (without cluster creation) = {sum(hs.model_times[0] + hs.resolution_times[0] for hs in cluster_solvers)}\n")
+    #
+    #
+    #
+    #     f.write(f"\n{critical_resources.critical_resources_per_tol[0]} critical resources  Time = {critical_resources.creation_times[0]}     ")
+    #     hs_cluster_time += critical_resources.creation_times[0]
+    #     if final_solver is None:
+    #         f.write(f"\n\nSolution is already feasible    Total time cluster heuristic = {hs_cluster_time}")
+    #     else:
+    #         f.write(f"Unassigned {critical_resources.unassigned_agents_per_tol[0]} Agents    Time = {critical_resources.unassigning_times[0]}")
+    #         hs_cluster_time += critical_resources.unassigning_times[0]
+    #
+    #
+    #         diff = critical_resources.current_tol - critical_resources.starting_tol
+    #         for j in range(1, diff + 1):
+    #             f.write(f"\nNo solution found     Time = {final_solver.resolution_times[j - 1]}   ->   Augmented tolerance\n")
+    #             f.write(f"\n{critical_resources.critical_resources_per_tol[j]} critical resources    Time = {critical_resources.creation_times[j]}     ")
+    #             f.write(f"Unassigned {critical_resources.unassigned_agents_per_tol[j]} Agents    Time = {critical_resources.unassigning_times[j]}")
+    #             hs_cluster_time += critical_resources.creation_times[j] + critical_resources.unassigning_times[j]
+    #
+    #
+    #         f.write(f"\n\nFinale solver:   Model created   Time = {final_solver.model_times[critical_resources.current_tol]}   status = {final_solver.status}     Time = {final_solver.resolution_times[critical_resources.current_tol]}\n")
+    #         for j in range(len(final_solver.model_times)):
+    #             hs_cluster_time += final_solver.model_times[j] + final_solver.resolution_times[j]
+    #         delay_assigned_agents = sum(a.delay for a in env.agents if a not in final_solver.critical_resources.removed_agents)
+    #         f.write(f"\nFinal Delay     --->     objVal (UB) = {final_solver.m.ObjVal + delay_assigned_agents}    objBound (LB) = {final_solver.m.ObjBound + delay_assigned_agents}    Total time cluster heuristic = {hs_cluster_time}")
+    #
+    #     f.write("\n\n========================================================================================\n")
+    #     f.write("========================================================================================\n\n")
 
 
 def read_scalability_results():
