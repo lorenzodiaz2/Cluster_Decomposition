@@ -15,12 +15,12 @@ def run_scalability():
                  "model times final", "resolution times final", "status final", "UB final", "LB final"]
     )
 
-    quadrant_range = range(3, 6)
+    quadrant_range = range(3, 7)
     for n_quadrants in quadrant_range:
         print()
         for i in range(5):
             print(f"n quadrant = {n_quadrants}    iteration {i} ->  Setting env... ", end="")
-            env = Environment(30, 150, n_quadrants, 30, 0, 12, False)
+            env = Environment(60, 750, n_quadrants, 150, 0, 12, False)
             print("Done.   Solving complete... ", end="")
             complete_solver = Heuristic_Solver(env.G, env.od_pairs)
             complete_solver.solve()
@@ -41,12 +41,12 @@ def run_scalability():
 
             if not all_clusters_ok:
                 print()
-                save_results(env, complete_solver, cluster_solvers, i, df, None,None)
+                save_results(env, complete_solver, cluster_solvers, df, None, None)
             else:
                 critical_resources = Critical_Resources(env.G, env.od_pairs)
                 if critical_resources.is_initially_feasible:
                     print("Solution is already feasible.")
-                    save_results(env, complete_solver, cluster_solvers, i, df, critical_resources, None)
+                    save_results(env, complete_solver, cluster_solvers, df, critical_resources, None)
                     continue
                 else:
                     print("Unassigning agents... ", end="")
@@ -56,7 +56,7 @@ def run_scalability():
                     final_solver.solve()
                     final_solver.assign_solutions()
                     print("Done.")
-                    save_results(env, complete_solver, cluster_solvers, i, df, critical_resources, final_solver)
+                    save_results(env, complete_solver, cluster_solvers, df, critical_resources, final_solver)
 
     df.to_csv("test.csv", index=False)
 

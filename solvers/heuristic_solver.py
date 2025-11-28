@@ -36,7 +36,6 @@ class Heuristic_Solver(General_Solver):
                 print("  (tol+1)  ", end="")
                 self.critical_resources.increment_tol()
                 self.critical_resources.unassign_agents()
-                print(f"  {len(self.critical_resources.agents)}   ", end="")
             else:
                 print("  (T+1)  ", end="")
                 for od_pair in self.od_pairs:
