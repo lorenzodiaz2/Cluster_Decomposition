@@ -42,6 +42,7 @@ class Environment:
         self.od_pairs: List[OD_Pair] = []
         self.agents: List[Agent] = []
         self.clusters: List[Cluster] = []
+        self.similarity_matrix = None
         self.set_time = None
         self.matrix_time = None
         self.nj_time = None
@@ -84,7 +85,7 @@ class Environment:
     def compute_clusters(self):
         start = time.time()
         n = len(self.od_pairs)
-        similarity_matrix = np.zeros((n, n), dtype=int)
+        self.similarity_matrix = np.zeros((n, n), dtype=int)
 
         with mp.Pool(
             processes=mp.cpu_count(),
@@ -94,13 +95,13 @@ class Environment:
             results = pool.map(compute_similarity_row, range(n - 1))
 
         for i, row in results:
-            similarity_matrix[i, i + 1:] = row[i + 1:]
-            similarity_matrix[i + 1:, i] = row[i + 1:]
+            self.similarity_matrix[i, i + 1:] = row[i + 1:]
+            self.similarity_matrix[i + 1:, i] = row[i + 1:]
 
         self.matrix_time = time.time() - start
 
         start = time.time()
-        tree = TreePartition(similarity_matrix, self.od_pairs, self.max_cluster_size)
+        tree = TreePartition(self.similarity_matrix, self.od_pairs, self.max_cluster_size)
         self.clusters = tree.compute_clusters()
         self.nj_time = time.time() - start
 
@@ -169,44 +170,48 @@ class Environment:
         left_up = (0, 0)
         right_down = (n - 1, n - 1)
 
+        off = self.offset
+
         if self.n_quadrants == 2:
-            self.quadrants = self.divide_by_2(left_up, right_down)
+            self.quadrants = self.divide_by_2(left_up, right_down, off)
         elif self.n_quadrants == 3:
-            self.quadrants = self.divide_by_3(left_up, right_down)
+            self.quadrants = self.divide_by_3(left_up, right_down, off)
         elif self.n_quadrants >= 4:
             q = self.n_quadrants // 4
             r = self.n_quadrants - q * 4
 
-            self.quadrants = self.divide_by_4(left_up, right_down)
+            self.quadrants = self.divide_by_4(left_up, right_down, off)
 
             if q == 1:
                 for i in range(r):
-                    left_up, right_down = self.quadrants[i]
-                    self.quadrants.extend(self.divide_by_2(left_up, right_down))
+                    lu, rd = self.quadrants[i]
+                    self.quadrants.extend(self.divide_by_2(lu, rd, off))
                 del self.quadrants[:r]
+
             if q == 2:
                 for i in range(4):
+                    lu, rd = self.quadrants[i]
                     if i < r:
-                        left_up, right_down = self.quadrants[i]
-                        self.quadrants.extend(self.divide_by_3(left_up, right_down))
+                        self.quadrants.extend(self.divide_by_3(lu, rd, off))
                     else:
-                        left_up, right_down = self.quadrants[i]
-                        self.quadrants.extend(self.divide_by_2(left_up, right_down))
+                        self.quadrants.extend(self.divide_by_2(lu, rd, off))
                 del self.quadrants[:4]
+
             if q == 3:
                 for i in range(4):
+                    lu, rd = self.quadrants[i]
                     if i < r:
-                        left_up, right_down = self.quadrants[i]
-                        self.quadrants.extend(self.divide_by_4(left_up, right_down))
+                        self.quadrants.extend(self.divide_by_4(lu, rd, off))
                     else:
-                        left_up, right_down = self.quadrants[i]
-                        self.quadrants.extend(self.divide_by_3(left_up, right_down))
+                        self.quadrants.extend(self.divide_by_3(lu, rd, off))
                 del self.quadrants[:4]
+
             if q == 4 and r == 0:
                 for i in range(4):
-                    left_up, right_down = self.quadrants[i]
-                    self.quadrants.extend(self.divide_by_4(left_up, right_down))
+                    lu, rd = self.quadrants[i]
+                    self.quadrants.extend(self.divide_by_4(lu, rd, off))
                 del self.quadrants[:4]
+
 
 
     def _set_capacities(self):
@@ -236,49 +241,93 @@ class Environment:
     @staticmethod
     def divide_by_2(
         left_up: Coord,
-        right_down: Coord
+        right_down: Coord,
+        offset: int = 0
     ) -> list[Quadrant]:
 
         top, left = left_up
         bottom, right = right_down
 
-        mid_col = (left + right) // 2
+        # split sulle colonne
+        left_end_col, right_start_col = Environment._split_interval(left, right, offset)
 
-        left_quadrant: Quadrant = (left_up, (bottom, mid_col))
-        right_quadrant: Quadrant = ((top, mid_col + 1), right_down)
+        left_quadrant: Quadrant = (left_up, (bottom, left_end_col))
+        right_quadrant: Quadrant = ((top, right_start_col), right_down)
 
         return [left_quadrant, right_quadrant]
 
     @staticmethod
     def divide_by_3(
         left_up: Coord,
-        right_down: Coord
+        right_down: Coord,
+        offset: int = 0
     ) -> list[Quadrant]:
-        left_quadrant, right_quadrant = Environment.divide_by_2(left_up, right_down)
-        left_up_quadrant, left_down_quadrant = Environment.divide(left_quadrant)
+        # prima split orizzontale (colonne) in 2
+        left_quadrant, right_quadrant = Environment.divide_by_2(left_up, right_down, offset)
+        # poi split verticale (righe) del quadrante di sinistra
+        left_up_quadrant, left_down_quadrant = Environment.divide(left_quadrant, offset)
 
         return [left_up_quadrant, left_down_quadrant, right_quadrant]
+
 
     @staticmethod
     def divide_by_4(
         left_up: Coord,
-        right_down: Coord
+        right_down: Coord,
+        offset: int = 0
     ) -> list[Quadrant]:
-        left_up_quadrant, left_down_quadrant, right_quadrant = Environment.divide_by_3(left_up, right_down)
-
-        right_up_quadrant, right_down_quadrant = Environment.divide(right_quadrant)
+        # prima divido in 3 (left_up, left_down, right intero)
+        left_up_quadrant, left_down_quadrant, right_quadrant = Environment.divide_by_3(
+            left_up, right_down, offset
+        )
+        # poi split verticale del quadrante di destra
+        right_up_quadrant, right_down_quadrant = Environment.divide(right_quadrant, offset)
 
         return [left_up_quadrant, left_down_quadrant, right_up_quadrant, right_down_quadrant]
 
+
     @staticmethod
-    def divide(quadrant: Quadrant) -> tuple[Quadrant, Quadrant]:
-        lu, br = quadrant
-        top, left = lu
-        bottom, right = br
+    def divide(
+        quadrant: Quadrant,
+        offset: int = 0
+    ) -> tuple[Quadrant, Quadrant]:
+        (top, left), (bottom, right) = quadrant
 
-        mid = (top + bottom) // 2
+        # split sulle righe
+        up_bottom_row, down_top_row = Environment._split_interval(top, bottom, offset)
 
-        up_quadrant: Quadrant = (lu, (mid, right))
-        down_quadrant: Quadrant = ((mid + 1, left), br)
+        up_quadrant: Quadrant = ((top, left), (up_bottom_row, right))
+        down_quadrant: Quadrant = ((down_top_row, left), (bottom, right))
 
         return up_quadrant, down_quadrant
+
+
+    @staticmethod
+    def _split_interval(start: int, end: int, offset: int) -> tuple[int, int]:
+        """
+        Divide [start, end] in due intervalli:
+            sinistra:  [start, left_end]
+            destra:    [right_start, end]
+        con comportamento:
+
+        - offset =  0 -> 1 cella in comune (mid)
+        - offset >  0 -> entrambi si espandono verso il centro (più overlap)
+        - offset <  0 -> entrambi si restringono verso l'esterno (buco in mezzo)
+
+        Esempio: start=0, end=11 (12 celle), mid=5
+            offset=0: left=[0..5], right=[5..11]
+            offset=1: left=[0..6], right=[4..11]
+            offset=-1: left=[0..4], right=[6..11]
+        """
+        mid = (start + end) // 2
+
+        # espansione/restringimento simmetrico attorno a mid
+        left_end = mid + offset
+        right_start = mid - offset
+
+        # clamp per rimanere dentro [start, end]
+        left_end = max(start, min(left_end, end))
+        right_start = max(start, min(right_start, end))
+
+        return left_end, right_start
+

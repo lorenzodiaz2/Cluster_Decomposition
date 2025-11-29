@@ -7,6 +7,11 @@ if __name__ == '__main__':
 
     run_scalability()
 
+    env = Environment(12, 750, 4, 1, -3, 1, True, seed=42)
+    for q in env.quadrants:
+        print(q)
+
+
     exit(0)
 
     parallel_times = {}
