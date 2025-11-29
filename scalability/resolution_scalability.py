@@ -88,6 +88,8 @@ def get_data_frame():
         "status final": pd.Series(dtype="object"),
         "UB complete": pd.Series(dtype="float"),
         "LB complete": pd.Series(dtype="float"),
+        "UB clusters": pd.Series(dtype="float"),
+        "LB clusters": pd.Series(dtype="float"),
         "final delay": pd.Series(dtype="int"),
         "total time complete": pd.Series(dtype="float"),
         "total time clusters + post": pd.Series(dtype="float")
