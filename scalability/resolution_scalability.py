@@ -8,7 +8,7 @@ from utils.results_io import save_results
 def run_scalability():
     df = get_data_frame()
 
-    quadrant_range = range(3, 5)
+    quadrant_range = range(3, 10)
     for n_quadrants in quadrant_range:
         print()
         for i in range(10):
