@@ -77,11 +77,11 @@ def save_results(
 
     df.loc[len(df)] = [
         grid_side, n_quadrants, n_pairs, n_agents, max_cluster_size, offset, k, seed, env_time,
-        model_times_complete, resolution_times_complete, status_complete, UB_complete, LB_complete,
+        model_times_complete, resolution_times_complete, status_complete,
         n_clusters, similarity_matrix, similarity_matrix_time, nj_time, n_agents_per_cluster, od_pairs_per_cluster, model_times_clusters, resolution_times_clusters,
         clusters_status, UBs_clusters, LBs_clusters,
         critical_resources_creation_times, unassigned_agents, unassigning_times,
-        model_times_final, resolution_times_final, status_final, final_delay, total_time_complete, total_time_clusters_post,
+        model_times_final, resolution_times_final, status_final, UB_complete, LB_complete, final_delay, total_time_complete, total_time_clusters_post
     ]
 
 

@@ -69,8 +69,6 @@ def get_data_frame():
         "model times complete": pd.Series(dtype="object"),
         "resolution times complete": pd.Series(dtype="object"),
         "status complete": pd.Series(dtype="object"),
-        "UB complete": pd.Series(dtype="float"),
-        "LB complete": pd.Series(dtype="float"),
         "n clusters": pd.Series(dtype="int"),
         "similarity matrix": pd.Series(dtype="object"),
         "similarity matrix time": pd.Series(dtype="float"),
@@ -88,6 +86,8 @@ def get_data_frame():
         "model times final": pd.Series(dtype="object"),
         "resolution times final": pd.Series(dtype="object"),
         "status final": pd.Series(dtype="object"),
+        "UB complete": pd.Series(dtype="float"),
+        "LB complete": pd.Series(dtype="float"),
         "final delay": pd.Series(dtype="int"),
         "total time complete": pd.Series(dtype="float"),
         "total time clusters + post": pd.Series(dtype="float")

@@ -248,7 +248,6 @@ class Environment:
         top, left = left_up
         bottom, right = right_down
 
-        # split sulle colonne
         left_end_col, right_start_col = Environment._split_interval(left, right, offset)
 
         left_quadrant: Quadrant = (left_up, (bottom, left_end_col))
@@ -262,9 +261,7 @@ class Environment:
         right_down: Coord,
         offset: int = 0
     ) -> list[Quadrant]:
-        # prima split orizzontale (colonne) in 2
         left_quadrant, right_quadrant = Environment.divide_by_2(left_up, right_down, offset)
-        # poi split verticale (righe) del quadrante di sinistra
         left_up_quadrant, left_down_quadrant = Environment.divide(left_quadrant, offset)
 
         return [left_up_quadrant, left_down_quadrant, right_quadrant]
@@ -276,11 +273,7 @@ class Environment:
         right_down: Coord,
         offset: int = 0
     ) -> list[Quadrant]:
-        # prima divido in 3 (left_up, left_down, right intero)
-        left_up_quadrant, left_down_quadrant, right_quadrant = Environment.divide_by_3(
-            left_up, right_down, offset
-        )
-        # poi split verticale del quadrante di destra
+        left_up_quadrant, left_down_quadrant, right_quadrant = Environment.divide_by_3(left_up, right_down, offset)
         right_up_quadrant, right_down_quadrant = Environment.divide(right_quadrant, offset)
 
         return [left_up_quadrant, left_down_quadrant, right_up_quadrant, right_down_quadrant]
@@ -293,7 +286,6 @@ class Environment:
     ) -> tuple[Quadrant, Quadrant]:
         (top, left), (bottom, right) = quadrant
 
-        # split sulle righe
         up_bottom_row, down_top_row = Environment._split_interval(top, bottom, offset)
 
         up_quadrant: Quadrant = ((top, left), (up_bottom_row, right))
@@ -303,29 +295,16 @@ class Environment:
 
 
     @staticmethod
-    def _split_interval(start: int, end: int, offset: int) -> tuple[int, int]:
-        """
-        Divide [start, end] in due intervalli:
-            sinistra:  [start, left_end]
-            destra:    [right_start, end]
-        con comportamento:
-
-        - offset =  0 -> 1 cella in comune (mid)
-        - offset >  0 -> entrambi si espandono verso il centro (più overlap)
-        - offset <  0 -> entrambi si restringono verso l'esterno (buco in mezzo)
-
-        Esempio: start=0, end=11 (12 celle), mid=5
-            offset=0: left=[0..5], right=[5..11]
-            offset=1: left=[0..6], right=[4..11]
-            offset=-1: left=[0..4], right=[6..11]
-        """
+    def _split_interval(
+        start: int,
+        end: int,
+        offset: int
+    ) -> tuple[int, int]:
         mid = (start + end) // 2
 
-        # espansione/restringimento simmetrico attorno a mid
         left_end = mid + offset
         right_start = mid - offset
 
-        # clamp per rimanere dentro [start, end]
         left_end = max(start, min(left_end, end))
         right_start = max(start, min(right_start, end))
 
