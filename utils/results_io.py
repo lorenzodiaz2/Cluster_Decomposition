@@ -50,10 +50,9 @@ def save_results(
     resolution_times_final = None
     status_final = None
     final_delay = None
-###########################################################################
     total_time_complete = sum(mt for mt in complete_solver.model_times) + sum(rt for rt in complete_solver.resolution_times)
-    total_time_clusters_post = env.similarity_matrix + env.nj_time
-###########################################################################
+    total_time_clusters_post = similarity_matrix_time + nj_time
+
     for hs in cluster_solvers:
         model_times_clusters.append(hs.model_times[0])
         resolution_times_clusters.append(hs.resolution_times[0])
