@@ -43,33 +43,38 @@ def save_results(
     UBs_clusters = []
     LBs_clusters = []
 
-    critical_resources_creation_times = -1
-    unassigned_agents = -1
-    unassigning_times = -1
-    model_times_final = -1
-    resolution_times_final = -1
-    status_final = -1
-    UB_final = -1
-    LB_final = -1
-
+    critical_resources_creation_times = None
+    unassigned_agents = None
+    unassigning_times = None
+    model_times_final = None
+    resolution_times_final = None
+    status_final = None
+    final_delay = None
+###########################################################################
+    total_time_complete = sum(mt for mt in complete_solver.model_times) + sum(rt for rt in complete_solver.resolution_times)
+    total_time_clusters_post = env.similarity_matrix + env.nj_time
+###########################################################################
     for hs in cluster_solvers:
         model_times_clusters.append(hs.model_times[0])
         resolution_times_clusters.append(hs.resolution_times[0])
         clusters_status.append(hs.status)
         UBs_clusters.append(hs.m.ObjVal)
         LBs_clusters.append(hs.m.ObjBound)
+        total_time_clusters_post += hs.model_times[0] + hs.resolution_times[0]
 
     if critical_resources is not None:
         critical_resources_creation_times = critical_resources.creation_times
+        total_time_clusters_post += sum(ct for ct in critical_resources_creation_times)
         if final_solver is not None:
             unassigned_agents = critical_resources.unassigned_agents_per_tol
             unassigning_times = critical_resources.unassigning_times
+            total_time_clusters_post += sum(ut for ut in unassigning_times)
 
             model_times_final = final_solver.model_times
             resolution_times_final = final_solver.resolution_times
+            total_time_clusters_post += sum(mt for mt in model_times_final) + sum(rt for rt in resolution_times_final)
             status_final = final_solver.status
-            UB_final = final_solver.m.ObjVal
-            LB_final = final_solver.m.ObjBound
+            final_delay = sum(a.delay for a in env.agents)
 
     df.loc[len(df)] = [
         grid_side, n_quadrants, n_pairs, n_agents, max_cluster_size, offset, k, seed, env_time,
@@ -77,7 +82,7 @@ def save_results(
         n_clusters, similarity_matrix, similarity_matrix_time, nj_time, n_agents_per_cluster, od_pairs_per_cluster, model_times_clusters, resolution_times_clusters,
         clusters_status, UBs_clusters, LBs_clusters,
         critical_resources_creation_times, unassigned_agents, unassigning_times,
-        model_times_final, resolution_times_final, status_final, UB_final, LB_final
+        model_times_final, resolution_times_final, status_final, final_delay, total_time_complete, total_time_clusters_post,
     ]
 
 

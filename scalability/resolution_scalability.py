@@ -88,8 +88,9 @@ def get_data_frame():
         "model times final": pd.Series(dtype="object"),
         "resolution times final": pd.Series(dtype="object"),
         "status final": pd.Series(dtype="object"),
-        "UB final": pd.Series(dtype="float"),
-        "LB final": pd.Series(dtype="float"),
+        "final delay": pd.Series(dtype="int"),
+        "total time complete": pd.Series(dtype="float"),
+        "total time clusters + post": pd.Series(dtype="float")
     })
 
 
