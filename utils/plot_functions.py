@@ -57,8 +57,21 @@ def draw_half_separators(ax: plt.Axes, G) -> None:
     n_rows = max(i for i, _ in nodes) + 1
     n_cols = max(j for _, j in nodes) + 1
 
-    mid_col = n_cols / 2
-    mid_row = n_rows / 2
+    mid_col = n_cols / 3
+    mid_row = n_rows / 3
+
+    # separatore verticale
+    ax.plot([mid_col - 0.5, mid_col - 0.5],
+            [0.5, -n_rows + 0.5],
+            lw=2, color="k", alpha=1.)
+
+    # separatore orizzontale
+    ax.plot([-0.5, n_cols - 0.5],
+            [-mid_row + 0.5, -mid_row + 0.5],
+            lw=2, color="k", alpha=1.)
+
+    mid_col = 2 * n_cols / 3
+    mid_row = 2 * n_rows / 3
 
     # separatore verticale
     ax.plot([mid_col - 0.5, mid_col - 0.5],

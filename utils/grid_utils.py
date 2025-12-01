@@ -11,7 +11,7 @@ def set_quadrants_4_9(grid_side, n_quadrants, off):
         quadrants = _divide_by_4(left_up, right_down, off)
     elif n_quadrants <= 9:
         quadrants = _divide_by_9(left_up, right_down, off)
-    
+
     return quadrants
 
 
@@ -132,24 +132,34 @@ def _split_interval_2(
     return left_end, right_start
 
 
-def _split_interval_3(start: int, end: int) -> list[tuple[int, int]]:
-
+def _split_interval_3(
+    start: int,
+    end: int,
+    offset: int = 0
+) -> list[tuple[int, int]]:
     length = end - start + 1
+    assert length % 3 == 0, "La lunghezza deve essere multipla di 3"
+
     base = length // 3
-    rem = length % 3
 
-    sizes = [base] * 3
-    for i in range(rem):
-        sizes[i] += 1
+    b1 = start + base
+    b2 = start + 2 * base
 
-    intervals = []
-    cur_start = start
-    for sz in sizes:
-        cur_end = cur_start + sz - 1
-        intervals.append((cur_start, cur_end))
-        cur_start = cur_end + 1
+    i1_start = start
+    i1_end   = b1 + offset
 
-    return intervals
+    i2_start = b1 - offset
+    i2_end   = b2 + offset
+
+    i3_start = b2 - offset
+    i3_end   = end
+
+    i1_end   = max(start, min(i1_end, end))
+    i2_start = max(start, min(i2_start, end))
+    i2_end   = max(start, min(i2_end, end))
+    i3_start = max(start, min(i3_start, end))
+
+    return [(i1_start, i1_end), (i2_start, i2_end), (i3_start, i3_end)]
 
 
 def _divide_by_9(
@@ -157,21 +167,33 @@ def _divide_by_9(
     right_down: Coord,
     offset: int = 0
 ) -> list[Quadrant]:
-    if offset != 0:
-        raise ValueError("offset deve essere 0 per mantenere i 9 quadranti tutti uguali")
-
     top, left = left_up
     bottom, right = right_down
 
-    row_intervals = _split_interval_3(top, bottom)
-    col_intervals = _split_interval_3(left, right)
+    row_intervals = _split_interval_3(top, bottom, offset)
+    col_intervals = _split_interval_3(left, right, offset)
 
-    quadrants: list[Quadrant] = []
+    return [
+        ((r_start, c_start), (r_end, c_end))
+        for (r_start, r_end) in row_intervals
+        for (c_start, c_end) in col_intervals
+    ]
 
-    for r_start, r_end in row_intervals:
-        for c_start, c_end in col_intervals:
-            quadrants.append(((r_start, c_start), (r_end, c_end)))
 
-    return quadrants
+
+
+def remove_nodes_from_quadrant(G, quadrant):
+    (top, left), (bottom, right) = quadrant
+
+    nodes_to_remove = [
+        (i, j)
+        for i in range(top, bottom + 1)
+        for j in range(left, right + 1)
+    ]
+
+    G.remove_nodes_from(nodes_to_remove)
+
+
+
 
 
