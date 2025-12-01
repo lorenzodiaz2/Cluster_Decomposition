@@ -51,7 +51,6 @@ def save_results(
     model_times_final = None
     resolution_times_final = None
     status_final = None
-    final_delay = None
     total_time_complete = sum(mt for mt in complete_solver.model_times) + sum(rt for rt in complete_solver.resolution_times)
     total_time_clusters_post = similarity_matrix_time + nj_time
 
@@ -77,7 +76,7 @@ def save_results(
             resolution_times_final = final_solver.resolution_times
             total_time_clusters_post += sum(mt for mt in model_times_final) + sum(rt for rt in resolution_times_final)
             status_final = final_solver.status
-            final_delay = sum(a.delay for a in env.agents)
+    final_delay = sum(a.delay for a in env.agents)
 
     df.loc[len(df)] = [
         grid_side, n_quadrants, n_pairs, n_agents, max_cluster_size, offset, k, seed, env_time,

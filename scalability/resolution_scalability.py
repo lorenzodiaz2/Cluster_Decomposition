@@ -51,7 +51,7 @@ def run_scalability():
                     print("Done.")
                     save_results(env, complete_solver, cluster_solvers, df, i, critical_resources, final_solver)
 
-    df.to_csv("test.csv", index=False)
+    df.to_csv("test_8-9.csv", index=False)
 
 
 
