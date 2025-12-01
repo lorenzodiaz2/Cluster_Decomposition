@@ -8,10 +8,10 @@ from utils.results_io import save_results
 def run_scalability():
     df = get_data_frame()
 
-    quadrant_range = range(8, 10)
+    quadrant_range = range(2, 4)
     for n_quadrants in quadrant_range:
         print()
-        for i in range(10):
+        for i in range(3):
             print(f"n quadrant = {n_quadrants}    iteration {i} ->  Setting env... ", end="")
             env = Environment(60, 750, n_quadrants, 150, -1, 12, seed=i)
             print("Done.   Solving complete... ", end="")
@@ -51,7 +51,7 @@ def run_scalability():
                     print("Done.")
                     save_results(env, complete_solver, cluster_solvers, df, i, critical_resources, final_solver)
 
-    df.to_csv("test_8-9.csv", index=False)
+    df.to_csv("new_test_2-3.csv", index=False)
 
 
 

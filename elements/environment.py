@@ -11,7 +11,7 @@ from elements.cluster import Cluster
 from elements.pair import OD_Pair
 from elements.path import Path
 from nj.tree_partition import TreePartition
-from utils.grid_utils import set_quadrants, set_quadrants_4_9, remove_nodes_from_quadrant
+from utils.grid_utils import set_quadrants_4_9
 from utils.parallel import init_paths_pool, compute_paths_for_quadrant, init_similarity_pool, compute_similarity_row
 
 Coord = tuple[int, int]
@@ -147,8 +147,6 @@ class Environment:
                     n_tot_agents += len(od_pair.agents)
                     seen.add((od_pair.src, od_pair.dst))
                     self.quadrant_by_od[od_pair.id] = quadrant
-            else:
-                remove_nodes_from_quadrant(self.G, quadrant)
 
 
     def _choose_pair(

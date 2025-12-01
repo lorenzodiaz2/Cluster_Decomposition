@@ -182,16 +182,16 @@ def _divide_by_9(
 
 
 
-def remove_nodes_from_quadrant(G, quadrant):
-    (top, left), (bottom, right) = quadrant
-
-    nodes_to_remove = [
-        (i, j)
-        for i in range(top, bottom + 1)
-        for j in range(left, right + 1)
-    ]
-
-    G.remove_nodes_from(nodes_to_remove)
+# def remove_nodes_from_quadrant(G, quadrant):
+#     (top, left), (bottom, right) = quadrant
+#
+#     nodes_to_remove = [
+#         (i, j)
+#         for i in range(top, bottom + 1)
+#         for j in range(left, right + 1)
+#     ]
+#
+#     G.remove_nodes_from(nodes_to_remove)
 
 
 
