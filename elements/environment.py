@@ -11,6 +11,7 @@ from elements.cluster import Cluster
 from elements.pair import OD_Pair
 from elements.path import Path
 from nj.tree_partition import TreePartition
+from utils.grid_utils import set_quadrants, set_quadrants_4_9
 from utils.parallel import init_paths_pool, compute_paths_for_quadrant, init_similarity_pool, compute_similarity_row
 
 Coord = tuple[int, int]
@@ -123,12 +124,23 @@ class Environment:
 
 
     def _choose_pairs(self):
-        self._set_quadrants()
+        self.quadrants = set_quadrants_4_9(self.grid_side, self.n_quadrants, self.offset)
 
         i = 0
         n_tot_agents = 0
         seen = set()
-        for quadrant in self.quadrants:
+        # for quadrant in self.quadrants:
+        #     for _ in range(self.n_pairs_per_quadrant):
+        #         od_pair = self._choose_pair(quadrant, i, n_tot_agents, seen)
+        #         self.od_pairs.append(od_pair)
+        #         i += 1
+        #         n_tot_agents += len(od_pair.agents)
+        #         seen.add((od_pair.src, od_pair.dst))
+        #         self.quadrant_by_od[od_pair.id] = quadrant
+
+        for j, quadrant in enumerate(self.quadrants):
+            if j >= self.n_quadrants:
+                break
             for _ in range(self.n_pairs_per_quadrant):
                 od_pair = self._choose_pair(quadrant, i, n_tot_agents, seen)
                 self.od_pairs.append(od_pair)
@@ -165,55 +177,6 @@ class Environment:
 
 
 
-    def _set_quadrants(self):
-        n = self.grid_side
-        left_up = (0, 0)
-        right_down = (n - 1, n - 1)
-
-        off = self.offset
-
-        if self.n_quadrants == 2:
-            self.quadrants = self.divide_by_2(left_up, right_down, off)
-        elif self.n_quadrants == 3:
-            self.quadrants = self.divide_by_3(left_up, right_down, off)
-        elif self.n_quadrants >= 4:
-            q = self.n_quadrants // 4
-            r = self.n_quadrants - q * 4
-
-            self.quadrants = self.divide_by_4(left_up, right_down, off)
-
-            if q == 1:
-                for i in range(r):
-                    lu, rd = self.quadrants[i]
-                    self.quadrants.extend(self.divide_by_2(lu, rd, off))
-                del self.quadrants[:r]
-
-            if q == 2:
-                for i in range(4):
-                    lu, rd = self.quadrants[i]
-                    if i < r:
-                        self.quadrants.extend(self.divide_by_3(lu, rd, off))
-                    else:
-                        self.quadrants.extend(self.divide_by_2(lu, rd, off))
-                del self.quadrants[:4]
-
-            if q == 3:
-                for i in range(4):
-                    lu, rd = self.quadrants[i]
-                    if i < r:
-                        self.quadrants.extend(self.divide_by_4(lu, rd, off))
-                    else:
-                        self.quadrants.extend(self.divide_by_3(lu, rd, off))
-                del self.quadrants[:4]
-
-            if q == 4 and r == 0:
-                for i in range(4):
-                    lu, rd = self.quadrants[i]
-                    self.quadrants.extend(self.divide_by_4(lu, rd, off))
-                del self.quadrants[:4]
-
-
-
     def _set_capacities(self):
         od_nodes = [node for od_pair in self.od_pairs for node in (od_pair.src, od_pair.dst)]
         V = list(self.G.nodes)
@@ -228,85 +191,4 @@ class Environment:
         for v in V:
             if v not in od_nodes:
                 self.G.nodes[v]["capacity"] = self.rng.randrange(5, 6)  #############
-
-
-    def _subgraph_for_quadrant(self, quadrant: Quadrant) -> nx.Graph:
-        (top, left), (bottom, right) = quadrant
-        nodes = [(i, j) for i in range(top, bottom + 1) for j in range(left, right + 1)]
-
-        return self.G.subgraph(nodes).copy()
-
-
-
-    @staticmethod
-    def divide_by_2(
-        left_up: Coord,
-        right_down: Coord,
-        offset: int = 0
-    ) -> list[Quadrant]:
-
-        top, left = left_up
-        bottom, right = right_down
-
-        left_end_col, right_start_col = Environment._split_interval(left, right, offset)
-
-        left_quadrant: Quadrant = (left_up, (bottom, left_end_col))
-        right_quadrant: Quadrant = ((top, right_start_col), right_down)
-
-        return [left_quadrant, right_quadrant]
-
-    @staticmethod
-    def divide_by_3(
-        left_up: Coord,
-        right_down: Coord,
-        offset: int = 0
-    ) -> list[Quadrant]:
-        left_quadrant, right_quadrant = Environment.divide_by_2(left_up, right_down, offset)
-        left_up_quadrant, left_down_quadrant = Environment.divide(left_quadrant, offset)
-
-        return [left_up_quadrant, left_down_quadrant, right_quadrant]
-
-
-    @staticmethod
-    def divide_by_4(
-        left_up: Coord,
-        right_down: Coord,
-        offset: int = 0
-    ) -> list[Quadrant]:
-        left_up_quadrant, left_down_quadrant, right_quadrant = Environment.divide_by_3(left_up, right_down, offset)
-        right_up_quadrant, right_down_quadrant = Environment.divide(right_quadrant, offset)
-
-        return [left_up_quadrant, left_down_quadrant, right_up_quadrant, right_down_quadrant]
-
-
-    @staticmethod
-    def divide(
-        quadrant: Quadrant,
-        offset: int = 0
-    ) -> tuple[Quadrant, Quadrant]:
-        (top, left), (bottom, right) = quadrant
-
-        up_bottom_row, down_top_row = Environment._split_interval(top, bottom, offset)
-
-        up_quadrant: Quadrant = ((top, left), (up_bottom_row, right))
-        down_quadrant: Quadrant = ((down_top_row, left), (bottom, right))
-
-        return up_quadrant, down_quadrant
-
-
-    @staticmethod
-    def _split_interval(
-        start: int,
-        end: int,
-        offset: int
-    ) -> tuple[int, int]:
-        mid = (start + end) // 2
-
-        left_end = mid + offset
-        right_start = mid - offset
-
-        left_end = max(start, min(left_end, end))
-        right_start = max(start, min(right_start, end))
-
-        return left_end, right_start
 
