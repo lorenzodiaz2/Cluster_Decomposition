@@ -8,38 +8,49 @@ from utils.results_io import save_results
 def run_scalability():
     df = get_data_frame()
 
-    quadrant_range = range(2, 4)
+    quadrant_range = range(2, 10)
     for n_quadrants in quadrant_range:
         print()
-        for i in range(3):
+        grid_side = 41 if n_quadrants <= 4 else 62
+        for i in range(5):
+            print(f"\n\n=========================================================================================================\n\n")
             print(f"n quadrant = {n_quadrants}    iteration {i} ->  Setting env... ", end="")
-            env = Environment(60, 750, n_quadrants, 150, -1, 12, seed=i)
-            print("Done.   Solving complete... ", end="")
-            complete_solver = Heuristic_Solver(env.G, env.od_pairs)
+            seed = i + 30
+            env = Environment(grid_side, 740, n_quadrants, 148, -1, 10, seed=seed)
+            print("Done.\n\nCOMPLETA\n\n")
+            complete_solver = Heuristic_Solver(env.G, env.od_pairs, output_flag=1)
             complete_solver.solve()
-            print("Done.   Solving clusters... ", end="")
+            print(f"\n\nSTATUS COMPLETE = {complete_solver.status}")
+            print(f"\n\n=========================================================================================================\n\n")
+
 
             env.compute_clusters()
+            print(f"{len(env.clusters)} clusters   ", end="")
             cluster_solvers = []
             all_clusters_ok = True
             for cluster in env.clusters:
-                hs = Heuristic_Solver(env.G, [od_pair for od_pair in cluster.od_pairs])
+                print(f"\n\n=========================================================================================================\n\nCLUSTER {cluster.id}\n\n")
+
+                hs = Heuristic_Solver(env.G, cluster.od_pairs, output_flag=1)
                 hs.solve()
+                print(f"{hs.status} in {hs.model_times} + {hs.resolution_times}   ", end="")
+                print(f"\n\n=========================================================================================================\n\n")
+
                 if hs.status != "OPTIMAL":
                     all_clusters_ok = False
                 else:
                     hs.assign_solutions()
                 cluster_solvers.append(hs)
-            print("Done.   ", end="")
+            # print("Done.   ", end="")
 
             if not all_clusters_ok:
                 print()
-                save_results(env, complete_solver, cluster_solvers, df, i, None, None)
+                save_results(env, complete_solver, cluster_solvers, df, seed, None, None)
             else:
                 critical_resources = Critical_Resources(env.G, env.od_pairs)
                 if critical_resources.is_initially_feasible:
                     print("Solution is already feasible.")
-                    save_results(env, complete_solver, cluster_solvers, df, i, critical_resources, None)
+                    save_results(env, complete_solver, cluster_solvers, df, seed, critical_resources, None)
                     continue
                 else:
                     print("Unassigning agents... ", end="")
@@ -49,9 +60,9 @@ def run_scalability():
                     final_solver.solve()
                     final_solver.assign_solutions()
                     print("Done.")
-                    save_results(env, complete_solver, cluster_solvers, df, i, critical_resources, final_solver)
+                    save_results(env, complete_solver, cluster_solvers, df, seed, critical_resources, final_solver)
 
-    df.to_csv("new_test_2-3.csv", index=False)
+    df.to_csv("148_test_2-9.csv", index=False)
 
 
 
@@ -70,7 +81,6 @@ def get_data_frame():
         "resolution times complete": pd.Series(dtype="object"),
         "status complete": pd.Series(dtype="object"),
         "n clusters": pd.Series(dtype="int"),
-        "similarity matrix": pd.Series(dtype="object"),
         "similarity matrix time": pd.Series(dtype="float"),
         "nj time": pd.Series(dtype="float"),
         "n agents per cluster": pd.Series(dtype="object"),

@@ -30,7 +30,8 @@ class Environment:
         reproducibility_flag: bool | None = True,
         remove_rnd_nodes_flag: bool | None = False,
         remove_percentage: float | None = 0.1,
-        seed: int | None = 42
+        seed: int | None = 42,
+        restrict_paths_to_quadrant: bool | None = False
     ):
         self.grid_side = grid_side
         Path.set_grid_side(grid_side)
@@ -52,6 +53,9 @@ class Environment:
         self.remove_percentage = remove_percentage
         self.quadrants: List[Quadrant] = []
         self.quadrant_by_od: dict[int, Quadrant] = {}
+        self.restrict_paths_to_quadrant = restrict_paths_to_quadrant
+
+        self.similarity_index = None
 
         self._set_environment()
 
@@ -72,7 +76,7 @@ class Environment:
         with mp.Pool(
             processes=mp.cpu_count(),
             initializer=init_paths_pool,
-            initargs=(self.G, self.k),
+            initargs=(self.G, self.k, self.restrict_paths_to_quadrant),
         ) as pool:
             results = pool.map(compute_paths_for_quadrant, tasks)
 
@@ -105,6 +109,7 @@ class Environment:
         tree = TreePartition(self.similarity_matrix, self.od_pairs, self.max_cluster_size)
         self.clusters = tree.compute_clusters()
         self.nj_time = time.time() - start
+        self._compute_similarity_index()
 
 
 
@@ -124,8 +129,10 @@ class Environment:
 
 
     def _choose_pairs(self):
-        self.quadrants = set_quadrants_4_9(self.grid_side, self.n_quadrants, self.offset)
-
+        if self.n_quadrants == 1:
+            self.quadrants = [((0, 0), (self.grid_side - 1, self.grid_side - 1))]
+        else:
+            self.quadrants = set_quadrants_4_9(self.grid_side, self.n_quadrants, self.offset)
         i = 0
         n_tot_agents = 0
         seen = set()
@@ -191,3 +198,20 @@ class Environment:
             if v not in od_nodes:
                 self.G.nodes[v]["capacity"] = self.rng.randrange(5, 6)  #############
 
+
+    def _compute_similarity_index(self):
+        sim_total = self.similarity_matrix.sum() / 2
+
+        if sim_total == 0:
+            self.similarity_index = 0.0
+            return
+
+        sim_intra = 0.0
+        for cluster in self.clusters:
+            od_ids = np.array([od.id for od in cluster.od_pairs], dtype=int)
+            if len(od_ids) <= 1:
+                continue
+            sub = self.similarity_matrix[np.ix_(od_ids, od_ids)]
+            sim_intra += np.triu(sub, k=1).sum()
+
+        self.similarity_index = sim_intra / sim_total

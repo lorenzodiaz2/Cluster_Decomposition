@@ -25,11 +25,13 @@ def compute_similarity_row(i: int):
 
 _GLOBAL_G: nx.Graph | None = None
 _GLOBAL_K: int | None = None
+_GLOBAL_RESTRICT_PATH_TO_QUADRANT: bool | None = False
 
-def init_paths_pool(G: nx.Graph, k: int):
-    global _GLOBAL_G, _GLOBAL_K
+def init_paths_pool(G: nx.Graph, k: int, restrict_paths_to_quadrant: bool):
+    global _GLOBAL_G, _GLOBAL_K, _GLOBAL_RESTRICT_PATH_TO_QUADRANT
     _GLOBAL_G = G
     _GLOBAL_K = k
+    _GLOBAL_RESTRICT_PATH_TO_QUADRANT = restrict_paths_to_quadrant
 
 def _subgraph_for_quadrant_global(quadrant):
     (top, left), (bottom, right) = quadrant
@@ -38,7 +40,7 @@ def _subgraph_for_quadrant_global(quadrant):
 
 def compute_paths_for_quadrant(args):
     quadrant, od_list = args
-    sub_g = _subgraph_for_quadrant_global(quadrant)
+    sub_g = _subgraph_for_quadrant_global(quadrant) if _GLOBAL_RESTRICT_PATH_TO_QUADRANT else _GLOBAL_G
     for od in od_list:
         od.compute_k_shortest_paths(sub_g, _GLOBAL_K)
     return od_list

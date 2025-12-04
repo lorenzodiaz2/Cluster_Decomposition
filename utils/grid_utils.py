@@ -138,28 +138,48 @@ def _split_interval_3(
     offset: int = 0
 ) -> list[tuple[int, int]]:
     length = end - start + 1
-    assert length % 3 == 0, "La lunghezza deve essere multipla di 3"
+
+    if offset < 0:
+        gap = -offset
+
+        usable = length - 2 * gap
+        if usable % 3 != 0:
+            raise ValueError(
+                f"Intervallo [{start}, {end}] di lunghezza {length} "
+                f"non compatibile con 3 blocchi uguali e gap={gap}"
+            )
+
+        block = usable // 3
+
+        i1_start = start
+        i1_end   = i1_start + block - 1
+
+        i2_start = i1_end + 1 + gap
+        i2_end   = i2_start + block - 1
+
+        i3_start = i2_end + 1 + gap
+        i3_end   = i3_start + block - 1
+
+        assert i3_end == end, f"Final end {i3_end} != {end}"
+
+        return [(i1_start, i1_end), (i2_start, i2_end), (i3_start, i3_end)]
 
     base = length // 3
+    rem = length % 3
 
-    b1 = start + base
-    b2 = start + 2 * base
+    sizes = [base, base, base]
+    for i in range(rem):
+        sizes[i] += 1
 
-    i1_start = start
-    i1_end   = b1 + offset
+    intervals = []
+    cur_start = start
+    for sz in sizes:
+        cur_end = cur_start + sz - 1
+        intervals.append((cur_start, cur_end))
+        cur_start = cur_end + 1
 
-    i2_start = b1 - offset
-    i2_end   = b2 + offset
+    return intervals
 
-    i3_start = b2 - offset
-    i3_end   = end
-
-    i1_end   = max(start, min(i1_end, end))
-    i2_start = max(start, min(i2_start, end))
-    i2_end   = max(start, min(i2_end, end))
-    i3_start = max(start, min(i3_start, end))
-
-    return [(i1_start, i1_end), (i2_start, i2_end), (i3_start, i3_end)]
 
 
 def _divide_by_9(
@@ -178,22 +198,4 @@ def _divide_by_9(
         for (r_start, r_end) in row_intervals
         for (c_start, c_end) in col_intervals
     ]
-
-
-
-
-# def remove_nodes_from_quadrant(G, quadrant):
-#     (top, left), (bottom, right) = quadrant
-#
-#     nodes_to_remove = [
-#         (i, j)
-#         for i in range(top, bottom + 1)
-#         for j in range(left, right + 1)
-#     ]
-#
-#     G.remove_nodes_from(nodes_to_remove)
-
-
-
-
 

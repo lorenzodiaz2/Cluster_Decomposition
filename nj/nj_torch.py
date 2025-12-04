@@ -4,48 +4,49 @@ from matplotlib import pyplot as plt
 
 
 class Node:
-    def __init__(self, idx, is_leaf=False, is_cherry=False, n_paths=0):
+    def __init__(self, idx, is_leaf=False, is_cherry=False, n_agents=0):
         self.id = idx
         self.is_leaf = is_leaf
         self.is_cherry = is_cherry
-        self.links = []
-        self.n_paths = n_paths
+        self.adj_nodes = []
+        self.n_agents = n_agents
         self.cluster = [self.id] if is_leaf else []
 
-    def compute_paths(self):
-        n_paths = 0
-        for link in self.links:
-            n_paths += link.n_paths
-        return n_paths
+    # Serve per sapere quanti agenti avrebbe un cluster se accettassi questo nodo come cluster
+    def compute_n_agents(self):
+        n_agents = 0
+        for adj_node in self.adj_nodes:
+            n_agents += adj_node.n_agents
+        return n_agents
 
-    def merge(self, n_paths):
-        self.n_paths += n_paths
-        for link in self.links:
-            if link.is_leaf:
-                self.cluster += link.cluster
+    def merge(self, n_agents):
+        self.n_agents += n_agents
+        for adj_node in self.adj_nodes:
+            if adj_node.is_leaf:
+                self.cluster += adj_node.cluster
 
         self.is_leaf = True
         self.is_cherry = False
 
     def get_parent(self):
         parent = None
-        for link in self.links:
-            if not link.is_leaf:
-                parent = link
+        for adj_node in self.adj_nodes:
+            if not adj_node.is_leaf:
+                parent = adj_node
         return parent
 
 
 
 class NjTree:
-    def __init__(self, similarity_matrix, paths, max_cluster_size):
+    def __init__(self, similarity_matrix, n_agents, max_cluster_size):
         self.d = similarity_matrix
         self.n_taxa = similarity_matrix.shape[0]
         self.max_cluster_size = max_cluster_size
         self.cherries = []
         self.n_nodes = 2 * self.n_taxa - 2
-        self.paths = paths
+        self.n_agents = n_agents
 
-        self.nodes = ([Node(i, is_leaf=True, n_paths=self.paths[i]) for i in range(self.n_taxa)] +
+        self.nodes = ([Node(i, is_leaf=True, n_agents=self.n_agents[i]) for i in range(self.n_taxa)] +
                       [Node(j) for j in range(self.n_taxa, self.n_nodes)])
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -95,18 +96,18 @@ class NjTree:
 
         # Chiusura con 3 taxa rimasti
         for i in range(3):
-            self.nodes[adj_idxs[i]].links.append(self.nodes[self.n_taxa])
-        self.nodes[self.n_taxa].links += [self.nodes[adj_idxs[i]] for i in range(3)]
-        if sum(self.root.links[i].is_leaf for i in range(3)) == 2:
+            self.nodes[adj_idxs[i]].adj_nodes.append(self.nodes[self.n_taxa])
+        self.nodes[self.n_taxa].adj_nodes += [self.nodes[adj_idxs[i]] for i in range(3)]
+        if sum(self.root.adj_nodes[i].is_leaf for i in range(3)) == 2:
             self.root.is_cherry = True
             self.cherries.append(self.root)
 
         # self.draw() ------------- STAMPA L'ALBERO
 
     def link(self, minI, minJ, int_node, adj_idxs):
-        self.nodes[adj_idxs[minI]].links.append(self.nodes[int_node])
-        self.nodes[adj_idxs[minJ]].links.append(self.nodes[int_node])
-        self.nodes[int_node].links += [self.nodes[adj_idxs[minI]], self.nodes[adj_idxs[minJ]]]
+        self.nodes[adj_idxs[minI]].adj_nodes.append(self.nodes[int_node])
+        self.nodes[adj_idxs[minJ]].adj_nodes.append(self.nodes[int_node])
+        self.nodes[int_node].adj_nodes += [self.nodes[adj_idxs[minI]], self.nodes[adj_idxs[minJ]]]
         if self.nodes[adj_idxs[minI]].is_leaf and self.nodes[adj_idxs[minJ]].is_leaf:
             self.nodes[int_node].is_cherry = True
             self.cherries.append(self.nodes[int_node])
@@ -114,7 +115,7 @@ class NjTree:
     def draw(self):
         g = nx.Graph()
         g.add_node(self.root.id)
-        for link in self.root.links:
+        for link in self.root.adj_nodes:
             self.add_node(self.root, link, g)
 
         nx.draw(g, with_labels=True, node_size=10)
@@ -123,6 +124,6 @@ class NjTree:
     def add_node(self, parent, node, g):
         g.add_node(node.id)
         g.add_edge(parent.id, node.id)
-        for link in node.links:
-            if link.id != parent.id:
-                self.add_node(node, link, g)
+        for adj_node in node.adj_nodes:
+            if adj_node.id != parent.id:
+                self.add_node(node, adj_node, g)

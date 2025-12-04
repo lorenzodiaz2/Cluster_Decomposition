@@ -13,15 +13,17 @@ class General_Solver:
         self,
         G: nx.Graph,
         od_pairs: List[OD_Pair],
-        max_time: int | None = 1800
+        time_limit: int,
+        output_flag: int
     ):
         self.G = G
         self.od_pairs = od_pairs
         self.m = None
         self.status = None
-        self.max_time = max_time
+        self.time_limit = time_limit
         self.model_times = []
         self.resolution_times = []
+        self.output_flag = output_flag
 
         self.A: List[Agent] = [a for od_pair in self.od_pairs for a in od_pair.agents]
         self.SP = {(od.src, od.dst): len(od.k_shortest_paths[0].visits) for od in self.od_pairs} ############# lunghezza totale, NON in passi
@@ -30,7 +32,7 @@ class General_Solver:
 
     def _optimize_model(self):
         start = time.time()
-        self.m.Params.TimeLimit = self.max_time
+        self.m.Params.TimeLimit = self.time_limit
         self.m.optimize()
         self.resolution_times.append(time.time() - start)
 

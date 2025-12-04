@@ -16,9 +16,11 @@ class Heuristic_Solver(General_Solver):
         self,
         G: nx.Graph,
         od_pairs: List[OD_Pair],
-        critical_resources: Critical_Resources | None = None
+        critical_resources: Critical_Resources | None = None,
+        time_limit: int | None = 3600,
+        output_flag : int | None = 0
     ):
-        super().__init__(G, od_pairs)
+        super().__init__(G, od_pairs, time_limit, output_flag)
 
         self.P = None
         self.K = None
@@ -49,7 +51,7 @@ class Heuristic_Solver(General_Solver):
         start = time.time()
 
         self.m = gp.Model("heuristic")
-        self.m.Params.OutputFlag = 0
+        self.m.Params.OutputFlag = self.output_flag
 
         self._set_variables()
         self._set_constraints()

@@ -6,4 +6,4 @@ if __name__ == '__main__':
 
 
 # todo creare una classe results che tenga il dataframe e la matrice di similarità
-# todo non dividere la griglia in quadranti ma creare "copie" della griglia
+# todo pensare alla metrica di bontà dei clusters
