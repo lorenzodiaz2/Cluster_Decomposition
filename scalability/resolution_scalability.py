@@ -5,7 +5,7 @@ from solvers.post_processing import Critical_Resources
 from elements.environment import Environment
 from utils.results_io import save_results
 
-def run_scalability():
+def run_scalability(n_pairs_per_quadrant):
     df = get_data_frame()
 
     quadrant_range = range(2, 10)
@@ -15,8 +15,9 @@ def run_scalability():
         for i in range(5):
             print(f"\n\n=========================================================================================================\n\n")
             print(f"n quadrant = {n_quadrants}    iteration {i} ->  Setting env... ", end="")
-            seed = i + 30
-            env = Environment(grid_side, 740, n_quadrants, 148, -1, 10, seed=seed)
+            seed = i + 40
+
+            env = Environment(grid_side,  n_pairs_per_quadrant * 5, n_quadrants, n_pairs_per_quadrant, -1, 10, seed=seed, restrict_paths_to_quadrant=True)
             print("Done.\n\nCOMPLETA\n\n")
             complete_solver = Heuristic_Solver(env.G, env.od_pairs, output_flag=1)
             complete_solver.solve()
@@ -62,7 +63,7 @@ def run_scalability():
                     print("Done.")
                     save_results(env, complete_solver, cluster_solvers, df, seed, critical_resources, final_solver)
 
-    df.to_csv("148_test_2-9.csv", index=False)
+    df.to_csv(f"{n_pairs_per_quadrant}_test_2-9.csv", index=False)
 
 
 
@@ -81,6 +82,8 @@ def get_data_frame():
         "resolution times complete": pd.Series(dtype="object"),
         "status complete": pd.Series(dtype="object"),
         "n clusters": pd.Series(dtype="int"),
+        "similarity index": pd.Series(dtype="float"),
+        "cluster similarity indexes": pd.Series(dtype="object"),
         "similarity matrix time": pd.Series(dtype="float"),
         "nj time": pd.Series(dtype="float"),
         "n agents per cluster": pd.Series(dtype="object"),

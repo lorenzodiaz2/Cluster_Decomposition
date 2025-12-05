@@ -56,6 +56,7 @@ class Environment:
         self.restrict_paths_to_quadrant = restrict_paths_to_quadrant
 
         self.similarity_index = None
+        self.cluster_similarity_indexes = None
 
         self._set_environment()
 
@@ -200,18 +201,50 @@ class Environment:
 
 
     def _compute_similarity_index(self):
-        sim_total = self.similarity_matrix.sum() / 2
+        S = self.similarity_matrix
+        sim_total = S.sum() / 2
 
         if sim_total == 0:
             self.similarity_index = 0.0
+            self.cluster_similarity_indexes = [0.0 for _ in self.clusters]
             return
 
-        sim_intra = 0.0
+        # ---- indice globale ----
+        sim_intra_global = 0.0
+        cluster_indexes = []
+
+        n = S.shape[0]
+        all_ids = np.arange(n)
+
         for cluster in self.clusters:
             od_ids = np.array([od.id for od in cluster.od_pairs], dtype=int)
             if len(od_ids) <= 1:
+                # cluster di size 0/1: niente similarità interna
+                cluster_indexes.append(0.0)
                 continue
-            sub = self.similarity_matrix[np.ix_(od_ids, od_ids)]
-            sim_intra += np.triu(sub, k=1).sum()
 
-        self.similarity_index = sim_intra / sim_total
+            # similarità intra del cluster
+            sub = S[np.ix_(od_ids, od_ids)]
+            sim_intra_C = np.triu(sub, k=1).sum()
+            sim_intra_global += sim_intra_C
+
+            # similarità cross: i in C, j non in C
+            outside = np.setdiff1d(all_ids, od_ids, assume_unique=True)
+            if outside.size > 0:
+                sim_cross_C = S[np.ix_(od_ids, outside)].sum()
+            else:
+                sim_cross_C = 0.0
+
+            sim_tot_C = sim_intra_C + sim_cross_C
+            if sim_tot_C == 0:
+                R_C = 0.0
+            else:
+                R_C = float(sim_intra_C / sim_tot_C)
+
+            cluster_indexes.append(R_C)
+
+
+        # indice globale (come prima)
+        self.similarity_index = float(sim_intra_global / sim_total)
+        self.cluster_similarity_indexes = cluster_indexes
+
