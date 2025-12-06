@@ -57,6 +57,7 @@ class Environment:
 
         self.similarity_index = None
         self.cluster_similarity_indexes = None
+        self.cluster_congestion_indexes = None
 
         self._set_environment()
 
@@ -110,7 +111,9 @@ class Environment:
         tree = TreePartition(self.similarity_matrix, self.od_pairs, self.max_cluster_size)
         self.clusters = tree.compute_clusters()
         self.nj_time = time.time() - start
+
         self._compute_similarity_index()
+        self._compute_cluster_congestion_indexes()
 
 
 
@@ -247,4 +250,65 @@ class Environment:
         # indice globale (come prima)
         self.similarity_index = float(sim_intra_global / sim_total)
         self.cluster_similarity_indexes = cluster_indexes
+
+
+    def _compute_cluster_congestion_indexes(self):
+        """
+        Per ogni cluster C calcola un indice di congestione media potenziale E(C):
+
+          - per ogni OD in C, prende TUTTI i path candidati (all_paths se disponibile, altrimenti k_shortest_paths),
+          - per ogni (t, node_id) conta su quante path della OD compare,
+          - usa come contributo di quella OD su (t, node_id):
+                n_agents_od * (count_paths / n_paths_od)
+          - somma su tutte le OD del cluster: ottiene occ(v,t),
+          - confronta con la capacità dei nodi,
+          - E(C) = (1 / n_agenti_C) * somma_{v,t} max(0, occ(v,t) - cap(v)).
+
+        Salva i valori in self.cluster_congestion_indexes (lista di float
+        parallela a self.clusters).
+        """
+        n_side = self.grid_side
+        congestion_indexes: list[float] = []
+
+        for cluster in self.clusters:
+            n_agents_cluster = cluster.n_agents
+
+            # occ[(t, node_id)] = "occupazione media potenziale" su (t, node_id)
+            occ: dict[tuple[int, int], float] = {}
+
+            for od in cluster.od_pairs:
+                n_agents_od = len(od.agents)
+
+                # prendo tutti i path candidati disponibili
+                paths = od.all_paths
+                n_paths = len(paths)
+
+                # visite per (t, node_id): quante PATH della OD passano per (t, node_id)
+                visit_counts: dict[tuple[int, int], int] = defaultdict(int)
+                for path in paths:
+                    enc = path.encoded  # array di node_id = i * n_side + j
+                    for t, node_id in enumerate(enc):
+                        key = (t, int(node_id))
+                        visit_counts[key] += 1
+
+                # contribuzione di questa OD all'occupazione media potenziale
+                for (t, node_id), count_paths in visit_counts.items():
+                    frac = count_paths / n_paths  # frazione di path della OD che passano qui
+                    key = (t, node_id)
+                    occ[key] = occ.get(key, 0.0) + n_agents_od * frac
+
+            # ora calcoliamo l'eccesso rispetto alla capacità dei nodi
+            excess_sum = 0.0
+            for (t, node_id), occ_val in occ.items():
+                i = node_id // n_side
+                j = node_id % n_side
+                v = (i, j)
+                cap = self.G.nodes[v].get("capacity", 0)
+                if occ_val > cap:
+                    excess_sum += (occ_val - cap)
+
+            E_c = excess_sum / n_agents_cluster
+            congestion_indexes.append(E_c)
+
+        self.cluster_congestion_indexes = congestion_indexes
 

@@ -1,5 +1,6 @@
 import pandas as pd
 
+from elements.environment import Environment
 from scalability.resolution_scalability import run_scalability
 
 def get_data_frame():
@@ -20,6 +21,7 @@ def get_data_frame():
         "n clusters": pd.Series(dtype="int"),
         "similarity index": pd.Series(dtype="float"),
         "cluster similarity indexes": pd.Series(dtype="object"),
+        "cluster congestion indexes": pd.Series(dtype="object"),
         "similarity matrix time": pd.Series(dtype="float"),
         "nj time": pd.Series(dtype="float"),
         "n agents per cluster": pd.Series(dtype="object"),
@@ -45,10 +47,36 @@ def get_data_frame():
     })
 
 if __name__ == '__main__':
-    df = get_data_frame()
+    df = pd.read_csv("results/20_test_2-9.csv")
+    values_to_insert = []
 
-    offset_values = [-1, 0, 1, 2, 3, 4, 5,6 ,7, 8, 9, 10]
+    for index, row in df.iterrows():
+        grid_side = int(row["grid side"])
+        n_quadrants = int(row["n quadrants"])
+        n_pairs_per_quadrant = int(row["n pairs"]) // n_quadrants
+        max_cluster_size = int(row["max cluster size"])
+        offset = int(row["offset"])
+        k = int(row["k"])
+        seed = int(row["seed"])
+        restrict_paths_to_quadrants = True if row["restrict paths to quadrant"] == "True" else False
+
+        env = Environment(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, offset, k, seed=seed, restrict_paths_to_quadrant=restrict_paths_to_quadrants)
+        env.compute_clusters()
+        values_to_insert.append(env.cluster_congestion_indexes)
+
+        print(f"{grid_side}   {n_quadrants}   {n_pairs_per_quadrant}   {offset}   {restrict_paths_to_quadrants}   {env.cluster_congestion_indexes}")
+
+    df.insert(16, "cluster congestion indexes", values_to_insert)
+
+
+
+    exit(0)
+    offset_values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     n_pairs_per_quadrant_values = [100, 108, 116, 124, 132]
+
+    run_scalability(20, 124, True, -1, df)
+    run_scalability(20, 132, True, -1, df)
+
 
     for offset in offset_values:
         for restrict_paths_to_quadrants in [False, True]:
@@ -61,9 +89,6 @@ if __name__ == '__main__':
 
 # todo creare una classe results che tenga il dataframe e la matrice di similarità (...)
 # todo pensare alla metrica di bontà dei clusters  ---->  IN TEORIA FATTO, DA PROVARE (VEDERE SOTTO)
-# todo provare a creare i clusters con od random (prese da qualsiasi quadrante) e quindi vedere il valore degli indici di similarità. Dovrebbero essere vicino lo zero
-# todo mettere restric_paths_to_quadrant a False e fare le stesse prove (magari direttamente con 10 istanze)
 
-# todo fare altre 5 prove sui test già fatti, recuperare il seed e aumentarlo
 # todo vedere se ha senso parallelizzare il calcolo degli indici di bontà dei clusters (non penso...)
 # todo pensare alla metrica di sovrapposizione spazio (spazio-temporale) dentro i clusters
