@@ -79,7 +79,7 @@ def save_results(
     final_delay = sum(a.delay for a in env.agents)
 
     df.loc[len(df)] = [
-        grid_side, n_quadrants, n_pairs, n_agents, max_cluster_size, offset, k, seed, env_time,
+        grid_side, n_quadrants, n_pairs, n_agents, max_cluster_size, offset, k, seed, env.restrict_paths_to_quadrant, env_time,
         model_times_complete, resolution_times_complete, status_complete,
         n_clusters, similarity_index, cluster_similarity_indexes, similarity_matrix_time, nj_time, n_agents_per_cluster, od_pairs_per_cluster, model_times_clusters, resolution_times_clusters, clusters_status, UBs_clusters, LBs_clusters,
         critical_resources_creation_times, unassigned_agents, unassigning_times,
