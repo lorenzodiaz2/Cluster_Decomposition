@@ -47,6 +47,7 @@ def get_data_frame():
     })
 
 if __name__ == '__main__':
+    """
     df = pd.read_csv("results/20_test_2-9.csv")
     values_to_insert = []
 
@@ -58,7 +59,7 @@ if __name__ == '__main__':
         offset = int(row["offset"])
         k = int(row["k"])
         seed = int(row["seed"])
-        restrict_paths_to_quadrants = True if row["restrict paths to quadrant"] == "True" else False
+        restrict_paths_to_quadrants = bool(row["restrict paths to quadrant"])
 
         env = Environment(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, offset, k, seed=seed, restrict_paths_to_quadrant=restrict_paths_to_quadrants)
         env.compute_clusters()
@@ -67,15 +68,16 @@ if __name__ == '__main__':
         print(f"{grid_side}   {n_quadrants}   {n_pairs_per_quadrant}   {offset}   {restrict_paths_to_quadrants}   {env.cluster_congestion_indexes}")
 
     df.insert(16, "cluster congestion indexes", values_to_insert)
+    df.to_csv("results/20_test_2-9.csv", index=False)
+    """
 
 
-
-    exit(0)
-    offset_values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    n_pairs_per_quadrant_values = [100, 108, 116, 124, 132]
-
-    run_scalability(20, 124, True, -1, df)
+    df = pd.read_csv("results/20_test_2-9.csv")
     run_scalability(20, 132, True, -1, df)
+
+
+    offset_values = [0, 2, 4, 6, 8, 10]
+    n_pairs_per_quadrant_values = [100, 108, 116, 124, 132]
 
 
     for offset in offset_values:
@@ -92,3 +94,4 @@ if __name__ == '__main__':
 
 # todo vedere se ha senso parallelizzare il calcolo degli indici di bontà dei clusters (non penso...)
 # todo pensare alla metrica di sovrapposizione spazio (spazio-temporale) dentro i clusters
+# todo trovare una soglia e, per ogni cluster vedere se la metrica di sovrapposizione supera la soglia e se supera fare un'ulteriore separazione

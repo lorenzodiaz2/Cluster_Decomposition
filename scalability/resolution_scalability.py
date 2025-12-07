@@ -19,7 +19,7 @@ def run_scalability(
         grid_side = 2 * base_grid_side + 1 if n_quadrants <= 4 else 3 * base_grid_side + 2
         for i in range(10):
             print(f"\n\n=========================================================================================================\n\n")
-            print(f"n quadrant = {n_quadrants}    iteration {i} ->  Setting env... ", end="")
+            print(f"n quadrant = {n_quadrants}    n pairs per quadrant = {n_pairs_per_quadrant}    iteration {i} ->  Setting env... ", end="")
             seed = i + 40
 
             env = Environment(grid_side,  n_pairs_per_quadrant * 5, n_quadrants, n_pairs_per_quadrant, offset, 10, seed=seed, restrict_paths_to_quadrant=restrict_paths_to_quadrant)
