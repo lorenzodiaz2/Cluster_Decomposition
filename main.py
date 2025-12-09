@@ -73,11 +73,22 @@ if __name__ == '__main__':
 
 
     df = pd.read_csv("results/20_test_2-9.csv")
+
+    run_scalability(20, 134, False, -1, df)
+    run_scalability(20, 136, False, -1, df)
+    run_scalability(20, 138, False, -1, df)
+    run_scalability(20, 140, False, -1, df)
+
+
     run_scalability(20, 132, True, -1, df)
+    run_scalability(20, 134, True, -1, df)
+    run_scalability(20, 136, True, -1, df)
+    run_scalability(20, 138, True, -1, df)
+    run_scalability(20, 140, True, -1, df)
 
 
     offset_values = [0, 2, 4, 6, 8, 10]
-    n_pairs_per_quadrant_values = [100, 108, 116, 124, 132]
+    n_pairs_per_quadrant_values = [100, 108, 116, 124, 132, 134, 136, 138, 140]
 
 
     for offset in offset_values:
