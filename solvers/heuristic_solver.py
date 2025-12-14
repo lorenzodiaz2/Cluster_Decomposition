@@ -48,7 +48,7 @@ class Heuristic_Solver(General_Solver):
 
 
     def _set_model(self):
-        start = time.time()
+        start = time.perf_counter()
 
         self.m = gp.Model("heuristic")
         self.m.Params.OutputFlag = self.output_flag
@@ -57,7 +57,7 @@ class Heuristic_Solver(General_Solver):
         self._set_constraints()
 
         self.m.setObjective(gp.quicksum(self.x[od_pair.id, j] * (len(p.visits) - self.SP[od_pair.src, od_pair.dst]) for (od_pair, j), p in self.P.items()), GRB.MINIMIZE)
-        self.model_times.append(time.time() - start)
+        self.model_times.append(time.perf_counter() - start)
 
 
 

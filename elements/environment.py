@@ -58,12 +58,13 @@ class Environment:
         self.similarity_index = None
         self.cluster_similarity_indexes = None
         self.cluster_congestion_indexes = None
+        self._od_index: dict[OD_Pair, int] | None = None
 
         self._set_environment()
 
 
     def _set_environment(self):
-        start = time.time()
+        start = time.perf_counter()
         self._create_grid_graph()
         self._choose_pairs()
         self._set_capacities()
@@ -86,11 +87,14 @@ class Environment:
 
 
         self.agents = [a for od_pair in self.od_pairs for a in od_pair.agents]
-        self.set_time = time.time() - start
+        self.set_time = time.perf_counter() - start
 
-
-    def compute_clusters(self):
-        start = time.time()
+    def compute_clusters(
+        self,
+        congestion_threshold: float | None = 0.34,
+        refinement_levels: int = 2
+    ):
+        start = time.perf_counter()
         n = len(self.od_pairs)
         self.similarity_matrix = np.zeros((n, n), dtype=int)
 
@@ -105,17 +109,76 @@ class Environment:
             self.similarity_matrix[i, i + 1:] = row[i + 1:]
             self.similarity_matrix[i + 1:, i] = row[i + 1:]
 
-        self.matrix_time = time.time() - start
+        self.matrix_time = time.perf_counter() - start
 
-        start = time.time()
+        start = time.perf_counter()
         tree = TreePartition(self.similarity_matrix, self.od_pairs, self.max_cluster_size)
         self.clusters = tree.compute_clusters()
-        self.nj_time = time.time() - start
+        self.nj_time = time.perf_counter() - start
+
+        # mappa OD -> indice di riga/colonna nella similarity_matrix
+        self._od_index = {od: idx for idx, od in enumerate(self.od_pairs)}
 
         self._compute_similarity_index()
         self._compute_cluster_congestion_indexes()
+        print("E(C) iniziali:", self.cluster_congestion_indexes)
+
+        base_max_size = self.max_cluster_size
+
+        for refinement_level in range(1, refinement_levels + 1):
+            level_max_size = max(1, base_max_size // (2 ** refinement_level))
+
+            E_list = self.cluster_congestion_indexes
+
+            new_clusters: list[Cluster] = []
+            any_split = False
+
+            print("level", refinement_level, end=": ")
+
+            for C, E_c in zip(self.clusters, E_list):
+                if (
+                    E_c is not None
+                    and E_c > congestion_threshold
+                    and C.n_agents > level_max_size
+                    and len(C.od_pairs) > 1
+                ):
+                    sub_clusters = self._split_cluster(C, level_max_size)
+                    new_clusters.extend(sub_clusters)
+                    any_split = True
+                else:
+                    new_clusters.append(C)
+
+            self.clusters = new_clusters
+            self._compute_cluster_congestion_indexes()
+            print(f"Level {refinement_level}: E(C) dopo split:", self.cluster_congestion_indexes)
+
+            if not any_split:
+                break
+
+        self._compute_similarity_index()
+        self._compute_cluster_congestion_indexes()
+        print("E(C) finali:", self.cluster_congestion_indexes)
 
 
+    def _split_cluster(
+        self,
+        cluster: Cluster,
+        max_cluster_size: int
+    ) -> list[Cluster]:
+        if len(cluster.od_pairs) <= 1:
+            return [cluster]
+
+        idxs = [self._od_index[od] for od in cluster.od_pairs]
+        sub = self.similarity_matrix[np.ix_(idxs, idxs)]
+
+        tree = TreePartition(sub, list(cluster.od_pairs), max_cluster_size)
+        new_clusters = tree.compute_clusters()
+
+        last_id = max(c.id for c in self.clusters) if self.clusters else -1
+        for k, c in enumerate(new_clusters, start=1):
+            c.id = last_id + k
+
+        return new_clusters
 
     def _create_grid_graph(self):
         self.G = nx.Graph()
@@ -253,20 +316,6 @@ class Environment:
 
 
     def _compute_cluster_congestion_indexes(self):
-        """
-        Per ogni cluster C calcola un indice di congestione media potenziale E(C):
-
-          - per ogni OD in C, prende TUTTI i path candidati (all_paths se disponibile, altrimenti k_shortest_paths),
-          - per ogni (t, node_id) conta su quante path della OD compare,
-          - usa come contributo di quella OD su (t, node_id):
-                n_agents_od * (count_paths / n_paths_od)
-          - somma su tutte le OD del cluster: ottiene occ(v,t),
-          - confronta con la capacità dei nodi,
-          - E(C) = (1 / n_agenti_C) * somma_{v,t} max(0, occ(v,t) - cap(v)).
-
-        Salva i valori in self.cluster_congestion_indexes (lista di float
-        parallela a self.clusters).
-        """
         n_side = self.grid_side
         congestion_indexes: list[float] = []
 
@@ -279,14 +328,13 @@ class Environment:
             for od in cluster.od_pairs:
                 n_agents_od = len(od.agents)
 
-                # prendo tutti i path candidati disponibili
                 paths = od.all_paths
                 n_paths = len(paths)
 
-                # visite per (t, node_id): quante PATH della OD passano per (t, node_id)
+                # visite per (t, node_id): quante PATH della OD passano per la chiave (t, node_id)
                 visit_counts: dict[tuple[int, int], int] = defaultdict(int)
                 for path in paths:
-                    enc = path.encoded  # array di node_id = i * n_side + j
+                    enc = path.encoded
                     for t, node_id in enumerate(enc):
                         key = (t, int(node_id))
                         visit_counts[key] += 1
@@ -297,7 +345,7 @@ class Environment:
                     key = (t, node_id)
                     occ[key] = occ.get(key, 0.0) + n_agents_od * frac
 
-            # ora calcoliamo l'eccesso rispetto alla capacità dei nodi
+            # eccesso rispetto alla capacità dei nodi
             excess_sum = 0.0
             for (t, node_id), occ_val in occ.items():
                 i = node_id // n_side

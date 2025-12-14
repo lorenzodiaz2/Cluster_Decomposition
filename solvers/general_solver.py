@@ -31,10 +31,10 @@ class General_Solver:
 
 
     def _optimize_model(self):
-        start = time.time()
+        start = time.perf_counter()
         self.m.Params.TimeLimit = self.time_limit
         self.m.optimize()
-        self.resolution_times.append(time.time() - start)
+        self.resolution_times.append(time.perf_counter() - start)
 
         status_map = {
             GRB.OPTIMAL: "OPTIMAL",

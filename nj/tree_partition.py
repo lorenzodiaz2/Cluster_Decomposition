@@ -7,7 +7,7 @@ from nj.nj_torch import NjTree, Node
 class TreePartition(NjTree):
 
     def __init__(self, similarity_matrix, od_pairs, max_cluster_size):
-        n_agents = {od_pair.id: len(od_pair.agents) for od_pair in od_pairs}
+        n_agents = {i: len(od_pairs[i].agents) for i in range(len(od_pairs))}
         self.od_pairs = od_pairs
         super().__init__(similarity_matrix, n_agents, max_cluster_size)
 
@@ -87,7 +87,11 @@ class TreePartition(NjTree):
         self.last_step(self.root)
         self.clusters = sorted(self.clusters, key=lambda x: x.n_agents, reverse=True)
 
-        clusters_list = [Cluster(idx, [pair for pair in self.od_pairs if pair.id in cluster_node.cluster]) for idx, cluster_node in enumerate(self.clusters)]
+        # clusters_list = [Cluster(idx, [pair for pair in self.od_pairs if pair.id in cluster_node.cluster]) for idx, cluster_node in enumerate(self.clusters)]
+        clusters_list = [
+            Cluster(idx, [self.od_pairs[i] for i in cluster_node.cluster])
+            for idx, cluster_node in enumerate(self.clusters)
+        ]
         self.merge_lightest(clusters_list)
         return clusters_list
 

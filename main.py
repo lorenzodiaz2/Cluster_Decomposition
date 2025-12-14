@@ -1,7 +1,9 @@
+import ast
 import pandas as pd
 
 from elements.environment import Environment
 from scalability.resolution_scalability import run_scalability
+from solvers.heuristic_solver import Heuristic_Solver
 
 def get_data_frame():
     return pd.DataFrame({
@@ -47,9 +49,10 @@ def get_data_frame():
     })
 
 if __name__ == '__main__':
-    """
+
+
+
     df = pd.read_csv("results/20_test_2-9.csv")
-    values_to_insert = []
 
     for index, row in df.iterrows():
         grid_side = int(row["grid side"])
@@ -59,25 +62,35 @@ if __name__ == '__main__':
         offset = int(row["offset"])
         k = int(row["k"])
         seed = int(row["seed"])
-        restrict_paths_to_quadrants = bool(row["restrict paths to quadrant"])
+        restrict_paths_to_quadrants = row["restrict paths to quadrant"]
+        total_time_complete = round(float(row["total time complete"]), 2)
+        total_time_clusters_complete = round(float(row["total time clusters + post"]), 2)
+        cluster_congestion_indexes = ast.literal_eval(row["cluster congestion indexes"])
+        round_indexes = [round(x, 3) for x in cluster_congestion_indexes]
 
-        env = Environment(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, offset, k, seed=seed, restrict_paths_to_quadrant=restrict_paths_to_quadrants)
-        env.compute_clusters()
-        values_to_insert.append(env.cluster_congestion_indexes)
+        resolution_times_clusters = ast.literal_eval(row["resolution times clusters"])
+        round_times_clusters = [round(x, 3) for x in resolution_times_clusters]
 
-        print(f"{grid_side}   {n_quadrants}   {n_pairs_per_quadrant}   {offset}   {restrict_paths_to_quadrants}   {env.cluster_congestion_indexes}")
-
-    df.insert(16, "cluster congestion indexes", values_to_insert)
-    df.to_csv("results/20_test_2-9.csv", index=False)
-    """
+        augmented_T_times = len(ast.literal_eval(row["resolution times complete"]))
 
 
-    df = pd.read_csv("results/20_test_2-9.csv")
+        if total_time_clusters_complete > total_time_complete and total_time_clusters_complete > 500:
+            print(f"{grid_side}  {n_quadrants}  {n_pairs_per_quadrant}  {restrict_paths_to_quadrants}  {augmented_T_times}  {total_time_complete}  {total_time_clusters_complete}   {round_indexes}   {round_times_clusters}")
+            env = Environment(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, offset, k, seed=seed, restrict_paths_to_quadrant=restrict_paths_to_quadrants)
+            for i in range(augmented_T_times - 1):
+                for od in env.od_pairs:
+                    od.delay_shortest_paths(od.T + 1)
+                    od.T += 1
+            env.compute_clusters()
 
-    run_scalability(20, 134, False, -1, df)
-    run_scalability(20, 136, False, -1, df)
-    run_scalability(20, 138, False, -1, df)
-    run_scalability(20, 140, False, -1, df)
+            times = []
+            for cluster in env.clusters:
+                hs = Heuristic_Solver(env.G, cluster.od_pairs)
+                times.append(round(sum(hs.resolution_times), 2))
+            print(f"{env.similarity_index}   {env.cluster_similarity_indexes}   {[round(idx, 3) for idx in env.cluster_congestion_indexes]}   {times}")
+
+    exit(0)
+
 
 
     run_scalability(20, 132, True, -1, df)
@@ -105,4 +118,3 @@ if __name__ == '__main__':
 
 # todo vedere se ha senso parallelizzare il calcolo degli indici di bontà dei clusters (non penso...)
 # todo pensare alla metrica di sovrapposizione spazio (spazio-temporale) dentro i clusters
-# todo trovare una soglia e, per ogni cluster vedere se la metrica di sovrapposizione supera la soglia e se supera fare un'ulteriore separazione
