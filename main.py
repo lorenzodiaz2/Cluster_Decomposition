@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
         final_delay = int(row["final delay"])
 
-        print(f"{grid_side}  {n_quadrants}  {n_pairs_per_quadrant}  {restrict_paths_to_quadrants}  {offset}  {seed}")
+        print(f"{grid_side}  {n_quadrants}  {n_pairs_per_quadrant}  {restrict_paths_to_quadrants}  {offset}  {seed}  ", end="")
         env = Environment(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, offset, k, seed=seed, restrict_paths_to_quadrant=restrict_paths_to_quadrants)
         for i in range(augmented_T_times - 1):
             for od in env.od_pairs:
@@ -86,6 +86,7 @@ if __name__ == '__main__':
         E_abs_list.append(E_abs)
         R_max_list.append(R_max)
         df.at[index, "nj time"] = env.nj_time
+        print(f"{[round(val, 2) for val in env.cluster_congestion_indexes]}   {[c.n_agents for c in env.clusters]}   {[round(val, 2) for val in E_abs]}   {[round(val, 2) for val in R_max]}")
 
     df.insert(17, "cluster congestion indexes absolute", E_abs_list)
     df.insert(18, "cluster congestion ratio max", R_max_list)
