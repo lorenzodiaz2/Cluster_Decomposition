@@ -58,6 +58,9 @@ class Environment:
         self.similarity_index = None
         self.cluster_similarity_indexes = None
         self.cluster_congestion_indexes = None
+        self.cluster_congestion_indexes_absolute = None
+        self.cluster_congestion_ratio_max = None
+
         self._od_index: dict[OD_Pair, int] | None = None
 
         self._set_environment()
@@ -89,6 +92,7 @@ class Environment:
         self.agents = [a for od_pair in self.od_pairs for a in od_pair.agents]
         self.set_time = time.perf_counter() - start
 
+
     def compute_clusters(
         self,
         congestion_threshold: float | None = 0.34,
@@ -114,14 +118,11 @@ class Environment:
         start = time.perf_counter()
         tree = TreePartition(self.similarity_matrix, self.od_pairs, self.max_cluster_size)
         self.clusters = tree.compute_clusters()
-        self.nj_time = time.perf_counter() - start
 
-        # mappa OD -> indice di riga/colonna nella similarity_matrix
+
         self._od_index = {od: idx for idx, od in enumerate(self.od_pairs)}
 
-        self._compute_similarity_index()
         self._compute_cluster_congestion_indexes()
-        print("E(C) iniziali:", self.cluster_congestion_indexes)
 
         base_max_size = self.max_cluster_size
 
@@ -132,8 +133,6 @@ class Environment:
 
             new_clusters: list[Cluster] = []
             any_split = False
-
-            print("level", refinement_level, end=": ")
 
             for C, E_c in zip(self.clusters, E_list):
                 if (
@@ -148,16 +147,16 @@ class Environment:
                 else:
                     new_clusters.append(C)
 
-            self.clusters = new_clusters
-            self._compute_cluster_congestion_indexes()
-            print(f"Level {refinement_level}: E(C) dopo split:", self.cluster_congestion_indexes)
-
             if not any_split:
                 break
 
+            self.clusters = new_clusters
+            self._compute_cluster_congestion_indexes()
+
+
+
+        self.nj_time = time.perf_counter() - start
         self._compute_similarity_index()
-        self._compute_cluster_congestion_indexes()
-        print("E(C) finali:", self.cluster_congestion_indexes)
 
 
     def _split_cluster(
@@ -179,6 +178,7 @@ class Environment:
             c.id = last_id + k
 
         return new_clusters
+
 
     def _create_grid_graph(self):
         self.G = nx.Graph()
@@ -243,7 +243,7 @@ class Environment:
                 continue
             break
 
-        number_of_agents = self.rng.randrange(5, 6)
+        number_of_agents = self.rng.randrange(5, 6) #############
         agents = [Agent(i, src, dst) for i in range(n_tot_agents, n_tot_agents + number_of_agents)]
 
         return OD_Pair(id_pair, src, dst, agents)
@@ -275,7 +275,6 @@ class Environment:
             self.cluster_similarity_indexes = [0.0 for _ in self.clusters]
             return
 
-        # ---- indice globale ----
         sim_intra_global = 0.0
         cluster_indexes = []
 
@@ -283,18 +282,16 @@ class Environment:
         all_ids = np.arange(n)
 
         for cluster in self.clusters:
-            od_ids = np.array([od.id for od in cluster.od_pairs], dtype=int)
+            od_ids = np.array([self._od_index[od] for od in cluster.od_pairs], dtype=int)
+
             if len(od_ids) <= 1:
-                # cluster di size 0/1: niente similarità interna
                 cluster_indexes.append(0.0)
                 continue
 
-            # similarità intra del cluster
             sub = S[np.ix_(od_ids, od_ids)]
             sim_intra_C = np.triu(sub, k=1).sum()
             sim_intra_global += sim_intra_C
 
-            # similarità cross: i in C, j non in C
             outside = np.setdiff1d(all_ids, od_ids, assume_unique=True)
             if outside.size > 0:
                 sim_cross_C = S[np.ix_(od_ids, outside)].sum()
@@ -302,27 +299,24 @@ class Environment:
                 sim_cross_C = 0.0
 
             sim_tot_C = sim_intra_C + sim_cross_C
-            if sim_tot_C == 0:
-                R_C = 0.0
-            else:
-                R_C = float(sim_intra_C / sim_tot_C)
+            R_C = 0.0 if sim_tot_C == 0 else float(sim_intra_C / sim_tot_C)
 
             cluster_indexes.append(R_C)
 
-
-        # indice globale (come prima)
         self.similarity_index = float(sim_intra_global / sim_total)
         self.cluster_similarity_indexes = cluster_indexes
 
 
     def _compute_cluster_congestion_indexes(self):
         n_side = self.grid_side
-        congestion_indexes: list[float] = []
+
+        congestion_indexes: list[float] = []  # E_c
+        congestion_abs: list[float] = []  # E_abs
+        congestion_r_max: list[float] = []  # R_max
 
         for cluster in self.clusters:
             n_agents_cluster = cluster.n_agents
 
-            # occ[(t, node_id)] = "occupazione media potenziale" su (t, node_id)
             occ: dict[tuple[int, int], float] = {}
 
             for od in cluster.od_pairs:
@@ -331,7 +325,6 @@ class Environment:
                 paths = od.all_paths
                 n_paths = len(paths)
 
-                # visite per (t, node_id): quante PATH della OD passano per la chiave (t, node_id)
                 visit_counts: dict[tuple[int, int], int] = defaultdict(int)
                 for path in paths:
                     enc = path.encoded
@@ -339,24 +332,41 @@ class Environment:
                         key = (t, int(node_id))
                         visit_counts[key] += 1
 
-                # contribuzione di questa OD all'occupazione media potenziale
                 for (t, node_id), count_paths in visit_counts.items():
-                    frac = count_paths / n_paths  # frazione di path della OD che passano qui
+                    frac = count_paths / n_paths
                     key = (t, node_id)
                     occ[key] = occ.get(key, 0.0) + n_agents_od * frac
 
-            # eccesso rispetto alla capacità dei nodi
             excess_sum = 0.0
+            r_max = 0.0
+
             for (t, node_id), occ_val in occ.items():
                 i = node_id // n_side
                 j = node_id % n_side
                 v = (i, j)
-                cap = self.G.nodes[v].get("capacity", 0)
+
+                cap = float(self.G.nodes[v].get("capacity", 0))
+
+                if cap > 0:
+                    ratio = occ_val / cap
+                else:
+                    ratio = float("inf") if occ_val > 0 else 1.0
+
+                if ratio > r_max:
+                    r_max = ratio
+
                 if occ_val > cap:
                     excess_sum += (occ_val - cap)
 
-            E_c = excess_sum / n_agents_cluster
+            E_abs = excess_sum
+            E_c = (E_abs / n_agents_cluster) if n_agents_cluster > 0 else 0.0
+
+            congestion_abs.append(E_abs)
             congestion_indexes.append(E_c)
+            congestion_r_max.append(r_max)
 
         self.cluster_congestion_indexes = congestion_indexes
+        self.cluster_congestion_indexes_absolute = congestion_abs
+        self.cluster_congestion_ratio_max = congestion_r_max
+
 

@@ -3,7 +3,6 @@ import pandas as pd
 
 from elements.environment import Environment
 from scalability.resolution_scalability import run_scalability
-from solvers.heuristic_solver import Heuristic_Solver
 
 def get_data_frame():
     return pd.DataFrame({
@@ -49,10 +48,9 @@ def get_data_frame():
     })
 
 if __name__ == '__main__':
-
-
-
     df = pd.read_csv("results/20_test_2-9.csv")
+    E_abs_list = []
+    R_max_list = []
 
     for index, row in df.iterrows():
         grid_side = int(row["grid side"])
@@ -73,21 +71,26 @@ if __name__ == '__main__':
 
         augmented_T_times = len(ast.literal_eval(row["resolution times complete"]))
 
+        final_delay = int(row["final delay"])
 
-        if total_time_clusters_complete > total_time_complete and total_time_clusters_complete > 500:
-            print(f"{grid_side}  {n_quadrants}  {n_pairs_per_quadrant}  {restrict_paths_to_quadrants}  {augmented_T_times}  {total_time_complete}  {total_time_clusters_complete}   {round_indexes}   {round_times_clusters}")
-            env = Environment(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, offset, k, seed=seed, restrict_paths_to_quadrant=restrict_paths_to_quadrants)
-            for i in range(augmented_T_times - 1):
-                for od in env.od_pairs:
-                    od.delay_shortest_paths(od.T + 1)
-                    od.T += 1
-            env.compute_clusters()
+        print(f"{grid_side}  {n_quadrants}  {n_pairs_per_quadrant}  {restrict_paths_to_quadrants}  {offset}  {seed}")
+        env = Environment(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, offset, k, seed=seed, restrict_paths_to_quadrant=restrict_paths_to_quadrants)
+        for i in range(augmented_T_times - 1):
+            for od in env.od_pairs:
+                od.delay_shortest_paths(od.T + 1)
+                od.T += 1
+        env.compute_clusters(refinement_levels=0)
+        E_abs = env.cluster_congestion_indexes_absolute
+        R_max = env.cluster_congestion_ratio_max
 
-            times = []
-            for cluster in env.clusters:
-                hs = Heuristic_Solver(env.G, cluster.od_pairs)
-                times.append(round(sum(hs.resolution_times), 2))
-            print(f"{env.similarity_index}   {env.cluster_similarity_indexes}   {[round(idx, 3) for idx in env.cluster_congestion_indexes]}   {times}")
+        E_abs_list.append(E_abs)
+        R_max_list.append(R_max)
+        df.at[index, "nj time"] = env.nj_time
+
+    df.insert(17, "cluster congestion indexes absolute", E_abs_list)
+    df.insert(18, "cluster congestion ratio max", R_max_list)
+    df.to_csv("results/20_test_2-9.csv", index=False)
+
 
     exit(0)
 
@@ -114,7 +117,7 @@ if __name__ == '__main__':
 
 
 # todo creare una classe results che tenga il dataframe e la matrice di similarità (...)
-# todo pensare alla metrica di bontà dei clusters  ---->  IN TEORIA FATTO, DA PROVARE (VEDERE SOTTO)
+# todo pensare alla metrica di bontà dei clusters  ---->  IN TEORIA FATTO
 
 # todo vedere se ha senso parallelizzare il calcolo degli indici di bontà dei clusters (non penso...)
 # todo pensare alla metrica di sovrapposizione spazio (spazio-temporale) dentro i clusters

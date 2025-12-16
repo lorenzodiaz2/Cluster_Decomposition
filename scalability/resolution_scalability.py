@@ -1,4 +1,5 @@
 from pandas import DataFrame
+import hashlib
 
 from solvers.heuristic_solver import Heuristic_Solver
 from solvers.post_processing import Critical_Resources
@@ -20,7 +21,7 @@ def run_scalability(
         for i in range(10):
             print(f"\n\n=========================================================================================================\n\n")
             print(f"n quadrant = {n_quadrants}    n pairs per quadrant = {n_pairs_per_quadrant}    iteration {i} ->  Setting env... ", end="")
-            seed = i + 40
+            seed = make_seed(base_grid_side, n_pairs_per_quadrant, restrict_paths_to_quadrant, offset, n_quadrants, i)
 
             env = Environment(grid_side,  n_pairs_per_quadrant * 5, n_quadrants, n_pairs_per_quadrant, offset, 10, seed=seed, restrict_paths_to_quadrant=restrict_paths_to_quadrant)
             print("Done.\n\nCOMPLETA\n\n")
@@ -69,3 +70,16 @@ def run_scalability(
                     save_results(env, complete_solver, cluster_solvers, df, seed, critical_resources, final_solver)
 
     df.to_csv(f"results/{base_grid_side}_test_2-9.csv", index=False)
+
+
+def make_seed(base_grid_side: int,
+              n_pairs_per_quadrant: int,
+              restrict_paths_to_quadrant: bool,
+              offset: int,
+              n_quadrants: int,
+              i: int,
+              BASE: int = 12345) -> int:
+    key = f"{BASE}|{base_grid_side}|{n_pairs_per_quadrant}|{int(restrict_paths_to_quadrant)}|{offset}|{n_quadrants}|{i}"
+    # 64-bit dall'hash, poi ridotto a 32-bit per stare “standard”
+    s64 = int.from_bytes(hashlib.blake2b(key.encode(), digest_size=8).digest(), "little")
+    return s64 % (2**32)

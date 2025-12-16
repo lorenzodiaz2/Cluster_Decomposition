@@ -28,7 +28,6 @@ class Critical_Resources:
                 self.agents_per_resource[(v, t)].add(a)
 
         self.residuals = {(v, t): (self.cap[v] - len(agents)) for (v, t), agents in self.agents_per_resource.items()}
-        self.critical_resources = {(v, t) for (v, t), res in self.residuals.items() if res < self.current_tol}
 
         self.od_by_agent = {}  # od_by_agent[a] -> od
         self.paths_by_od = {}  # paths_by_od[od] -> [path_visits di tutti i paths] però le salvo come tuple
@@ -40,6 +39,22 @@ class Critical_Resources:
                 self.resources_by_path[path_visits] = [(path_visits[t], t) for t in range(len(path_visits))]
             for a in od.agents:
                 self.od_by_agent[a] = od
+
+        self.violated_resources = {(v, t) for (v, t), res in self.residuals.items() if res < 0}
+
+        self.violated_od_pairs = set()
+        for key in self.violated_resources:
+            for a in self.agents_per_resource.get(key, ()):
+                self.violated_od_pairs.add(self.od_by_agent[a])
+
+        rel = set()
+        for od in self.violated_od_pairs:
+            for path_visits in self.paths_by_od[od]:
+                rel.update(self.resources_by_path[path_visits])
+
+        self.relevant_resources = rel if rel else None
+        base_critical = {(v, t) for (v, t), res in self.residuals.items() if res < self.current_tol}
+        self.critical_resources = base_critical & self.relevant_resources if self.relevant_resources is not None else base_critical
 
         self.scores: dict[Agent, float] = {}
         self.removed_agents = set()
@@ -129,10 +144,13 @@ class Critical_Resources:
             new_residual = self.residuals[key] + 1
             self.residuals[key] = new_residual
 
-            if new_residual < self.current_tol:
-                heapq.heappush(self._heap, (new_residual, key))
-            else:
+            if self.relevant_resources is not None and key not in self.relevant_resources:
                 self.critical_resources.discard(key)
+            else:
+                if new_residual < self.current_tol:
+                    heapq.heappush(self._heap, (new_residual, key))
+                else:
+                    self.critical_resources.discard(key)
 
             if new_residual == self.cap[v]:
                 self.residuals.pop(key, None)
@@ -144,7 +162,10 @@ class Critical_Resources:
         start = time.perf_counter()
         self.current_tol += delta
         self.residuals = {(v, t): (self.cap[v] - len(agents)) for (v, t), agents in self.agents_per_resource.items()}
-        self.critical_resources = {(v, t) for (v, t), res in self.residuals.items() if res < self.current_tol}
+
+        base_critical = {(v, t) for (v, t), res in self.residuals.items() if res < self.current_tol}
+        self.critical_resources = base_critical & self.relevant_resources if self.relevant_resources is not None else base_critical
+
         self._build_heap()
 
         self.creation_times.append(time.perf_counter() - start)
