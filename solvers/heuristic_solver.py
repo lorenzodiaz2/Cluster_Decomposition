@@ -18,9 +18,9 @@ class Heuristic_Solver(General_Solver):
         od_pairs: List[OD_Pair],
         critical_resources: Critical_Resources | None = None,
         time_limit: int | None = 3600,
-        output_flag : int | None = 0
+        verbose : bool | None = False
     ):
-        super().__init__(G, od_pairs, time_limit, output_flag)
+        super().__init__(G, od_pairs, time_limit, verbose)
 
         self.P = None
         self.K = None
@@ -46,6 +46,7 @@ class Heuristic_Solver(General_Solver):
                     od_pair.T += 1
             self._set_model()
             self._optimize_model()
+        self._assign_solutions()
 
 
     def _set_model(self):
@@ -89,7 +90,7 @@ class Heuristic_Solver(General_Solver):
 
 
 
-    def assign_solutions(self):
+    def _assign_solutions(self):
         if self.status == "OPTIMAL" and self.m.SolCount > 0:
             not_assigned_agents = {od_pair.id: [a for a in od_pair.agents] for od_pair in self.od_pairs} if not self.critical_resources else {od_pair.id: [a for a in od_pair.agents if a in self.critical_resources.removed_agents] for od_pair in self.critical_resources.critical_od_pairs}
             for (od_pair, j), p in self.P.items():

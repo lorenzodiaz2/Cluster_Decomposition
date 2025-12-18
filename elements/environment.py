@@ -95,8 +95,9 @@ class Environment:
 
     def compute_clusters(
         self,
-        congestion_threshold: float | None = 0.34,
-        refinement_levels: int = 2
+        refinement_levels: int = 2,
+        E_abs_threshold: float = 250.0,
+        R_max_threshold: float = 2.0,
     ):
         start = time.perf_counter()
         n = len(self.od_pairs)
@@ -127,22 +128,22 @@ class Environment:
         base_max_size = self.max_cluster_size
 
         for refinement_level in range(1, refinement_levels + 1):
-            level_max_size = max(1, base_max_size // (2 ** refinement_level))
+            level_max_size = max(1, base_max_size // (2 ** refinement_level)) + 1
 
-            E_list = self.cluster_congestion_indexes
+            E_abs_list = self.cluster_congestion_indexes_absolute
+            R_max_list = self.cluster_congestion_ratio_max
 
             new_clusters: list[Cluster] = []
             any_split = False
 
-            for C, E_c in zip(self.clusters, E_list):
-                if (
-                    E_c is not None
-                    and E_c > congestion_threshold
-                    and C.n_agents > level_max_size
-                    and len(C.od_pairs) > 1
-                ):
-                    sub_clusters = self._split_cluster(C, level_max_size)
-                    new_clusters.extend(sub_clusters)
+            for C, E_abs, R_max in zip(self.clusters, E_abs_list, R_max_list):
+                should_split = (
+                    (E_abs is not None and E_abs > E_abs_threshold) or
+                    (R_max is not None and R_max > R_max_threshold)
+                )
+
+                if should_split and C.n_agents > level_max_size and len(C.od_pairs) > 1:
+                    new_clusters.extend(self._split_cluster(C, level_max_size))
                     any_split = True
                 else:
                     new_clusters.append(C)
@@ -152,8 +153,6 @@ class Environment:
 
             self.clusters = new_clusters
             self._compute_cluster_congestion_indexes()
-
-
 
         self.nj_time = time.perf_counter() - start
         self._compute_similarity_index()
@@ -347,10 +346,7 @@ class Environment:
 
                 cap = float(self.G.nodes[v].get("capacity", 0))
 
-                if cap > 0:
-                    ratio = occ_val / cap
-                else:
-                    ratio = float("inf") if occ_val > 0 else 1.0
+                ratio = occ_val / cap
 
                 if ratio > r_max:
                     r_max = ratio
