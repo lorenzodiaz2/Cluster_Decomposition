@@ -16,7 +16,7 @@ class Incumbent:
 def add_current_sol(model: Model, where, incumbent_obj):
     if where == GRB.Callback.MIPSOL:
         incumbent_obj.solutions.append(model.cbGet(GRB.Callback.MIPSOL_OBJ))
-        incumbent_obj.times.append(time.time() - model._start_time)
+        incumbent_obj.times.append(time.perf_counter() - model._start_time)
 
 
 class General_Solver:
@@ -48,7 +48,7 @@ class General_Solver:
         start = time.perf_counter()
         self.m.Params.TimeLimit = self.time_limit
         callback = partial(add_current_sol, incumbent_obj=self.incumbent)
-        self.m._start_time = time.time()
+        self.m._start_time = time.perf_counter()
         self.m.optimize(callback)
         self.resolution_times.append(time.perf_counter() - start)
 

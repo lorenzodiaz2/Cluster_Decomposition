@@ -60,6 +60,9 @@ class Environment:
         self.cluster_congestion_indexes = None
         self.cluster_congestion_indexes_absolute = None
         self.cluster_congestion_ratio_max = None
+        self.refinement_levels = None
+        self.E_abs_threshold = None
+        self.R_max_threshold = None
 
         self._od_index: dict[OD_Pair, int] | None = None
 
@@ -95,10 +98,13 @@ class Environment:
 
     def compute_clusters(
         self,
-        refinement_levels: int = 2,
+        refinement_levels: int = 0,
         E_abs_threshold: float = 250.0,
         R_max_threshold: float = 2.0,
     ):
+        self.refinement_levels = refinement_levels
+        self.E_abs_threshold = E_abs_threshold
+        self.R_max_threshold = R_max_threshold
         start = time.perf_counter()
         n = len(self.od_pairs)
         self.similarity_matrix = np.zeros((n, n), dtype=int)
@@ -128,7 +134,7 @@ class Environment:
         base_max_size = self.max_cluster_size
 
         for refinement_level in range(1, refinement_levels + 1):
-            level_max_size = max(1, base_max_size // (2 ** refinement_level)) + 1
+            level_max_size = max(1, base_max_size // (2 ** refinement_level))
 
             E_abs_list = self.cluster_congestion_indexes_absolute
             R_max_list = self.cluster_congestion_ratio_max
