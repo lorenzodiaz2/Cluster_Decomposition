@@ -12,7 +12,6 @@ from solvers.post_processing import Critical_Resources
 # Helpers (robust + CSV friendly)
 # -----------------------------
 def _jsonable(x: Any) -> Any:
-    """Convert to something JSON-serializable (stable for CSV)."""
     if x is None:
         return None
     if isinstance(x, (int, float, str, bool)):
@@ -20,12 +19,9 @@ def _jsonable(x: Any) -> Any:
     if isinstance(x, (list, tuple)):
         return [_jsonable(v) for v in x]
     if isinstance(x, set):
-        # stable order
         return sorted(_jsonable(v) for v in x)
     if isinstance(x, dict):
-        # stable keys order
         return {str(k): _jsonable(v) for k, v in sorted(x.items(), key=lambda kv: str(kv[0]))}
-    # numpy scalars, gurobi objs, custom objs, etc.
     try:
         return _jsonable(x.item())  # numpy scalar
     except Exception:
@@ -33,7 +29,6 @@ def _jsonable(x: Any) -> Any:
 
 
 def _dump(x: Any) -> Any:
-    """Dump containers to JSON string; leave scalars as-is."""
     if x is None:
         return None
     if isinstance(x, (int, float, str, bool)):
@@ -70,7 +65,7 @@ def _safe_objbound(solver: Heuristic_Solver):
 
 def _sum_or_none(values: list[float | None]) -> float | None:
     vals = [v for v in values if v is not None]
-    if len(vals) != len(values):  # if any missing => return None (più onesto)
+    if len(vals) != len(values):
         return None
     return float(sum(vals))
 
@@ -80,7 +75,7 @@ def _extract_cluster_block(
     cluster_solvers: list[Heuristic_Solver],
     critical_resources: Critical_Resources | None,
     final_solver: Heuristic_Solver | None,
-    suffix: str,  # " 1" or " 2"
+    suffix: str,
 ) -> dict[str, Any]:
 
     # cluster stats
@@ -88,7 +83,6 @@ def _extract_cluster_block(
     n_agents_per_cluster = [c.n_agents for c in env.clusters]
     od_pairs_per_cluster = [[od.id for od in c.od_pairs] for c in env.clusters]
 
-    # per-cluster solver stats
     model_times_clusters = []
     resolution_times_clusters = []
     clusters_status = []
@@ -105,7 +99,6 @@ def _extract_cluster_block(
     UB_clusters = _sum_or_none(UBs_clusters)
     LB_clusters = _sum_or_none(LBs_clusters)
 
-    # post-processing / repair stats
     critical_resources_creation_times = None
     unassigned_agents = None
     unassigning_times = None
@@ -116,7 +109,6 @@ def _extract_cluster_block(
 
     total_time_clusters_post = (env.matrix_time or 0.0) + (env.nj_time or 0.0)
 
-    # add cluster solving times
     for hs in cluster_solvers:
         total_time_clusters_post += sum(_safe_attr(hs, "model_times", []) or [])
         total_time_clusters_post += sum(_safe_attr(hs, "resolution_times", []) or [])
@@ -266,11 +258,9 @@ def save_results(
         "total time complete": float(total_time_complete),
     }
 
-    # Merge blocks
     row.update(block_1)
     row.update(block_2)
 
-    # Append to df (ensures missing columns become NaN if any)
     df.loc[len(df)] = row
 
 

@@ -60,4 +60,4 @@ class General_Solver:
             GRB.SUBOPTIMAL: "SUBOPTIMAL",
         }
         self.status = status_map.get(self.m.Status, str(self.m.Status))
-        self.gap = self.m.MIPGap
+        self.gap = self.m.MIPGap if self.status != "INFEASIBLE" else None

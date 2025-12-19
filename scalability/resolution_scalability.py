@@ -44,7 +44,7 @@ def run_scalability(
     for n_quadrants in quadrant_range:
         grid_side = 2 * base_grid_side + 1 if n_quadrants <= 4 else 3 * base_grid_side + 2
         for i in range(10):
-            print(f"n quadrant = {n_quadrants}    n pairs per quadrant = {n_pairs_per_quadrant}    iteration {i}")
+            print(f"n quadrant = {n_quadrants}    n pairs per quadrant = {n_pairs_per_quadrant}    iteration {i}   ", end="")
 
             env_1 = Environment(grid_side,  n_pairs_per_quadrant * 5, n_quadrants, n_pairs_per_quadrant, offset, 10, seed=seed)
 
@@ -61,13 +61,14 @@ def run_scalability(
             for _ in range(augmented_T_times):
                 for od in env_2.od_pairs:
                     od.delay_shortest_paths(od.T + 1)
+                    od.T += 1
 
-            cluster_solvers_2, all_clusters_ok_2 = solve_clusters(env_2, 2)
+            cluster_solvers_2, all_clusters_ok_2 = solve_clusters(env_2, 1)
             critical_resources_2, final_solver_2 = solve_final(env_2, all_clusters_ok_2)
 
 
             save_results(env_1, cluster_solvers_1, critical_resources_1, final_solver_1, env_2, cluster_solvers_2, critical_resources_2, final_solver_2, complete_solver, seed, df)
-
+            print()
             seed += 1
         print()
 

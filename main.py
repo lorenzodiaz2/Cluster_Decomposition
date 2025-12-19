@@ -94,16 +94,9 @@ def get_data_frame():
 
 if __name__ == '__main__':
     df = get_data_frame()
-    seed = 0
-    run_scalability(20, 80, 0, df, seed)
-    seed += 80
-    run_scalability(20, 90, 0, df, seed)
 
-
-
-    exit(0)
-    offset_values = [0, 2, 4, 6, 8, 10]
-    n_pairs_per_quadrant_values = [100, 108, 116, 124, 132, 134, 136, 138, 140]
+    offset_values = [-1, 0, 2, 5, 8, 10, 12, 15]
+    n_pairs_per_quadrant_values = [110, 118, 126, 132, 134, 136, 138, 140, 145, 150]
     seed = 0
 
     for offset in offset_values:
