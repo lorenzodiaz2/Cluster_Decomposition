@@ -2,7 +2,7 @@ import pandas as pd
 
 from scalability.resolution_scalability import run_scalability
 
-def get_data_frame():
+def get_data_frame_total():
     return pd.DataFrame({
         # =================================================================
         # PARAMETRI DI MODELLO
@@ -93,8 +93,12 @@ def get_data_frame():
     })
 
 if __name__ == '__main__':
-    df = get_data_frame()
+    # df = pd.read_csv("results/new_test.csv")
+    df = get_data_frame_total()
+    run_scalability(20, 20, -1, df, 0)
+    run_scalability(20, 20, -1, df, 1)
 
+    exit(0)
     offset_values = [-1, 0, 2, 5, 8, 10, 12, 15]
     n_pairs_per_quadrant_values = [110, 118, 126, 132, 134, 136, 138, 140, 145, 150]
     seed = 0

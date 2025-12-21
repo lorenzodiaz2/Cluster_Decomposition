@@ -136,9 +136,9 @@ def _extract_cluster_block(
     final_delay = sum(a.delay for a in env.agents)
 
     out = {
-        f"refinement levels{suffix}": _safe_attr(env, "refinement_levels", None),
-        f"E threshold{suffix}": _safe_attr(env, "E_abs_threshold", None),
-        f"R threshold{suffix}": _safe_attr(env, "R_max_threshold", None),
+        # f"refinement levels{suffix}": _safe_attr(env, "refinement_levels", None),
+        # f"E threshold{suffix}": _safe_attr(env, "E_abs_threshold", None),
+        # f"R threshold{suffix}": _safe_attr(env, "R_max_threshold", None),
 
         f"n clusters{suffix}": n_clusters,
         f"similarity index{suffix}": _safe_attr(env, "similarity_index", None),
@@ -168,7 +168,7 @@ def _extract_cluster_block(
 
         f"UB clusters{suffix}": UB_clusters,
         f"LB clusters{suffix}": LB_clusters,
-        f"final delay{suffix}": int(final_delay),
+        # f"final delay{suffix}": int(final_delay),
         f"total time clusters + post{suffix}": float(total_time_clusters_post),
     }
     return out
@@ -177,15 +177,99 @@ def _extract_cluster_block(
 # -----------------------------
 # Main function
 # -----------------------------
+# def save_results(
+#     env_1: Environment,
+#     cluster_solvers_1: list[Heuristic_Solver],
+#     critical_resources_1: Critical_Resources | None,
+#     final_solver_1: Heuristic_Solver | None,
+#     env_2: Environment,
+#     cluster_solvers_2: list[Heuristic_Solver],
+#     critical_resources_2: Critical_Resources | None,
+#     final_solver_2: Heuristic_Solver | None,
+#     complete_solver: Heuristic_Solver,
+#     seed: int,
+#     df: DataFrame,
+# ):
+#     # -------------------------
+#     # Parameters / instance info
+#     # -------------------------
+#     grid_side = env_1.grid_side
+#     n_quadrants = env_1.n_quadrants
+#     n_pairs_per_quadrant = env_1.n_pairs_per_quadrant
+#     n_agents = len(env_1.agents)
+#     max_cluster_size = env_1.max_cluster_size
+#     offset = env_1.offset
+#     k = env_1.k
+#     restrict_paths_to_quadrant = env_1.restrict_paths_to_quadrant
+#     env_time = env_1.set_time
+#
+#     # -------------------------
+#     # Complete solution block
+#     # -------------------------
+#     model_times_complete = _safe_attr(complete_solver, "model_times", None)
+#     resolution_times_complete = _safe_attr(complete_solver, "resolution_times", None)
+#     status_complete = _safe_attr(complete_solver, "status", None)
+#
+#     UB_complete = _safe_objval(complete_solver)
+#     LB_complete = _safe_objbound(complete_solver)
+#     gap_complete = _safe_attr(complete_solver, "gap", None)
+#
+#     incumbent = _safe_attr(complete_solver, "incumbent", None)
+#     incumbent_times = _safe_attr(incumbent, "times", []) if incumbent is not None else []
+#     incumbent_solutions = _safe_attr(incumbent, "solutions", []) if incumbent is not None else []
+#
+#     total_time_complete = 0.0
+#     if model_times_complete is not None:
+#         total_time_complete += sum(model_times_complete)
+#     if resolution_times_complete is not None:
+#         total_time_complete += sum(resolution_times_complete)
+#
+#     # -------------------------
+#     # Cluster blocks (1 and 2)
+#     # -------------------------
+#     block_1 = _extract_cluster_block(env_1, cluster_solvers_1, critical_resources_1, final_solver_1, suffix=" 1")
+#     block_2 = _extract_cluster_block(env_2, cluster_solvers_2, critical_resources_2, final_solver_2, suffix=" 2")
+#
+#     # -------------------------
+#     # Build row dict following your DF schema
+#     # -------------------------
+#     row = {
+#         # PARAMETRI DI MODELLO
+#         "grid side": int(grid_side),
+#         "n quadrants": int(n_quadrants),
+#         "n pairs per quadrant": int(n_pairs_per_quadrant),
+#         "n agents": int(n_agents),
+#         "max cluster size": int(max_cluster_size),
+#         "offset": int(offset),
+#         "k": int(k),
+#         "seed": int(seed),
+#         "restrict paths to quadrant": bool(restrict_paths_to_quadrant),
+#         "env time": float(env_time) if env_time is not None else None,
+#
+#         # VALORI SOLUZIONE COMPLETA
+#         "model times complete": _dump(model_times_complete),
+#         "resolution times complete": _dump(resolution_times_complete),
+#         "status complete": status_complete,
+#         "UB complete": UB_complete,
+#         "LB complete": LB_complete,
+#         "gap complete": float(gap_complete) if gap_complete is not None else None,
+#         "incumbent times": _dump(incumbent_times),
+#         "incumbent solutions": _dump(incumbent_solutions),
+#         "total time complete": float(total_time_complete),
+#     }
+#
+#     row.update(block_1)
+#     row.update(block_2)
+#
+#     df.loc[len(df)] = row
+
+
+
 def save_results(
     env_1: Environment,
     cluster_solvers_1: list[Heuristic_Solver],
     critical_resources_1: Critical_Resources | None,
     final_solver_1: Heuristic_Solver | None,
-    env_2: Environment,
-    cluster_solvers_2: list[Heuristic_Solver],
-    critical_resources_2: Critical_Resources | None,
-    final_solver_2: Heuristic_Solver | None,
     complete_solver: Heuristic_Solver,
     seed: int,
     df: DataFrame,
@@ -227,8 +311,8 @@ def save_results(
     # -------------------------
     # Cluster blocks (1 and 2)
     # -------------------------
-    block_1 = _extract_cluster_block(env_1, cluster_solvers_1, critical_resources_1, final_solver_1, suffix=" 1")
-    block_2 = _extract_cluster_block(env_2, cluster_solvers_2, critical_resources_2, final_solver_2, suffix=" 2")
+    block_1 = _extract_cluster_block(env_1, cluster_solvers_1, critical_resources_1, final_solver_1, suffix="")
+    # block_2 = _extract_cluster_block(env_2, cluster_solvers_2, critical_resources_2, final_solver_2, suffix=" 2")
 
     # -------------------------
     # Build row dict following your DF schema
@@ -259,7 +343,7 @@ def save_results(
     }
 
     row.update(block_1)
-    row.update(block_2)
+    # row.update(block_2)
 
     df.loc[len(df)] = row
 
