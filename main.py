@@ -100,7 +100,8 @@ if __name__ == '__main__':
     seed = 0
 
     for offset in offset_values:
-        for restrict_paths_to_quadrants in [False, True]:
-            for n_pairs_per_quadrant in n_pairs_per_quadrant_values:
-                run_scalability(20, n_pairs_per_quadrant, offset, df, seed)
-                seed += 80
+        for n_pairs_per_quadrant in n_pairs_per_quadrant_values:
+            run_scalability(20, n_pairs_per_quadrant, offset, df, seed)
+            seed += 80
+            print()
+        print()
