@@ -72,6 +72,5 @@ def run_scalability(
             print()
             seed += 1
         print()
-
-    df.to_csv(f"results/prova.csv", index=False)
+        df.to_csv(f"results/new_test.csv", index=False)
 

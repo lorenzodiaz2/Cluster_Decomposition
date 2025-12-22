@@ -168,7 +168,7 @@ def _extract_cluster_block(
 
         f"UB clusters{suffix}": UB_clusters,
         f"LB clusters{suffix}": LB_clusters,
-        # f"final delay{suffix}": int(final_delay),
+        f"final delay{suffix}": int(final_delay),
         f"total time clusters + post{suffix}": float(total_time_clusters_post),
     }
     return out
