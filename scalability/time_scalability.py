@@ -1,63 +1,87 @@
+import math
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 from solvers.heuristic_solver import Heuristic_Solver
 from elements.environment import Environment
 
 
-def save_img(results, i: int | None = None):
-    plt.plot(results.keys(), results.values(), marker="o", markersize=3)
+def save_img(results):
+    xs = sorted(results.keys())
+    ys = [results[x] for x in xs]
+    plt.figure()
+    plt.plot(xs, ys, marker="o", markersize=3)
     plt.xlabel("od")
-    plt.ylabel("Time")
+    plt.ylabel("Time (s)")
     plt.grid(True)
     plt.tight_layout()
-
-    if i:
-        plt.savefig(f"scalability_{i}.png")
-    else:
-        plt.savefig(f"scalability_new.png")
+    plt.savefig("scalability_results.png")
+    plt.close()
 
 
-def run():
-    grid_side = 20
-    offset = 20
-    k = 10
-    max_count = 3
-    step = 5
+def run_time_scalability(
+    grid_side: int,
+    k: int,
+    time_limit: int = 1800,
+    n_seeds: int = 5,
+    n_start: int = 50,
+    step: int = 5,
+    stop_after: int = 3,
+    tl_threshold: float = 0.6
+):
+    n = n_start
+    consecutive_bad = 0
 
-    for j in range(5):
-        print("\n\n==============================================================================================\n\n")
-        max_time_counter = 0
-        pairs_per_quadrant = 5
-        i = 0
-        results = {}
+    median_times = {}
+    tl_rates = {}
 
+    while True:
+        times = []
+        tl = 0
 
-        while max_time_counter < max_count:
-            print(f"i = {i}     grid side = {grid_side}   total number of pairs = {pairs_per_quadrant}... ", end="")
-            seed = 50 * j + i
-            env = Environment(grid_side, 0, 4, pairs_per_quadrant, offset, k, seed=seed)
-            solver = Heuristic_Solver(env.G, env.od_pairs)
+        needed_tl = math.ceil(tl_threshold * n_seeds)
+
+        for j in range(n_seeds):
+            seed = 12345 + 100000 * j + n
+            env = Environment(grid_side, 0, 1, n, 0, k, seed=seed)
+
+            solver = Heuristic_Solver(env.G, env.od_pairs, time_limit=time_limit)
             solver.solve()
 
-            total_time = sum(m_times for m_times in solver.model_times) + sum(r_time for r_time in solver.resolution_times)
-            results[pairs_per_quadrant] = total_time
-
-            counter_updated = "COUNTER UPDATED" if solver.status == "TIME_LIMIT" else ""
-            print(f"Solved in {solver.model_times} + {solver.resolution_times} = {total_time}     {counter_updated}")
+            total_time = sum(solver.model_times) + sum(solver.resolution_times)
+            times.append(total_time)
 
             if solver.status == "TIME_LIMIT":
-                max_time_counter += 1
+                tl += 1
 
-            if solver.status == "OPTIMAL":
-                max_time_counter = 0
+            if tl >= needed_tl:
+                break
 
-            pairs_per_quadrant += step
-            i += 1
+        tl_rate = tl / n_seeds
+        med = float(np.median(times))
+
+        median_times[n] = med
+        tl_rates[n] = tl_rate
+
+        print(f"n={n}  median={med:.3f}s  TL_rate={tl_rate:.2f}")
+
+        if tl_rate >= tl_threshold:
+            consecutive_bad += 1
+        else:
+            consecutive_bad = 0
+
+        if consecutive_bad >= stop_after:
+            break
+
+        n += step
+
+    with open("time_scalability_results.txt", "w") as f:
+        f.write(f"Grid side = {grid_side}  (cells={grid_side*grid_side})\n")
+        f.write(f"time_limit={time_limit}s, n_seeds={n_seeds}\n\n")
+        for n in sorted(median_times):
+            f.write(f"{n}: median={median_times[n]:.6f}, tl_rate={tl_rates[n]:.2f}\n")
+
+    save_img(median_times)
 
 
-        with open("time_scalability_results", "w") as f:
-            f.write(f"Grid size = {grid_side * grid_side}\n\n")
-            for n, time in results.items():
-                f.write(f"{n}:{time}\n")
-
-        save_img(results)

@@ -1,0 +1,34 @@
+Grid side = 20  (cells=400)
+time_limit=1800s, n_seeds=5
+
+50: median=0.085546, tl_rate=0.00
+55: median=0.098557, tl_rate=0.00
+60: median=0.110817, tl_rate=0.00
+65: median=0.115293, tl_rate=0.00
+70: median=0.226358, tl_rate=0.00
+75: median=0.188475, tl_rate=0.00
+80: median=0.229202, tl_rate=0.00
+85: median=0.249037, tl_rate=0.00
+90: median=0.284497, tl_rate=0.00
+95: median=0.295262, tl_rate=0.00
+100: median=0.334550, tl_rate=0.00
+105: median=0.367372, tl_rate=0.00
+110: median=0.467459, tl_rate=0.00
+115: median=1.515678, tl_rate=0.00
+120: median=0.946527, tl_rate=0.00
+125: median=1.624493, tl_rate=0.00
+130: median=1.338983, tl_rate=0.00
+135: median=3.015860, tl_rate=0.00
+140: median=4.109794, tl_rate=0.00
+145: median=5.103708, tl_rate=0.00
+150: median=4.267019, tl_rate=0.00
+155: median=22.009759, tl_rate=0.00
+160: median=32.716074, tl_rate=0.00
+165: median=3.509165, tl_rate=0.00
+170: median=193.355144, tl_rate=0.00
+175: median=279.373325, tl_rate=0.40
+180: median=179.695930, tl_rate=0.20
+185: median=754.606741, tl_rate=0.20
+190: median=1800.251521, tl_rate=0.60
+195: median=1800.244701, tl_rate=0.60
+200: median=1800.239142, tl_rate=0.60

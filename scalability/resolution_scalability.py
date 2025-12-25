@@ -10,7 +10,7 @@ def solve_clusters(env: Environment, refinement_levels: int = 0):
     cluster_solvers = []
     all_clusters_ok = True
     for cluster in env.clusters:
-        hs = Heuristic_Solver(env.G, cluster.od_pairs, verbose=False)
+        hs = Heuristic_Solver(env.G, cluster.od_pairs)
         hs.solve()
         if hs.status != "OPTIMAL":
             all_clusters_ok = False
@@ -34,6 +34,7 @@ def solve_final(env, all_clusters_ok):
 def run_scalability(
     base_grid_side: int,
     n_pairs_per_quadrant: int,
+    max_cluster_size: int,
     offset: int,
     df: DataFrame,
     starting_seed: int
@@ -41,14 +42,15 @@ def run_scalability(
     seed = starting_seed
 
     quadrant_range = range(2, 10)
-    for n_quadrants in quadrant_range:
+    q_range = [2, 4, 7, 9]
+    for n_quadrants in q_range:
         grid_side = 2 * base_grid_side + 1 if n_quadrants <= 4 else 3 * base_grid_side + 2
         for i in range(10):
-            print(f"n quadrant = {n_quadrants}    n pairs per quadrant = {n_pairs_per_quadrant}    iteration {i}   ", end="")
+            print(f"n quadrants = {n_quadrants}    n pairs per quadrant = {n_pairs_per_quadrant}    offset = {offset}    iteration {i}   ", end="")
 
-            env_1 = Environment(grid_side,  n_pairs_per_quadrant * 5, n_quadrants, n_pairs_per_quadrant, offset, 10, seed=seed)
+            env_1 = Environment(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, offset, 10, seed=seed)
 
-            complete_solver = Heuristic_Solver(env_1.G, env_1.od_pairs, verbose=False)
+            complete_solver = Heuristic_Solver(env_1.G, env_1.od_pairs, verbose=True)
             complete_solver.solve()
             # augmented_T_times = len(complete_solver.model_times) - 1
 
@@ -69,8 +71,8 @@ def run_scalability(
 
             # save_results(env_1, cluster_solvers_1, critical_resources_1, final_solver_1, env_2, cluster_solvers_2, critical_resources_2, final_solver_2, complete_solver, seed, df)
             save_results(env_1, cluster_solvers_1, critical_resources_1, final_solver_1, complete_solver, seed, df)
-            print()
+            # print()
             seed += 1
         print()
-        df.to_csv(f"results/new_test.csv", index=False)
+        df.to_csv(f"results/test_20_750.csv", index=False)
 

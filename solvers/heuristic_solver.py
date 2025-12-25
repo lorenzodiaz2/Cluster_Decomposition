@@ -17,7 +17,7 @@ class Heuristic_Solver(General_Solver):
         G: nx.Graph,
         od_pairs: List[OD_Pair],
         critical_resources: Critical_Resources | None = None,
-        time_limit: int | None = 3600,
+        time_limit: int | None = 1800,
         verbose : bool | None = False
     ):
         super().__init__(G, od_pairs, time_limit, verbose)
