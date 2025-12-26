@@ -41,16 +41,15 @@ def run_scalability(
 ):
     seed = starting_seed
 
-    quadrant_range = range(2, 10)
-    q_range = [2, 4, 7, 9]
-    for n_quadrants in q_range:
+    # quadrant_range = range(2, 10)
+    for n_quadrants in [2, 4, 7, 9]:
         grid_side = 2 * base_grid_side + 1 if n_quadrants <= 4 else 3 * base_grid_side + 2
         for i in range(10):
             print(f"n quadrants = {n_quadrants}    n pairs per quadrant = {n_pairs_per_quadrant}    offset = {offset}    iteration {i}   ", end="")
 
             env_1 = Environment(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, offset, 10, seed=seed)
 
-            complete_solver = Heuristic_Solver(env_1.G, env_1.od_pairs, verbose=True)
+            complete_solver = Heuristic_Solver(env_1.G, env_1.od_pairs)
             complete_solver.solve()
             # augmented_T_times = len(complete_solver.model_times) - 1
 

@@ -171,7 +171,7 @@ def _extract_cluster_block(
         f"final delay{suffix}": int(final_delay),
         f"total time clusters + post{suffix}": float(total_time_clusters_post),
     }
-    print(f"{round(total_time_clusters_post, 2)}  delay = {final_delay}")
+    print(f"t = {round(total_time_clusters_post, 2)}  delay = {final_delay}    ({n_clusters})")
     return out
 
 
@@ -308,7 +308,7 @@ def save_results(
         total_time_complete += sum(model_times_complete)
     if resolution_times_complete is not None:
         total_time_complete += sum(resolution_times_complete)
-    print(f"{round(total_time_complete, 2)}  LB = {LB_complete}  UB = {UB_complete}", end="   -   ")
+    print(f"t = {round(total_time_complete, 2)}  LB = {LB_complete}  UB = {UB_complete}", end="   -   ")
 
     # -------------------------
     # Cluster blocks (1 and 2)
