@@ -40,7 +40,7 @@ def _safe_attr(obj: Any, name: str, default=None):
     return getattr(obj, name, default)
 
 
-def _safe_objval(solver: Heuristic_Solver):
+def _safe_objVal(solver: Heuristic_Solver):
     m = _safe_attr(solver, "m", None)
     if m is None:
         return None
@@ -53,7 +53,7 @@ def _safe_objval(solver: Heuristic_Solver):
         return None
 
 
-def _safe_objbound(solver: Heuristic_Solver):
+def _safe_objBound(solver: Heuristic_Solver):
     m = _safe_attr(solver, "m", None)
     if m is None:
         return None
@@ -93,8 +93,8 @@ def _extract_cluster_block(
         model_times_clusters.append(_safe_attr(hs, "model_times", [None])[0] if _safe_attr(hs, "model_times", None) else None)
         resolution_times_clusters.append(_safe_attr(hs, "resolution_times", [None])[0] if _safe_attr(hs, "resolution_times", None) else None)
         clusters_status.append(_safe_attr(hs, "status", None))
-        UBs_clusters.append(_safe_objval(hs))
-        LBs_clusters.append(_safe_objbound(hs))
+        UBs_clusters.append(_safe_objVal(hs))
+        LBs_clusters.append(_safe_objBound(hs))
 
     UB_clusters = _sum_or_none(UBs_clusters)
     LB_clusters = _sum_or_none(LBs_clusters)
@@ -113,27 +113,46 @@ def _extract_cluster_block(
         total_time_clusters_post += sum(_safe_attr(hs, "model_times", []) or [])
         total_time_clusters_post += sum(_safe_attr(hs, "resolution_times", []) or [])
 
-    if critical_resources is not None:
-        critical_resources_creation_times = _safe_attr(critical_resources, "creation_times", None)
-        if critical_resources_creation_times is not None:
-            total_time_clusters_post += sum(critical_resources_creation_times)
+    total_delay = sum(a.delay for a in env.agents)
 
-        if final_solver is not None:
-            unassigned_agents = _safe_attr(critical_resources, "unassigned_agents_per_tol", None)
-            unassigning_times = _safe_attr(critical_resources, "unassigning_times", None)
-            if unassigning_times is not None:
-                total_time_clusters_post += sum(unassigning_times)
+    cluster_has_tl = any(s == "TIME_LIMIT" for s in (clusters_status or []))
 
-            model_times_final = _safe_attr(final_solver, "model_times", None)
-            resolution_times_final = _safe_attr(final_solver, "resolution_times", None)
-            status_final = _safe_attr(final_solver, "status", None)
+    if cluster_has_tl:
+        UB_final = None
+        LB_final = None
+    else:
+        if critical_resources is not None:
+            critical_resources_creation_times = _safe_attr(critical_resources, "creation_times", None)
+            total_time_clusters_post += sum(critical_resources_creation_times or [])
 
-            if model_times_final is not None:
-                total_time_clusters_post += sum(model_times_final)
-            if resolution_times_final is not None:
-                total_time_clusters_post += sum(resolution_times_final)
+            if final_solver is not None:
+                unassigned_agents = _safe_attr(critical_resources, "unassigned_agents_per_tol", None)
+                unassigning_times = _safe_attr(critical_resources, "unassigning_times", None)
+                total_time_clusters_post += sum(unassigning_times or [])
 
-    final_delay = sum(a.delay for a in env.agents)
+                model_times_final = _safe_attr(final_solver, "model_times", None)
+                resolution_times_final = _safe_attr(final_solver, "resolution_times", None)
+                status_final = _safe_attr(final_solver, "status", None)
+
+                removed = set(_safe_attr(critical_resources, "removed_agents", None) or [])
+                fixed_delay = sum(a.delay for a in env.agents if a not in removed)
+
+                ub_removed = _safe_objVal(final_solver)
+                lb_removed = _safe_objBound(final_solver)
+
+                UB_final = (fixed_delay + ub_removed) if ub_removed is not None else None
+                LB_final = (fixed_delay + lb_removed) if lb_removed is not None else None
+
+                total_time_clusters_post += sum(model_times_final or [])
+                total_time_clusters_post += sum(resolution_times_final or [])
+            else:
+                UB_final = total_delay
+                LB_final = total_delay
+        else:
+            UB_final = total_delay
+            LB_final = total_delay
+
+    # final_delay = sum(a.delay for a in env.agents)
 
     out = {
         # f"refinement levels{suffix}": _safe_attr(env, "refinement_levels", None),
@@ -168,10 +187,12 @@ def _extract_cluster_block(
 
         f"UB clusters{suffix}": UB_clusters,
         f"LB clusters{suffix}": LB_clusters,
-        f"final delay{suffix}": int(final_delay),
+        f"UB final{suffix}": UB_final,
+        f"LB final{suffix}": LB_final,
+        # f"final delay{suffix}": int(final_delay),
         f"total time clusters + post{suffix}": float(total_time_clusters_post),
     }
-    print(f"t = {round(total_time_clusters_post, 2)}  delay = {final_delay}    ({n_clusters})")
+    print(f"t = {round(total_time_clusters_post, 2)}  LB = {LB_final}   UB = {UB_final}    ({n_clusters})")
     return out
 
 
@@ -295,8 +316,8 @@ def save_results(
     resolution_times_complete = _safe_attr(complete_solver, "resolution_times", None)
     status_complete = _safe_attr(complete_solver, "status", None)
 
-    UB_complete = _safe_objval(complete_solver)
-    LB_complete = _safe_objbound(complete_solver)
+    UB_complete = _safe_objVal(complete_solver)
+    LB_complete = _safe_objBound(complete_solver)
     gap_complete = _safe_attr(complete_solver, "gap", None)
 
     incumbent = _safe_attr(complete_solver, "incumbent", None)
