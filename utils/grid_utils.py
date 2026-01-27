@@ -2,7 +2,7 @@ Coord = tuple[int, int]
 Quadrant = tuple[Coord, Coord]
 
 
-def set_quadrants_4_9(grid_side, n_quadrants, off):
+def set_replicated_quadrants(grid_side, n_quadrants, off):
     left_up = (0, 0)
     right_down = (grid_side - 1, grid_side - 1)
     quadrants: list[Quadrant] = []
@@ -16,7 +16,7 @@ def set_quadrants_4_9(grid_side, n_quadrants, off):
 
 
 
-def set_quadrants(grid_side, n_quadrants, off):
+def set_divided_quadrants(grid_side, n_quadrants, off):
     left_up = (0, 0)
     right_down = (grid_side - 1, grid_side - 1)
     quadrants: list[Quadrant] = []
@@ -116,69 +116,78 @@ def _divide(
     return up_quadrant, down_quadrant
 
 
-def _split_interval_2(
-    start: int,
-    end: int,
-    offset: int
-) -> tuple[int, int]:
-    mid = (start + end) // 2
 
-    left_end = mid + offset
-    right_start = mid - offset
+from typing import TypeAlias
 
-    left_end = max(start, min(left_end, end))
-    right_start = max(start, min(right_start, end))
+Interval: TypeAlias = tuple[int, int]
 
+def _split_interval_k(start: int, end: int, k: int, offset: int) -> list[Interval]:
+    if k <= 0:
+        raise ValueError("k must be > 0")
+    if end < start:
+        raise ValueError("empty interval")
+
+    length = end - start + 1
+
+    # -------- GAP (offset < 0) --------
+    if offset < 0:
+        gap = -offset
+        usable = length - gap * (k - 1)
+        if usable < k:
+            raise ValueError(
+                f"offset={offset} troppo negativo: non c'è spazio per {k} blocchi con gap={gap} in [{start},{end}]"
+            )
+
+        base = usable // k
+        rem = usable % k
+        sizes = [base + (1 if i < rem else 0) for i in range(k)]
+
+        intervals: list[Interval] = []
+        cur = start
+        for sz in sizes:
+            s = cur
+            e = s + sz - 1
+            intervals.append((s, e))
+            cur = e + 1 + gap
+        return intervals
+
+    # -------- OVERLAP (offset >= 0) --------
+    overlap = offset + 1  # offset=0 -> overlap 1, offset=1 -> overlap 2, ...
+
+    base = length // k
+    rem = length % k
+    sizes = [base + (1 if i < rem else 0) for i in range(k)]
+
+    intervals: list[Interval] = []
+    cur = start
+    for sz in sizes:
+        s = cur
+        e = s + sz - 1
+        intervals.append((s, e))
+        cur = e + 1
+
+    # estendo a destra tutti tranne l'ultimo => overlap tra adiacenti = overlap
+    for i in range(k - 1):
+        s, e = intervals[i]
+        intervals[i] = (s, min(end, e + overlap))
+
+    return intervals
+
+
+def _split_interval_2(start: int, end: int, offset: int) -> tuple[int, int]:
+    intervals = _split_interval_k(start, end, 2, offset)
+    # il type-checker non sa che sono 2: indicizziamo + assert
+    assert len(intervals) == 2
+    left_end = intervals[0][1]
+    right_start = intervals[1][0]
     return left_end, right_start
 
 
-def _split_interval_3(
-    start: int,
-    end: int,
-    offset: int = 0
-) -> list[tuple[int, int]]:
-    length = end - start + 1
+def _split_interval_3(start: int, end: int, offset: int = 0) -> list[Interval]:
+    return _split_interval_k(start, end, 3, offset)
 
-    if offset < 0:
-        gap = -offset
 
-        usable = length - 2 * gap
-        if usable % 3 != 0:
-            raise ValueError(
-                f"Intervallo [{start}, {end}] di lunghezza {length} "
-                f"non compatibile con 3 blocchi uguali e gap={gap}"
-            )
 
-        block = usable // 3
-
-        i1_start = start
-        i1_end   = i1_start + block - 1
-
-        i2_start = i1_end + 1 + gap
-        i2_end   = i2_start + block - 1
-
-        i3_start = i2_end + 1 + gap
-        i3_end   = i3_start + block - 1
-
-        assert i3_end == end, f"Final end {i3_end} != {end}"
-
-        return [(i1_start, i1_end), (i2_start, i2_end), (i3_start, i3_end)]
-
-    base = length // 3
-    rem = length % 3
-
-    sizes = [base, base, base]
-    for i in range(rem):
-        sizes[i] += 1
-
-    intervals = []
-    cur_start = start
-    for sz in sizes:
-        cur_end = cur_start + sz - 1
-        intervals.append((cur_start, cur_end))
-        cur_start = cur_end + 1
-
-    return intervals
 
 
 

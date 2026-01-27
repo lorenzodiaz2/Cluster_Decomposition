@@ -1,10 +1,78 @@
 import random
-from typing import List
 import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_hex
 
-from elements.pair import OD_Pair
+from mcpa.elements.pair import OD_Pair
+
+from typing import Any, Iterable, Optional
+
+
+def plot_graph_clients_facilities(
+    G: nx.Graph,
+    clients: Iterable[Any],
+    facilities: Iterable[Any],
+    pos: Optional[dict[Any, tuple[float, float]]] = None,
+    node_size: int = 30,
+    client_size: int = 120,
+    facility_size: int = 140,
+    with_labels: bool = False,
+    title: Optional[str] = None,
+):
+    """
+    Plotta G e sovrappone clienti (blu) e facilities (rosso).
+    - client.position e facility.position devono essere nodi presenti in G.
+    - Se pos non è fornito:
+        * se i nodi sono tuple (x, y) usa quelle come coordinate
+        * altrimenti usa spring_layout
+    """
+
+    # 1) Calcolo posizioni dei nodi
+    if pos is None:
+        # se i nodi sembrano coordinate (x,y)
+        sample = next(iter(G.nodes), None)
+        if isinstance(sample, tuple) and len(sample) == 2:
+            pos = {n: (float(n[0]), float(n[1])) for n in G.nodes}
+        else:
+            pos = nx.spring_layout(G, seed=0)
+
+    # 2) Nodi dei clienti/facilities
+    client_nodes = [c.position for c in clients if c.position in G]
+    facility_nodes = [f.position for f in facilities if f.position in G]
+
+    # 3) Disegno grafo base
+    plt.figure(figsize=(10, 8))
+    nx.draw_networkx_edges(G, pos, alpha=0.35, width=1.0)
+    nx.draw_networkx_nodes(G, pos, node_size=node_size, alpha=0.6)
+
+    # 4) Overlay: facilities (rosso) e clients (blu)
+    nx.draw_networkx_nodes(
+        G, pos,
+        nodelist=facility_nodes,
+        node_size=facility_size,
+        node_color="red",
+        alpha=0.9,
+        label="Facilities"
+    )
+    nx.draw_networkx_nodes(
+        G, pos,
+        nodelist=client_nodes,
+        node_size=client_size,
+        node_color="blue",
+        alpha=0.9,
+        label="Clients"
+    )
+
+    if with_labels:
+        nx.draw_networkx_labels(G, pos, font_size=5)
+
+    plt.legend()
+    if title:
+        plt.title(title)
+    plt.axis("off")
+    plt.tight_layout()
+    plt.show()
+
 
 
 # ---------------------------------
@@ -12,7 +80,7 @@ from elements.pair import OD_Pair
 # ---------------------------------
 def plot_graph(
     G: nx.Graph,
-    od_pairs: List[OD_Pair] | None = None
+    od_pairs: list[OD_Pair] | None = None
 ) -> None:
     plt.figure(figsize=(8, 6), dpi=200)
 
@@ -88,7 +156,7 @@ def draw_half_separators(ax: plt.Axes, G) -> None:
 
 def plot_paths(
     G: nx.Graph,
-    od_pairs: List[OD_Pair],
+    od_pairs: list[OD_Pair],
     colors: dict | None = None,
 ) -> None:
     plt.figure(figsize=(8, 6), dpi=200)
