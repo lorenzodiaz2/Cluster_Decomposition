@@ -243,7 +243,7 @@ class General_Environment(ABC):
         self.clusters_solvers = []
 
         for cluster in self.clusters:
-            hs = solver_factory(cluster)
+            hs = solver_factory(self, cluster)
             hs.solve()
             self.clusters_solvers.append(hs)
 

@@ -200,3 +200,7 @@ class MCPA_Environment(General_Environment):
         """Se voglio recuperare un'istanza da un dataset tocca implementa sto metodo"""
         pass
 
+    def __str__(self):
+        return f"grid side: {self.grid_side}   n OD = {len(self.elements)}   k = {self.k}   n quadrants = {self.n_quadrants}"
+
+

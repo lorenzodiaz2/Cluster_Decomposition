@@ -16,7 +16,6 @@ class MSCFL_Critical_Resources(CFL_Critical_Resources):
         return sum(max(0, self.residuals[f.id]) for f in candidate.k_facilities)
 
     def _recompute(self, candidate: Client):
-        print(f"rimossa una unità di domanda dal client {candidate.id}")
         fid = self._current_fid
         assert fid is not None
 

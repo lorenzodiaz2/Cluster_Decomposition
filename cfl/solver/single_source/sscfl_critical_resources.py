@@ -47,7 +47,7 @@ class SSCFL_Critical_Resources(CFL_Critical_Resources):
         self.removed_items.add(cid)
         self.critical_clients.add(candidate)
 
-        print(f"removed client {cid} with demand removed = {self.removed_units_by_client[cid]}")
+        # print(f"removed client {cid} with demand removed = {self.removed_units_by_client[cid]}")
 
         # 4) aggiorna residuo della facility
         new_residual = self.residuals[fid] + q

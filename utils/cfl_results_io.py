@@ -52,7 +52,7 @@ def _extract_cluster_block(
         total_time_heuristic += sum(_safe_attr(hs, "resolution_times", []) or [])
 
     cluster_has_tl = any(s == "TIME_LIMIT" for s in (clusters_status or []))
-    total_cost = total_solution_cost(env.G, env.elements, env.facilities)
+    total_cost = total_solution_cost(env.elements, env.facilities)
     gap = None
 
     if cluster_has_tl:
@@ -84,13 +84,16 @@ def _extract_cluster_block(
 
                 gap = 100 * (UB_final - UB_complete) / UB_complete
             else:
-                gap = 0.
+                gap = 0. if UB_complete == total_cost else 100 * (total_cost - UB_complete) / UB_complete
                 UB_final = total_cost
                 LB_final = total_cost
         else:
             UB_final = total_cost
             LB_final = total_cost
 
+    unassigned_string = "unassigned clients" if is_ss else "unassigned demands"
+    unassigned_times_string = "unassigning clients times" if is_ss else "unassigning demands times"
+    n_open_facilities_final = sum(1 for f in env.facilities if f.is_open)
 
     out = {
         f"n clusters": n_clusters,
@@ -119,14 +122,16 @@ def _extract_cluster_block(
 
         f"critical resources creation times": _dump(critical_resources_creation_times),
 
-        f"{"unassigned clients" if is_ss else "unassigned demands"}": _dump(unassigned_items),
-        f"{"unassigning clients times" if is_ss else "unassigning demands times"}": _dump(unassigning_items_times),
+        f"{unassigned_string}": _dump(unassigned_items),
+        f"{unassigned_times_string}": _dump(unassigning_items_times),
 
         f"model times final": _dump(model_times_final),
         f"resolution times final": _dump(resolution_times_final),
         f"status final": status_final,
         f"UB final": UB_final,
         f"LB final": LB_final,
+        f"n open facilities final": n_open_facilities_final,
+        f"% n open facilities final": round(100 * n_open_facilities_final / (env.n_facilities_per_quadrant * env.n_quadrants), 2),
         f"gap": gap,
         f"total time heuristic": float(total_time_heuristic),
     }
@@ -171,6 +176,8 @@ def save_cfl_results(
     LB_complete = _safe_objBound(complete_solver)
     gap_complete = _safe_attr(complete_solver, "gap", None)
 
+    n_open_facilities_complete = sum(1 for var in complete_solver.x.values() if var.X > 0.5)
+
     incumbent = _safe_attr(complete_solver, "incumbent", None)
     incumbent_times = _safe_attr(incumbent, "times", []) if incumbent is not None else []
     incumbent_solutions = _safe_attr(incumbent, "solutions", []) if incumbent is not None else []
@@ -212,6 +219,7 @@ def save_cfl_results(
         "status complete": status_complete,
         "UB complete": UB_complete,
         "LB complete": LB_complete,
+        "n open facilities complete": n_open_facilities_complete,
         "gap complete": float(gap_complete) if gap_complete is not None else None,
         "incumbent times": _dump(incumbent_times),
         "incumbent solutions": _dump(incumbent_solutions),

@@ -1,3 +1,4 @@
+import random
 from collections import defaultdict
 import multiprocessing as mp
 from typing import Callable
@@ -28,6 +29,13 @@ class CFL_Environment(General_Environment):
     ):
         super().__init__(grid_side, max_cluster_size, n_quadrants, n_clients_per_quadrant, offset, k,
                          reproducibility_flag, remove_rnd_nodes_flag, remove_percentage, seed, instance_file)
+
+        if reproducibility_flag:
+            self.rng_clients = random.Random(seed + 1_000_003)
+            self.rng_facilities = random.Random(seed + 2_000_003)
+        else:
+            self.rng_clients = random.Random()
+            self.rng_facilities = random.Random()
 
         self.n_facilities_per_quadrant = n_facilities_per_quadrant
         self.facilities = []
@@ -64,27 +72,26 @@ class CFL_Environment(General_Environment):
         self._start_parallel()
 
     def _make_client(self, quadrant: Quadrant, id_client: int) -> Client:
-        pos = self._choose_position(quadrant)
-        demand = self.rng.randrange(20, 21)
+        pos = self._choose_position(quadrant, self.rng_clients)
+        demand = 20
         return Client(id_client, pos, demand)
 
     def _make_facility(self, quadrant: Quadrant, id_fac: int) -> Facility:
-        pos = self._choose_position(quadrant)
-        capacity = self.rng.randrange(120, 121)
-        opening_cost = self.rng.randrange(1200, 1201)
+        pos = self._choose_position(quadrant, self.rng_facilities)
+        capacity = 170
+        opening_cost = 1000
         return Facility(id_fac, pos, capacity, opening_cost)
 
-    def _choose_position(self, quadrant: Quadrant) -> Coord:
+    def _choose_position(self, quadrant: Quadrant, rng: random.Random) -> Coord:
         top, left = quadrant[0]
         bottom, right = quadrant[1]
         row_range = range(top, bottom + 1)
         col_range = range(left, right + 1)
 
         while True:
-            pos = (self.rng.choice(row_range), self.rng.choice(col_range))
+            pos = (rng.choice(row_range), rng.choice(col_range))
             if pos in self.G.nodes():
                 return pos
-
 
     def _start_parallel(self):
         client_by_quadrant = defaultdict(list)
@@ -179,7 +186,7 @@ class CFL_Environment(General_Environment):
                 K = getattr(client, "k_facilities", None) or getattr(client, "all_facilities", [])
                 m = len(K)
                 if m <= 0:
-                    continue  # (caso raro: client senza candidati)
+                    continue
 
                 frac = d / m
                 for fac in K:

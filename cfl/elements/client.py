@@ -10,14 +10,33 @@ class Client:
         self.k_facilities: list[Facility] = []
         self.all_facilities: list[Facility] = []
         self.shipment_by_facility: dict[int, int] = {}
+        self.distances_to_facilities: dict[int, float] = {}
 
 
-    def find_nearest_facilities(self, G: nx.Graph, facilities: list[Facility], k: int) -> None:
-        dist = dict(nx.single_source_shortest_path_length(G, self.position))
-        ordered = sorted(facilities, key=lambda fac: (dist.get(fac.position, math.inf), -fac.capacity))
+    def find_nearest_facilities(
+            self,
+            G: nx.Graph,
+            facilities: list[Facility],
+            k: int,
+            weight: str | None = None
+    ) -> None:
+        if weight is None:
+            dist_to_nodes = dict(nx.single_source_shortest_path_length(G, self.position))
+        else:
+            dist_to_nodes = dict(nx.single_source_dijkstra_path_length(G, self.position, weight=weight))
+
+        self.distances_to_facilities = {
+            fac.id: dist_to_nodes.get(fac.position, math.inf)
+            for fac in facilities
+        }
+
+        ordered = sorted(
+            facilities,
+            key=lambda fac: (self.distances_to_facilities.get(fac.id, math.inf), -fac.capacity),
+        )
+
         chosen: list[Facility] = []
         cap_sum = 0
-
         for f in ordered:
             chosen.append(f)
             cap_sum += f.capacity
@@ -42,9 +61,6 @@ class Client:
 
     @staticmethod
     def compute_similarity(c1, c2):
-
-
-
         ids1 = {f.id for f in c1.k_facilities}
         ids2 = {f.id for f in c2.k_facilities}
         return len(ids1 & ids2)

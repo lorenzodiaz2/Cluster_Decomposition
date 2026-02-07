@@ -71,6 +71,7 @@ def _sum_or_none(values: list[float | None]) -> float | None:
 
 def _extract_cluster_block(
     env: MCPA_Environment,
+    UB_complete: float,
     critical_resources: MCPA_Critical_Resources | None,
     final_solver: MCPA_Heuristic_Solver | None,
 ) -> dict[str, Any]:
@@ -113,6 +114,7 @@ def _extract_cluster_block(
     total_delay = sum(a.delay for a in env.agents)
 
     cluster_has_tl = any(s == "TIME_LIMIT" for s in (clusters_status or []))
+    gap = None
 
     if cluster_has_tl:
         UB_final = None
@@ -142,7 +144,9 @@ def _extract_cluster_block(
 
                 total_time_clusters_post += sum(model_times_final or [])
                 total_time_clusters_post += sum(resolution_times_final or [])
+                gap = 100 * (UB_final - UB_complete) / UB_complete
             else:
+                gap = 0. if UB_complete == total_delay else 100 * (total_delay - UB_complete) / UB_complete
                 UB_final = total_delay
                 LB_final = total_delay
         else:
@@ -157,6 +161,13 @@ def _extract_cluster_block(
         f"cluster congestion indexes": _dump(_safe_attr(env, "cluster_congestion_indexes", None)),
         f"cluster congestion indexes absolute": _dump(_safe_attr(env, "cluster_congestion_indexes_absolute", None)),
         f"cluster congestion ratio max": _dump(_safe_attr(env, "cluster_congestion_ratio_max", None)),
+
+        f"global congestion absolute": _dump(_safe_attr(env, "global_congestion_index_absolute", None)),
+        f"cross congestion absolute": _dump(_safe_attr(env, "cross_congestion_index_absolute", None)),
+        f"global congestion ratio max": _dump(_safe_attr(env, "global_congestion_ratio_max", None)),
+        f"cross congestion rate": _dump(_safe_attr(env, "cross_congestion_rate", None)),
+        f"cross congestion share": _dump(_safe_attr(env, "cross_congestion_share", None)),
+
         f"similarity matrix time": _safe_attr(env, "matrix_time", None),
         f"nj time": _safe_attr(env, "nj_time", None),
 
@@ -181,6 +192,7 @@ def _extract_cluster_block(
         f"LB clusters": LB_clusters,
         f"UB final": UB_final,
         f"LB final": LB_final,
+        f"gap": gap,
         f"total time clusters + post": float(total_time_clusters_post),
     }
     print(f"t = {round(total_time_clusters_post, 2)}  LB = {LB_final}   UB = {UB_final}    ({n_clusters})")
@@ -234,7 +246,7 @@ def save_mcpa_results(
     # -------------------------
     # Cluster blocks (1 and 2)
     # -------------------------
-    block = _extract_cluster_block(env, critical_resources, final_solver)
+    block = _extract_cluster_block(env, UB_complete, critical_resources, final_solver)
 
     # -------------------------
     # Build row dict following your DF schema

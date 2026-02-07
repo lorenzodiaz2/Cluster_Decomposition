@@ -1,3 +1,4 @@
+import math
 from abc import ABC, abstractmethod
 from collections import defaultdict
 
@@ -13,17 +14,16 @@ from general.general_solver import General_Solver
 
 BIG_M = 10**6
 
-def total_solution_cost(G: nx.Graph, clients, facilities, is_TB_instance: bool = True) -> int:
-    fac_by_id = {fac.id: fac for fac in facilities}
-
+def total_solution_cost(clients, facilities, is_TB_instance: bool = True) -> int:
     open_cost = sum(fac.activation_cost for fac in facilities if fac.is_open)
 
     ship_cost = 0
     for cl in clients:
-        dist = nx.single_source_dijkstra_path_length(G, cl.position, weight="cost")
         for fid, q in cl.shipment_by_facility.items():
-            fac = fac_by_id[fid]
-            ship_cost += dist.get(fac.position, BIG_M) * q if is_TB_instance else dist.get(fac.position, BIG_M)
+            d = cl.distances_to_facilities.get(fid, BIG_M)
+            if d == math.inf:
+                d = BIG_M
+            ship_cost += d * q if is_TB_instance else d
 
     return open_cost + ship_cost
 
@@ -49,8 +49,9 @@ class CFL_Heuristic_Solver(General_Solver, ABC):
 
         self.critical_resources = critical_resources
         if critical_resources:
-            self.critical_resources.unassign_items()
-            self.fixed_cost_before = total_solution_cost(self.G, self.clients, self.facilities)
+            if not critical_resources.is_initially_feasible:
+                self.critical_resources.unassign_items()
+            self.fixed_cost_before = total_solution_cost(self.clients, self.facilities)
 
 
         self.cost: dict[tuple[int, int], float] = {}
@@ -92,25 +93,24 @@ class CFL_Heuristic_Solver(General_Solver, ABC):
         ship_cost = self._compute_shipping_cost()
         self.m.setObjective(open_cost + ship_cost, GRB.MINIMIZE)
 
-
     def _precompute_costs(self):
         self.cost = {}
         pairs = set(self.y.keys())
         active_clients = self.repair_clients if self.critical_resources else self.clients
 
         for c in active_clients:
-            dist = nx.single_source_dijkstra_path_length(self.G, c.position, weight="cost")
             for f in c.k_facilities:
                 key = (f.id, c.id)
                 if key in pairs:
-                    self.cost[key] = dist.get(f.position, 10**6)
+                    d = c.distances_to_facilities.get(f.id, BIG_M)
+                    self.cost[key] = BIG_M if d == math.inf else d
 
 
     def _handle_infeasibility(self):
         if self.critical_resources:
             self.critical_resources.increment_tol()
             self.critical_resources.unassign_items()
-            self.fixed_cost_before = total_solution_cost(self.G, self.clients, self.facilities)
+            self.fixed_cost_before = total_solution_cost(self.clients, self.facilities)
             return True
 
         else:

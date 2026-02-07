@@ -1,37 +1,10 @@
 from datetime import datetime
-
 from pandas import DataFrame
 
-from mcpa.elements.pair import OD_Pair
 from mcpa.solver.mcpa_heuristic_solver import MCPA_Heuristic_Solver
 from mcpa.solver.mcpa_critical_resources import MCPA_Critical_Resources
 from mcpa.elements.mcpa_environment import MCPA_Environment
 from utils.mcpa_results_io import save_mcpa_results
-
-def solve_clusters(env: MCPA_Environment):
-    env.compute_clusters(OD_Pair.compute_similarity)
-    cluster_solvers = []
-    all_clusters_ok = True
-    for cluster in env.clusters:
-        hs = MCPA_Heuristic_Solver(env.G, cluster.elements)
-        hs.solve()
-        if hs.status != "OPTIMAL":
-            all_clusters_ok = False
-        cluster_solvers.append(hs)
-
-    return cluster_solvers, all_clusters_ok
-
-
-def solve_final(env, all_clusters_ok):
-    critical_resources = None
-    final_solver = None
-    if all_clusters_ok:
-        critical_resources = MCPA_Critical_Resources(env.G, env.elements)
-        if not critical_resources.is_initially_feasible:
-            critical_resources.unassign_items()
-            final_solver = MCPA_Heuristic_Solver(env.G, env.elements, critical_resources)
-            final_solver.solve()
-    return critical_resources, final_solver
 
 
 def run_mcpa_scalability(
@@ -53,17 +26,23 @@ def run_mcpa_scalability(
 
             print(f"n quadrants = {n_quadrants}    n pairs per quadrant = {n_pairs_per_quadrant}    offset = {offset}    iteration {i}   ", end="")
 
-            env_1 = MCPA_Environment(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, offset, 10, seed=seed)
+            env = MCPA_Environment(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, offset, 10, seed=seed)
 
-            complete_solver = MCPA_Heuristic_Solver(env_1.G, env_1.elements)
+            complete_solver = MCPA_Heuristic_Solver(env.G, env.elements)
             complete_solver.solve()
 
-            cluster_solvers_1, all_clusters_ok_1 = solve_clusters(env_1)
+            env.solve_clusters()
 
-            critical_resources_1, final_solver_1 = solve_final(env_1, all_clusters_ok_1)
+            critical_resources = None
+            final_solver = None
+            if all(hs.status == "OPTIMAL" for hs in env.clusters_solvers):
+                critical_resources = MCPA_Critical_Resources(env.G, env.elements)
+                if not critical_resources.is_initially_feasible:
+                    final_solver = MCPA_Heuristic_Solver(env.G, env.elements, critical_resources)
+                    final_solver.solve()
 
-            save_mcpa_results(env_1, critical_resources_1, final_solver_1, complete_solver, seed, df)
+            save_mcpa_results(env, critical_resources, final_solver, complete_solver, seed, df)
             seed += 1
+            df.to_csv(f"results/mcpa/mcpa_results.csv", index=False)
         print()
-        df.to_csv(f"results/test_20_750.csv", index=False)
 
