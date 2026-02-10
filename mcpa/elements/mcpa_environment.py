@@ -149,7 +149,7 @@ class MCPA_Environment(General_Environment):
     def solve_clusters(self):
         self._solve_clusters(
             OD_Pair.compute_similarity,
-            lambda c: MCPA_Heuristic_Solver(self.G, c.elements)
+            lambda env, c: MCPA_Heuristic_Solver(env.G, c.elements)
         )
 
 
