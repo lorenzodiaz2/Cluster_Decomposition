@@ -125,7 +125,7 @@ def _extract_cluster_block(
             total_time_clusters_post += sum(critical_resources_creation_times or [])
 
             if final_solver is not None:
-                unassigned_agents = _safe_attr(critical_resources, "unassigned_agents_per_tol", None)
+                unassigned_agents = _safe_attr(critical_resources, "unassigned_items_per_tol", None)
                 unassigning_times = _safe_attr(critical_resources, "unassigning_times", None)
                 total_time_clusters_post += sum(unassigning_times or [])
 
@@ -133,7 +133,7 @@ def _extract_cluster_block(
                 resolution_times_final = _safe_attr(final_solver, "resolution_times", None)
                 status_final = _safe_attr(final_solver, "status", None)
 
-                removed = set(_safe_attr(critical_resources, "removed_agents", None) or [])
+                removed = set(_safe_attr(critical_resources, "removed_items", None) or [])
                 fixed_delay = sum(a.delay for a in env.agents if a not in removed)
 
                 ub_removed = _safe_objVal(final_solver)

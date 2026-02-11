@@ -26,6 +26,9 @@ class MCPA_Heuristic_Solver(General_Solver):
         self.E = None
         self.x = None
         self.critical_resources = critical_resources
+        if critical_resources:
+            if not critical_resources.is_initially_feasible:
+                self.critical_resources.unassign_items()
         self.G = G
         self.od_pairs = od_pairs
         self.A: list[Agent] = [a for od_pair in self.od_pairs for a in od_pair.agents]

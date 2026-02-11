@@ -81,7 +81,6 @@ class General_Critical_Resources(ABC):
                 return resource
         return None
 
-
     def increment_tol(self):
         start = time.perf_counter()
 
@@ -89,15 +88,25 @@ class General_Critical_Resources(ABC):
         self._update_residuals()
 
         self.violated_resources = {r for r, res in self.residuals.items() if res < 0}
-        self.relevant_resources = self._compute_relevant_resources()
+
+        prev_rel = self.relevant_resources
+        new_rel = self._compute_relevant_resources()
+
+        if new_rel is None and prev_rel is not None:
+            new_rel = prev_rel
+
+        self.relevant_resources = new_rel
 
         base_critical = {r for r, res in self.residuals.items() if res < self.current_tol}
-        self.critical_resources = base_critical & self.relevant_resources if self.relevant_resources is not None else base_critical
+        self.critical_resources = (
+            base_critical & self.relevant_resources
+            if self.relevant_resources is not None
+            else base_critical
+        )
 
         self._build_heap()
         self.creation_times.append(time.perf_counter() - start)
         self.critical_resources_per_tol.append(len(self.critical_resources))
-
 
     @abstractmethod
     def _update_residuals(self):
