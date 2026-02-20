@@ -2,6 +2,9 @@ import random
 import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_hex
+import seaborn as sns
+import matplotlib.colors as mcolors
+import matplotlib as mpl
 
 from mcpa.elements.pair import OD_Pair
 
@@ -208,3 +211,86 @@ def plot_paths(
 
 def grid_layout(G: nx.Graph):
     return {(i, j): (j, -i) for (i, j) in G.nodes()}
+
+
+def plot_heatmap(df, columns):
+    subset = df[columns]
+    matrice_corr = subset.corr(method='spearman')
+
+    plt.figure(figsize=(12, 12))
+    sns.heatmap(matrice_corr,
+                annot=True,
+                cmap='coolwarm',
+                fmt=".2f",
+                vmin=-1, vmax=1)
+
+    plt.title('Correlation Matrix')
+    plt.show()
+
+
+def plot_curves(curves, y_label, x_values, min_value, max_value, cbar_str, name_file):
+    # 'viridis', 'plasma', 'coolwarm', 'spring', 'berlin'
+    cmap = mpl.colormaps["cividis"]
+    norm = mcolors.Normalize(vmin=min_value, vmax=max_value)
+    y_limit = 0
+
+    plt.figure(figsize=(14, 10))
+
+    for curve, (n_el, q) in curves:
+        if max(curve) > y_limit:
+            y_limit = max(curve)
+        if n_el <= 375:
+            color = cmap(norm(n_el * q))
+            plt.plot(x_values, curve, marker='o', linestyle='-', color=color, alpha=0.7)
+
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])
+    cbar = plt.colorbar(sm, ax=plt.gca())
+
+    cbar.set_label(cbar_str, fontsize=24)
+    cbar.ax.tick_params(labelsize=24)
+
+    plt.ylim((0, y_limit))
+
+    plt.xticks(x_values)
+    plt.grid(True, linestyle='--', alpha=0.5)
+
+    plt.xlabel("Offset", fontsize=30)
+    plt.ylabel(y_label, fontsize=30)
+    plt.tick_params(axis='both', which='major', labelsize=26)
+
+    plt.savefig(name_file, dpi=1200)
+    # plt.show()
+
+
+def get_curves(dir_path, offset_values):
+    gap_curves = []
+    time_curves = []
+    min_val = float("inf")
+    max_val = float("-inf")
+
+    for j in range(4, 34):
+        gap_curve = []
+        time_curve = []
+        n_elements = ()
+
+        for i in offset_values:
+            with open(f"{dir_path}/tex/summary_{i}.tex", "r", encoding="utf-8") as f:
+                lines = f.readlines()
+            line = lines[j]
+            arr = line[:-2].replace(" ", "").split("&")
+            gap = float(arr[-2])
+            time = float(arr[4])
+            gap_curve.append(gap)
+            time_curve.append(time)
+            n_elements = (int(arr[0]), int(arr[1])) # int(arr[0]) * int(arr[1])
+            tot = int(arr[0]) * int(arr[1])
+            if tot < min_val:
+                min_val = tot
+            if tot > max_val:
+                max_val = tot
+
+        gap_curves.append((gap_curve, n_elements))
+        time_curves.append((time_curve, n_elements))
+
+    return gap_curves, time_curves, min_val, max_val

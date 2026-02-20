@@ -28,6 +28,31 @@ class ScalabilityResult:
     stop_reason: str
 
 
+def read():
+    with open("../results/mcpa/mcpa_parameters_selection_results.txt", "r") as f:
+        lines = f.readlines()
+    points = {}
+    j = 0
+    for i in range(len(lines)):
+        if lines[i].__contains__("n: runs_done, tl_count, tl_rate, median_capped, p90_capped, max_capped, is_bad"):
+            j = i + 1
+    c = 0
+    for i in range(j, len(lines)):
+        if lines[i].strip() == "":
+            continue
+
+        n = int(lines[i].split(":")[0])
+        right_arr = lines[i].split(":")[1].split(",")
+        points[n] = ScalabilityPoint(n, 5, int(right_arr[1]), float(right_arr[2]), float(right_arr[3]), float(right_arr[4]), float(right_arr[5]), bool(int(right_arr[6])))
+        print(n, right_arr)
+        c += 1
+
+    _save_scalability_plot(points, "mcpa_parameters_selection_results", "Number of OD Pairs", False)
+    _save_scalability_plot(points, "mcpa_parameters_selection_results", "Number of OD Pairs", True)
+
+
+
+
 def _save_scalability_plot(
     points: dict[int, ScalabilityPoint],
     name_file: str,
@@ -51,11 +76,12 @@ def _save_scalability_plot(
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(f"{name_file}_600dpi.png", dpi=600)
-    plt.savefig(f"{name_file}_1200dpi.png", dpi=1200)
+    # plt.savefig(f"{name_file}_600dpi.pdf", dpi=600)
+    plt.savefig(f"{name_file}{"_log" if logy else ""}.pdf", dpi=1200)
 
     plt.close()
 
+read()
 
 def run_time_scalability(
     grid_side: int,

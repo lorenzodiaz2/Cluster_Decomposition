@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Callable, Any
 import networkx as nx
+import pandas as pd
 
 from cfl.elements.client import Client
 from cfl.elements.facility import Facility
@@ -238,3 +239,28 @@ def set_client_facility_lists_from_cost_graph(
                 break
 
         c.k_facilities = chosen
+
+
+def get_sum_from_array_string(arr):
+    arr = arr.strip("[]")
+    num_arr = arr.split(", ")
+    s = 0
+    for n in num_arr:
+        s += float(n)
+    return s
+
+def get_last_from_array_string(arr):
+    if not "[" in arr:
+        return 0
+    arr = arr.strip("[]")
+    num_arr = arr.split(", ")
+    return float(num_arr[-1])
+
+
+def fmt_int(x):
+    return f"{int(x)}"
+
+
+def fmt_float(x):
+    if pd.isna(x): return "-"
+    return f"{x:.2f}"

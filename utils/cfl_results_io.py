@@ -1,12 +1,15 @@
+import math
 from typing import Any
 
+import numpy as np
+import pandas as pd
 from pandas import DataFrame
 
 from cfl.elements.cfl_environment import CFL_Environment
 from cfl.solver.cfl_critical_resources import CFL_Critical_Resources
 from cfl.solver.cfl_heuristic_solver import CFL_Heuristic_Solver, total_solution_cost
 from utils.mcpa_results_io import _safe_attr, _safe_objVal, _safe_objBound, _dump
-
+from utils.read_instance import fmt_int, fmt_float, get_sum_from_array_string, get_last_from_array_string
 
 
 def _extract_cluster_block(
@@ -230,5 +233,243 @@ def save_cfl_results(
 
     df.loc[len(df)] = row
 
+
+def save_cfl_tex_tables():
+    column_formatters = {
+        "1": fmt_int,
+        "2": fmt_int,
+        "3": fmt_float,
+        "4": fmt_int,
+        "5": fmt_float,
+        "6": fmt_int,
+        "7": fmt_float,
+        "8": fmt_float,
+        "9": fmt_float,
+        "10": fmt_int,
+        "11": fmt_float,
+        "12": fmt_float
+    }
+
+    df = pd.read_csv("results/cfl/ss/sscfl_results.csv")
+    df['unassigning clients times'] = df['unassigning clients times'].astype(str)
+    df['model times final'] = df['model times final'].astype(str)
+    df['resolution times final'] = df['resolution times final'].astype(str)
+    df['critical resources creation times'] = df['critical resources creation times'].astype(str)
+    df['unassigned clients'] = df['unassigned clients'].astype(str)
+
+    for offset in [10]:
+        df_out = pd.DataFrame(columns=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
+        for n_clients_per_quadrant in [125, 150, 175, 200, 225]:
+            for n_quadrants in [2, 3, 4, 6, 7, 9]:
+                n_instances = 0
+                complete_times = []
+                heuristic_times = []
+                gaps = []
+                n_time_limit_complete = 0
+                n_time_limit_heuristic = 0
+                speeds_up = []
+                repair_times = []
+                unassigned_clients = []
+                n_clusters = []
+                cluster_creation_times = []
+
+                for _, row in df.iterrows():
+                    _grid_side = int(row["grid side"])
+                    _n_quadrants = int(row["n quadrants"])
+                    _n_clients_per_quadrant = int(row["n clients per quadrant"])
+                    _max_cluster_size = int(row["max cluster size"])
+                    _offset = int(row["offset"])
+                    _k = int(row["k"])
+                    _seed = int(row["seed"])
+                    _status_complete = row["status complete"]
+                    _clusters_status = row["clusters status"]
+                    _complete_time = float(row["total time complete"])
+                    _heuristic_time = float(row["total time heuristic"])
+                    _status_final = row["status final"]
+                    _n_clusters = int(row["n clusters"])
+                    _cluster_creation_time = 100 * (float(row["similarity matrix time"]) + float(row["nj time"])) / _heuristic_time
+
+                    _repair_time = 0
+
+                    if row["critical resources creation times"] != "nan":
+                        _repair_time += get_sum_from_array_string(row["critical resources creation times"])
+
+                    if row["unassigning clients times"] != "nan":
+                        _repair_time += get_sum_from_array_string(row["unassigning clients times"])
+
+                    if row["model times final"] != "nan":
+                        _repair_time += get_sum_from_array_string(row["model times final"])
+
+                    if row["resolution times final"] != "nan":
+                        _repair_time += get_sum_from_array_string(row["resolution times final"])
+
+                    _unassigned_clients = 0
+                    if row["unassigned clients"] != "nan":
+                        _unassigned_clients += get_last_from_array_string(row["unassigned clients"])
+
+                    consider_gap = True
+                    _gap = float(row["gap"])
+
+                    if n_clients_per_quadrant != _n_clients_per_quadrant or n_quadrants != _n_quadrants or offset != _offset:
+                        continue
+
+                    if _status_complete == "TIME_LIMIT":
+                        n_time_limit_complete += 1
+
+                    if "TIME_LIMIT" in _clusters_status:
+                        n_time_limit_heuristic += 1
+                        consider_gap = False
+
+                    if _status_final == "TIME_LIMIT":
+                        if "TIME_LIMIT" not in _clusters_status:
+                            n_time_limit_heuristic += 1
+
+                    n_instances += 1
+                    complete_times.append(_complete_time)
+                    heuristic_times.append(_heuristic_time)
+                    if consider_gap:
+                        gaps.append(_gap)
+                    speeds_up.append(_complete_time / _heuristic_time)
+                    repair_times.append(100 * _repair_time / _heuristic_time)
+                    unassigned_clients.append(100 * _unassigned_clients / (_n_clients_per_quadrant * _n_quadrants))
+                    n_clusters.append(_n_clusters)
+                    cluster_creation_times.append(_cluster_creation_time)
+
+                if n_instances < 5:
+                    continue
+
+                if n_time_limit_complete > 5:
+                    n_time_limit_complete = 5
+                if n_time_limit_heuristic > 5:
+                    n_time_limit_heuristic = 5
+                median_complete_times = round(np.median(complete_times), 2)
+                median_heuristic_times = round(np.median(heuristic_times), 2)
+                median_gaps = round(np.median(gaps), 2) if len(gaps) > 0 else None
+                std_dev_gap = round(math.sqrt(np.std(gaps)), 2) if len(gaps) > 0 else None
+                median_speed_up = round(np.median(speeds_up), 2) if len(speeds_up) > 0 else None
+                median_repair_times = round(np.median(repair_times), 2) if len(repair_times) > 0 else 0
+                median_unassigned_clients = round(np.median(unassigned_clients), 2) if len(unassigned_clients) > 0 else 0
+                median_n_clusters = np.median(n_clusters) if len(n_clusters) > 0 else 0
+                median_clusters_creation_time = np.median(cluster_creation_times) if len(cluster_creation_times) > 0 else 0
+
+                df_out.loc[len(df_out)] = [n_clients_per_quadrant, n_quadrants, median_complete_times, n_time_limit_complete, median_heuristic_times, n_time_limit_heuristic, median_clusters_creation_time, median_repair_times, median_unassigned_clients, median_n_clusters, median_gaps, median_speed_up]
+
+        df_out.to_latex(
+            f"results/cfl/ss/tex/summary_{offset}.tex",
+            index=False,
+            formatters=column_formatters
+        )
+
+
+    df = pd.read_csv("results/cfl/ms/mscfl_results.csv")
+    df['unassigning demands times'] = df['unassigning demands times'].astype(str)
+    df['model times final'] = df['model times final'].astype(str)
+    df['resolution times final'] = df['resolution times final'].astype(str)
+    df['critical resources creation times'] = df['critical resources creation times'].astype(str)
+    df['unassigned demands'] = df['unassigned demands'].astype(str)
+
+
+    for offset in [10]:
+        df_out = pd.DataFrame(columns=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
+        for n_clients_per_quadrant in [125, 150, 175, 200, 225]:
+            for n_quadrants in [2, 3, 4, 6, 7, 9]:
+                n_instances = 0
+                complete_times = []
+                heuristic_times = []
+                gaps = []
+                n_time_limit_complete = 0
+                n_time_limit_heuristic = 0
+                speeds_up = []
+                repair_times = []
+                unassigned_demands = []
+                n_clusters = []
+                cluster_creation_times = []
+
+                for _, row in df.iterrows():
+                    _grid_side = int(row["grid side"])
+                    _n_quadrants = int(row["n quadrants"])
+                    _n_clients_per_quadrant = int(row["n clients per quadrant"])
+                    _max_cluster_size = int(row["max cluster size"])
+                    _offset = int(row["offset"])
+                    _k = int(row["k"])
+                    _seed = int(row["seed"])
+                    _status_complete = row["status complete"]
+                    _clusters_status = row["clusters status"]
+                    _complete_time = float(row["total time complete"])
+                    _heuristic_time = float(row["total time heuristic"])
+                    _status_final = row["status final"]
+                    _n_clusters = int(row["n clusters"])
+                    _cluster_creation_time = 100 * (float(row["similarity matrix time"]) + float(row["nj time"])) / _heuristic_time
+
+                    _repair_time = 0
+
+                    if row["critical resources creation times"] != "nan":
+                        _repair_time += get_sum_from_array_string(row["critical resources creation times"])
+
+                    if row["unassigning demands times"] != "nan":
+                        _repair_time += get_sum_from_array_string(row["unassigning demands times"])
+
+                    if row["model times final"] != "nan":
+                        _repair_time += get_sum_from_array_string(row["model times final"])
+
+                    if row["resolution times final"] != "nan":
+                        _repair_time += get_sum_from_array_string(row["resolution times final"])
+
+                    _unassigned_demand = 0
+                    if row["unassigned demands"] != "nan":
+                        _unassigned_demand += get_last_from_array_string(row["unassigned demands"])
+
+                    consider_gap = True
+                    _gap = float(row["gap"])
+
+                    if n_clients_per_quadrant != _n_clients_per_quadrant or n_quadrants != _n_quadrants or offset != _offset:
+                        continue
+
+                    if _status_complete == "TIME_LIMIT":
+                        n_time_limit_complete += 1
+
+                    if "TIME_LIMIT" in _clusters_status:
+                        n_time_limit_heuristic += 1
+                        consider_gap = False
+
+                    if _status_final == "TIME_LIMIT":
+                        if "TIME_LIMIT" not in _clusters_status:
+                            n_time_limit_heuristic += 1
+
+                    n_instances += 1
+                    complete_times.append(_complete_time)
+                    heuristic_times.append(_heuristic_time)
+                    if consider_gap:
+                        gaps.append(_gap)
+                    speeds_up.append(_complete_time / _heuristic_time)
+                    repair_times.append(100 * _repair_time / _heuristic_time)
+                    unassigned_demands.append(100 * _unassigned_demand / (_n_clients_per_quadrant * _n_quadrants * 20))
+                    n_clusters.append(_n_clusters)
+                    cluster_creation_times.append(_cluster_creation_time)
+
+                if n_instances < 5:
+                    continue
+
+                if n_time_limit_complete > 5:
+                    n_time_limit_complete = 5
+                if n_time_limit_heuristic > 5:
+                    n_time_limit_heuristic = 5
+                median_complete_times = round(np.median(complete_times), 2)
+                median_heuristic_times = round(np.median(heuristic_times), 2)
+                median_gaps = round(np.median(gaps), 2) if len(gaps) > 0 else None
+                std_dev_gap = round(math.sqrt(np.std(gaps)), 2) if len(gaps) > 0 else None
+                median_speed_up = round(np.median(speeds_up), 2) if len(speeds_up) > 0 else None
+                median_repair_times = round(np.median(repair_times), 2) if len(repair_times) > 0 else 0
+                median_unassigned_clients = round(np.median(unassigned_demands), 2) if len(unassigned_demands) > 0 else 0
+                median_n_clusters = np.median(n_clusters) if len(n_clusters) > 0 else 0
+                median_clusters_creation_time = np.median(cluster_creation_times) if len(cluster_creation_times) > 0 else 0
+
+                df_out.loc[len(df_out)] = [n_clients_per_quadrant, n_quadrants, median_complete_times, n_time_limit_complete, median_heuristic_times, n_time_limit_heuristic, median_clusters_creation_time, median_repair_times, median_unassigned_clients, median_n_clusters, median_gaps, median_speed_up]
+
+        df_out.to_latex(
+            f"results/cfl/ms/tex/summary_{offset}.tex",
+            index=False,
+            formatters=column_formatters
+        )
 
 

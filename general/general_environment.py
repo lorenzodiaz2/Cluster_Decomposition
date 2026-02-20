@@ -269,7 +269,9 @@ class General_Environment(ABC):
         for occ_c, mass_c in zip(cluster_occ, cluster_mass):
             E_abs, R_max = self._congestion_from_occ(occ_c)
             E = (E_abs / mass_c) if mass_c > 0 else 0.0
-            cong.append(E); cong_abs.append(E_abs); cong_rmax.append(R_max)
+            cong.append(E)
+            cong_abs.append(E_abs)
+            cong_rmax.append(R_max)
 
         self.cluster_congestion_indexes = cong
         self.cluster_congestion_indexes_absolute = cong_abs
