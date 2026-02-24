@@ -1,4 +1,3 @@
-import math
 from typing import Any
 
 import numpy as np
@@ -257,9 +256,9 @@ def save_cfl_tex_tables():
     df['critical resources creation times'] = df['critical resources creation times'].astype(str)
     df['unassigned clients'] = df['unassigned clients'].astype(str)
 
-    for offset in [10]:
+    for offset in [-15, -7, 0, 5, 10]:
         df_out = pd.DataFrame(columns=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
-        for n_clients_per_quadrant in [125, 150, 175, 200, 225]:
+        for n_clients_per_quadrant in [175]:
             for n_quadrants in [2, 3, 4, 6, 7, 9]:
                 n_instances = 0
                 complete_times = []
@@ -345,7 +344,6 @@ def save_cfl_tex_tables():
                 median_complete_times = round(np.median(complete_times), 2)
                 median_heuristic_times = round(np.median(heuristic_times), 2)
                 median_gaps = round(np.median(gaps), 2) if len(gaps) > 0 else None
-                std_dev_gap = round(math.sqrt(np.std(gaps)), 2) if len(gaps) > 0 else None
                 median_speed_up = round(np.median(speeds_up), 2) if len(speeds_up) > 0 else None
                 median_repair_times = round(np.median(repair_times), 2) if len(repair_times) > 0 else 0
                 median_unassigned_clients = round(np.median(unassigned_clients), 2) if len(unassigned_clients) > 0 else 0
@@ -369,9 +367,9 @@ def save_cfl_tex_tables():
     df['unassigned demands'] = df['unassigned demands'].astype(str)
 
 
-    for offset in [10]:
+    for offset in [-15, -7, 0, 5, 10]:
         df_out = pd.DataFrame(columns=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
-        for n_clients_per_quadrant in [125, 150, 175, 200, 225]:
+        for n_clients_per_quadrant in [175]:
             for n_quadrants in [2, 3, 4, 6, 7, 9]:
                 n_instances = 0
                 complete_times = []
@@ -417,7 +415,7 @@ def save_cfl_tex_tables():
 
                     _unassigned_demand = 0
                     if row["unassigned demands"] != "nan":
-                        _unassigned_demand += get_last_from_array_string(row["unassigned demands"])
+                        _unassigned_demand += float(row["unassigned demands"])
 
                     consider_gap = True
                     _gap = float(row["gap"])
@@ -457,7 +455,6 @@ def save_cfl_tex_tables():
                 median_complete_times = round(np.median(complete_times), 2)
                 median_heuristic_times = round(np.median(heuristic_times), 2)
                 median_gaps = round(np.median(gaps), 2) if len(gaps) > 0 else None
-                std_dev_gap = round(math.sqrt(np.std(gaps)), 2) if len(gaps) > 0 else None
                 median_speed_up = round(np.median(speeds_up), 2) if len(speeds_up) > 0 else None
                 median_repair_times = round(np.median(repair_times), 2) if len(repair_times) > 0 else 0
                 median_unassigned_clients = round(np.median(unassigned_demands), 2) if len(unassigned_demands) > 0 else 0

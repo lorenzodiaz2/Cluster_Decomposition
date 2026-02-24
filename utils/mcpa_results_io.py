@@ -312,7 +312,7 @@ def save_mcpa_tex_tables():
 
     for offset in [-1, 0, 1, 2, 5]:
         df_out = pd.DataFrame(columns=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
-        for n_clients_per_quadrant in [140, 145, 150, 155, 160]:
+        for n_clients_per_quadrant in [150]:
             for n_quadrants in [2, 3, 4, 6, 7, 9]:
                 n_instances = 0
                 complete_times = []
@@ -338,7 +338,7 @@ def save_mcpa_tex_tables():
                     _status_complete = row["status complete"]
                     _clusters_status = row["clusters status"]
                     _complete_time = float(row["total time complete"])
-                    _heuristic_time = float(row["total time clusters + post"])
+                    _heuristic_time = float(row["total time heuristic"])
                     _status_final = row["status final"]
                     _n_clusters = int(row["n clusters"])
                     _cluster_creation_time = 100 * (float(row["similarity matrix time"]) + float(row["nj time"])) / _heuristic_time
@@ -399,7 +399,6 @@ def save_mcpa_tex_tables():
                 median_complete_times = round(np.median(complete_times), 2)
                 median_heuristic_times = round(np.median(heuristic_times), 2)
                 median_gaps = round(np.median(gaps), 2) if len(gaps) > 0 else None
-                std_dev_gap = round(math.sqrt(np.std(gaps)), 2) if len(gaps) > 0 else None
                 median_speed_up = round(np.median(speeds_up), 2) if len(speeds_up) > 0 else None
                 median_repair_times = round(np.median(repair_times), 2) if len(repair_times) > 0 else 0
                 median_unassigned_agents = round(np.median(unassigned_agents), 2) if len(unassigned_agents) > 0 else 0

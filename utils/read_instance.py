@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Callable, Any
 import networkx as nx
+import numpy as np
 import pandas as pd
 
 from cfl.elements.client import Client
@@ -255,6 +256,18 @@ def get_last_from_array_string(arr):
     arr = arr.strip("[]")
     num_arr = arr.split(", ")
     return float(num_arr[-1])
+
+def get_min_from_array_string(arr):
+    arr = arr.strip("[]")
+    num_arr = arr.split(", ")
+    min_value = float("inf")
+    mean = 0
+    for el in num_arr:
+        mean += float(el)
+        if float(el) < min_value:
+            min_value = float(el)
+    mean /= len(num_arr)
+    return min_value
 
 
 def fmt_int(x):

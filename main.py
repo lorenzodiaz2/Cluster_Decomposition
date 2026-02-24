@@ -1,67 +1,178 @@
 import pandas as pd
+from scipy.stats import spearmanr
+import matplotlib.pyplot as plt
 
-from cfl.scalability.cfl_scalability_resolution import run_sscfl_scalability_instance, run_mscfl_scalability_instance
-from mcpa.scalability.mcpa_scalability_resolution import run_mcpa_scalability
+from mcpa.elements.mcpa_environment import MCPA_Environment
+from mcpa.elements.pair import OD_Pair
+from utils.read_instance import get_min_from_array_string
 
+
+def compute_spearman(df, x, y):
+    coef, p_value = spearmanr(df[f"{x}"], df[f"{y}"])
+    print(f"Coefficiente di Spearman tra {x} e {y}: {coef}")
+    print(f"P-value: {p_value}")
+
+
+
+
+def scatter_plot(x, y):
+    plt.scatter(x, y, color='blue', marker='o')
+    # m, q = np.polyfit(x, y, 1)
+    # plt.plot(x, m*np.array(x) + q, color='red', label=f'Trend (y={m:.2f}x + {q:.2f})')
+
+    plt.title("Scatter Plot")
+    plt.xlabel("Asse X")
+    plt.ylabel("Asse Y")
+    # plt.legend()
+    plt.grid(True)
+    plt.show()
+
+
+
+def plot_similarity_scatter():
+    df = pd.read_csv("results/mcpa/mcpa_results.csv")
+    df = df[df['UB final'] == df['LB final']]
+    df = df[df['n pairs per quadrant'] == 150]
+    scatter_plot(df["similarity index"], df["gap"])
+    compute_spearman(df, "similarity index", "gap")
+
+    df = pd.read_csv("results/cfl/ss/sscfl_results.csv")
+    df = df[df['UB final'] == df['LB final']]
+    df = df[df['n clients per quadrant'] == 175]
+    scatter_plot(df["similarity index"], df["gap"])
+    compute_spearman(df, "similarity index", "gap")
+
+    df = pd.read_csv("results/cfl/ms/mscfl_results.csv")
+    df = df[df['UB final'] == df['LB final']]
+    df = df[df['n clients per quadrant'] == 175]
+    scatter_plot(df["similarity index"], df["gap"])
+    compute_spearman(df, "similarity index", "gap")
+
+
+
+def compute_additional_metrics(df):
+    silhouette_list = []
+    max_mean_list = []
+
+    for index, row in df.iterrows():
+
+        _grid_side = int(row["grid side"])
+        _n_quadrants = int(row["n quadrants"])
+        _n_pairs_per_quadrant = int(row["n pairs per quadrant"])
+        _max_cluster_size = int(row["max cluster size"])
+        _offset = int(row["offset"])
+        _k = int(row["k"])
+        _seed = int(row["seed"])
+        n = len(str(row["model times complete"]).split(",")) - 1
+
+        env = MCPA_Environment(_grid_side, _max_cluster_size, _n_quadrants,
+                               _n_pairs_per_quadrant, _offset, _k, seed=_seed)
+        print(index)
+
+        for i in range(n - 1):
+            for od in env.elements:
+                od.delay_shortest_paths(od.T)
+
+        env.compute_clusters(OD_Pair.compute_similarity)
+
+        val_silhouette = env.silhouette_score
+        val_max_mean = env.max_mean_intercluster_similarity
+
+        silhouette_list.append(val_silhouette)
+        max_mean_list.append(val_max_mean)
+
+    df['silhouette_score'] = silhouette_list
+    df['max_mean_intercluster_sim'] = max_mean_list
+
+    return df
 
 
 
 if __name__ == '__main__':
-    seed = 1000
+    df = pd.read_csv("results/mcpa/150_mcpa_results.csv")
+    new_df = compute_additional_metrics(df)
+    new_df.to_csv("results/mcpa/new_150_mcpa_results.csv", index=False)
 
 
-    df = pd.read_csv(f"results/cfl/ss/sscfl_results.csv")
-    for offset in [-15, -7, 0, 5]:
-        run_sscfl_scalability_instance(50, 45, 175, offset, 10, df, seed, [2, 3, 4, 6, 7, 9], 5)
-        seed += 30
-        print()
+    exit(0)
+    plot_similarity_scatter()
+
+    print("\n\n==============================\n\n")
+
+    df = pd.read_csv("results/mcpa/mcpa_results.csv")
+    df = df[df['n pairs per quadrant'] == 150]
+    df = df[df['UB final'] == df['LB final']]
+    df["min similarity index"] = df["cluster similarity indexes"].apply(get_min_from_array_string)
+    scatter_plot(df["min similarity index"], df["gap"])
+    compute_spearman(df, "min similarity index", "gap")
 
 
-    print("\n\n\n=====================================================\n\n\n")
+    df = pd.read_csv("results/cfl/ss/sscfl_results.csv")
+    df = df[df['n clients per quadrant'] == 175]
+    df = df[df['UB final'] == df['LB final']]
+    df["min similarity index"] = df["cluster similarity indexes"].apply(get_min_from_array_string)
+    scatter_plot(df["min similarity index"], df["gap"])
+    compute_spearman(df, "min similarity index", "gap")
 
 
-    df = pd.read_csv(f"results/cfl/ms/mscfl_results.csv")
-    for n_pairs in [40, 45, 50, 55, 60]:
-        for offset in [-15, -7, 0, 5]:
-            run_mscfl_scalability_instance(50, n_pairs, 250, offset, 10, df, seed, [2, 3, 4, 6, 7, 9], 5)
-            seed += 30
-            print()
+    df = pd.read_csv("results/cfl/ms/mscfl_results.csv")
+    df = df[df['n clients per quadrant'] == 175]
+    df = df[df['UB final'] == df['LB final']]
+    df["min similarity index"] = df["cluster similarity indexes"].apply(get_min_from_array_string)
+    scatter_plot(df["min similarity index"], df["gap"])
+    compute_spearman(df, "min similarity index", "gap")
 
 
 
-    print("\n\n\n=====================================================\n\n\n")
 
 
-    seed = 1218
-    df = pd.read_csv(f"results/mcpa/mcpa_results.csv")
-
-    run_mcpa_scalability(20, 140, 750, 1, df, seed, [7], 5)
-    seed += 5
-    print()
-
-    for n_pairs_per_quadrant in [145, 150, 155, 160]:
-        run_mcpa_scalability(20, n_pairs_per_quadrant, 750, 1, df, seed, [3, 7], 5)
-        seed += 10
-        print()
-    print()
 
 
-    for n_pairs_per_quadrant in [140, 145, 150, 160]:
-        run_mcpa_scalability(20, n_pairs_per_quadrant, 750, 2, df, seed, [3], 5)
-        seed += 10
-        print()
-    print()
 
 
-    run_mcpa_scalability(20, 140, 750, 5, df, seed, [7], 5)
-    seed += 5
-    print()
 
-    for n_pairs_per_quadrant in [145, 150, 155, 160]:
-        run_mcpa_scalability(20, n_pairs_per_quadrant, 750, 5, df, seed, [3, 7], 5)
-        seed += 10
-        print()
-    print()
+    exit(0)
+    print("SPACE-TIME CAPACITATED PATH ASSIGNMENT\n")
+
+    df = pd.read_csv("results/mcpa/mcpa_results.csv")
+    compute_spearman(df, "n agents", "total time complete")
+    compute_spearman(df, "global congestion absolute", "total time complete")
+    compute_spearman(df, "cross congestion absolute", "total time heuristic")
+    compute_spearman(df, "similarity index", "total time heuristic")
+    df = df[df['UB final'] == df['LB final']]
+    compute_spearman(df, "similarity index", "gap")
+
+
+    print("\n\n============================================\n\n")
+    print("CAPACITATED FACILITY LOCATION PROBLEM - SINGLE SOURCE\n")
+
+    df = pd.read_csv("results/cfl/ss/sscfl_results.csv")
+    df["instance size"] = df['n clients per quadrant'] * df["n facilities per quadrant"] * df["n quadrants"]
+    compute_spearman(df, "instance size", "total time complete")
+    compute_spearman(df, "global congestion absolute", "total time complete")
+    compute_spearman(df, "similarity index", "total time heuristic")
+    compute_spearman(df, "cross congestion absolute", "total time heuristic")
+    df = df[df['UB final'] == df['LB final']]
+    compute_spearman(df, "similarity index", "gap")
+
+
+    print("\n\n============================================\n\n")
+    print("CAPACITATED FACILITY LOCATION PROBLEM - SPLITTABLE DEMAND\n")
+
+    df = pd.read_csv("results/cfl/ms/mscfl_results.csv")
+    df["instance size"] = df['n clients per quadrant'] * df["n facilities per quadrant"] * df["n quadrants"]
+    compute_spearman(df, "instance size", "total time complete")
+    compute_spearman(df, "global congestion absolute", "total time complete")
+    compute_spearman(df, "similarity index", "total time heuristic")
+    compute_spearman(df, "cross congestion absolute", "total time heuristic")
+    df = df[df['UB final'] == df['LB final']]
+    compute_spearman(df, "similarity index", "gap")
+
+
+
+
+
+
 
 
 

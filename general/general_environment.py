@@ -69,6 +69,9 @@ class General_Environment(ABC):
 
         self._cluster_elements_index = None
 
+        self.max_mean_intercluster_similarity = None
+        self.silhouette_score = None
+
         # mi servono come cache per il calcolo degli indici di congestione
         self._cluster_occ_cache = None
         self._global_occ_cache = None
@@ -184,6 +187,7 @@ class General_Environment(ABC):
         self.nj_time = time.perf_counter() - start
         self._compute_congestion_indexes()
         self._compute_similarity_index()
+        self._compute_max_mean_intercluster_similarity()
 
 
     def _merge(self, clusters, condition_fn: Callable):
@@ -286,6 +290,177 @@ class General_Environment(ABC):
         self.cross_congestion_index_absolute = E_cross
         self.cross_congestion_rate = (E_cross / denominator) if denominator > 0 else 0.0
         self.cross_congestion_share = E_cross / (E_abs_g + 1e-9)
+
+
+    def _cluster_element_indices(self, cluster) -> np.ndarray:
+        # mappa element.id -> indice di riga/colonna in S
+        return np.array(
+            [self._cluster_elements_index[e.id] for e in cluster.elements],
+            dtype=int
+        )
+
+    def _compute_max_mean_intercluster_similarity(self) -> None:
+        """
+        Ritorna:
+          - max_mean_sim: massimo della similarità media tra coppie di cluster (A != B)
+          - argmax_pair: (idx_cluster_A, idx_cluster_B) che realizza il massimo, oppure None se non definito
+        """
+        S = self.similarity_matrix
+        if S is None or self.clusters is None or len(self.clusters) < 2:
+            return
+
+        # Pre calcolo indici elementi per cluster
+        cluster_ids = [self._cluster_element_indices(c) for c in self.clusters]
+        sizes = [len(ids) for ids in cluster_ids]
+
+        max_mean = 0.0
+
+        for a in range(len(cluster_ids) - 1):
+            Ia = cluster_ids[a]
+            na = sizes[a]
+            if na == 0:
+                continue
+
+            for b in range(a + 1, len(cluster_ids)):
+                Ib = cluster_ids[b]
+                nb = sizes[b]
+                if nb == 0:
+                    continue
+
+                cross_sum = float(S[np.ix_(Ia, Ib)].sum())
+                mean_sim = cross_sum / (na * nb)
+
+                if mean_sim > max_mean:
+                    max_mean = mean_sim
+
+        self.max_mean_intercluster_similarity = max_mean
+
+
+
+    def _build_cluster_labels(self) -> np.ndarray:
+        """
+        Ritorna un array labels di lunghezza n (n = #elements),
+        dove labels[i] = indice del cluster a cui appartiene l'elemento con indice i nella similarity_matrix.
+        """
+        n = len(self.elements)
+        labels = np.full(n, -1, dtype=int)
+
+        for c_idx, cluster in enumerate(self.clusters):
+            for e in cluster.elements:
+                labels[self._cluster_elements_index[e.id]] = c_idx
+
+        # sanity check: tutti assegnati?
+        # se non vuoi eccezioni, puoi solo ignorare; ma qui è meglio fail-fast
+        if np.any(labels < 0):
+            raise ValueError("Silhouette: alcuni elementi non risultano assegnati a nessun cluster.")
+
+        return labels
+
+
+    def _compute_silhouette_score(
+        self,
+        normalize_distance: bool = False,
+        distance_eps: float = 1e-12,
+    ) -> None:
+        """
+        Calcola il silhouette score a partire da self.similarity_matrix e self.clusters.
+
+        - Converte la similarità S in una distanza D:
+              D = Smax - S
+          oppure (se normalize_distance=True):
+              D = (Smax - S) / (Smax + eps)
+
+        - silhouette per punto i:
+              s(i) = (b(i) - a(i)) / max(a(i), b(i))
+          dove:
+              a(i) = distanza media di i dagli altri punti nel suo cluster
+              b(i) = minimo, sui cluster diversi, della distanza media di i dai punti di quel cluster
+
+        Salva:
+          self.silhouette_score (media su punti validi)
+          self.element_silhouette_scores (array di lunghezza n, con NaN se non definibile)
+        """
+        S = self.similarity_matrix
+        if S is None or self.clusters is None or len(self.clusters) < 2:
+            self.silhouette_score = 0.0
+            self.element_silhouette_scores = None
+            return
+
+        n = S.shape[0]
+        labels = self._build_cluster_labels()
+
+        # Cluster -> indici (nella matrice)
+        cluster_ids = [self._cluster_element_indices(c) for c in self.clusters]
+        cluster_sizes = np.array([len(ids) for ids in cluster_ids], dtype=int)
+
+        # Se qualche cluster ha 0 o se esiste un solo cluster non ha senso
+        if np.sum(cluster_sizes > 0) < 2:
+            self.silhouette_score = 0.0
+            self.element_silhouette_scores = None
+            return
+
+        Smax = float(S.max()) if n > 0 else 0.0
+        if Smax <= 0.0:
+            # tutto zero -> tutte distanze uguali -> silhouette ~ 0
+            self.silhouette_score = 0.0
+            self.element_silhouette_scores = np.zeros(n, dtype=float)
+            return
+
+        # distanza
+        D = (Smax + 1 - S).astype(float)
+        if normalize_distance:
+            D = D / (Smax + distance_eps)
+
+        # silhouette per elemento
+        s = np.full(n, np.nan, dtype=float)
+
+        # Precalcolo: per ogni i e cluster c, distanza media di i verso i punti in cluster c
+        # Nota: O(n^2) ma n nel tuo caso tipicamente non enorme; se serve si ottimizza dopo.
+        for i in range(n):
+            ci = labels[i]
+            ids_ci = cluster_ids[ci]
+            size_ci = len(ids_ci)
+
+            # a(i): media distanze verso il suo cluster (escludendo se stesso)
+            if size_ci <= 1:
+                # silhouette non definita per singleton
+                continue
+
+            # somma distanze verso il cluster
+            # (include D[i,i]=0, quindi sottrarre e dividere per size-1)
+            sum_intra = float(D[i, ids_ci].sum())
+            a_i = (sum_intra - D[i, i]) / (size_ci - 1)
+
+            # b(i): minimo su cluster diversi della distanza media
+            b_i = np.inf
+            for c_idx, ids_c in enumerate(cluster_ids):
+                if c_idx == ci:
+                    continue
+                if len(ids_c) == 0:
+                    continue
+                mean_to_c = float(D[i, ids_c].mean())
+                if mean_to_c < b_i:
+                    b_i = mean_to_c
+
+            if not np.isfinite(b_i):
+                continue
+
+            denom = max(a_i, b_i)
+            if denom <= distance_eps:
+                s[i] = 0.0
+            else:
+                s[i] = (b_i - a_i) / denom
+
+        # Media su punti definiti
+        valid = np.isfinite(s)
+        if not np.any(valid):
+            self.silhouette_score = 0.0
+            self.element_silhouette_scores = s
+            return
+
+        self.silhouette_score = float(np.nanmean(s))
+        self.element_silhouette_scores = s
+
 
     @abstractmethod
     def _ensure_expected_occupancy_cache(self) -> None:

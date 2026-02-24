@@ -239,9 +239,8 @@ def plot_curves(curves, y_label, x_values, min_value, max_value, cbar_str, name_
     for curve, (n_el, q) in curves:
         if max(curve) > y_limit:
             y_limit = max(curve)
-        if n_el <= 375:
-            color = cmap(norm(n_el * q))
-            plt.plot(x_values, curve, marker='o', linestyle='-', color=color, alpha=0.7)
+        color = cmap(norm(n_el * q))
+        plt.plot(x_values, curve, marker='o', linestyle='-', color=color, alpha=0.7)
 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
@@ -263,13 +262,13 @@ def plot_curves(curves, y_label, x_values, min_value, max_value, cbar_str, name_
     # plt.show()
 
 
-def get_curves(dir_path, offset_values):
+def get_gap_time_curves(dir_path, offset_values):
     gap_curves = []
     time_curves = []
     min_val = float("inf")
     max_val = float("-inf")
 
-    for j in range(4, 34):
+    for j in range(4, 10):
         gap_curve = []
         time_curve = []
         n_elements = ()
@@ -294,3 +293,42 @@ def get_curves(dir_path, offset_values):
         time_curves.append((time_curve, n_elements))
 
     return gap_curves, time_curves, min_val, max_val
+
+
+def get_offset_vs_speedup_curves(dir_path, offset_values):
+    speedup_curves = []
+    t_repair_curves = []
+    unassigned_curves = []
+    min_val = float("inf")
+    max_val = float("-inf")
+
+    for j in range(4, 10):
+        speedup_curve = []
+        t_repair_curve = []
+        unassigned_curve = []
+        n_elements = ()
+
+        for i in offset_values:
+            with open(f"{dir_path}/tex/summary_{i}.tex", "r", encoding="utf-8") as f:
+                lines = f.readlines()
+            line = lines[j]
+            arr = line[:-3].replace(" ", "").split("&")
+            print(arr)
+            speedup = float(arr[-1])
+            t_repair = float(arr[-5])
+            unassigned = float(arr[-4])
+            speedup_curve.append(speedup)
+            t_repair_curve.append(t_repair)
+            unassigned_curve.append(unassigned)
+            n_elements = (int(arr[0]), int(arr[1]))
+            tot = int(arr[0]) * int(arr[1])
+            if tot < min_val:
+                min_val = tot
+            if tot > max_val:
+                max_val = tot
+
+        speedup_curves.append((speedup_curve, n_elements))
+        t_repair_curves.append((t_repair_curve, n_elements))
+        unassigned_curves.append((unassigned_curve, n_elements))
+
+    return speedup_curves, t_repair_curves, unassigned_curves, min_val, max_val
