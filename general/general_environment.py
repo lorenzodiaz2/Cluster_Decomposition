@@ -188,6 +188,7 @@ class General_Environment(ABC):
         self._compute_congestion_indexes()
         self._compute_similarity_index()
         self._compute_max_mean_intercluster_similarity()
+        self._compute_silhouette_score()
 
 
     def _merge(self, clusters, condition_fn: Callable):
