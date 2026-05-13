@@ -261,13 +261,19 @@ def get_min_from_array_string(arr):
     arr = arr.strip("[]")
     num_arr = arr.split(", ")
     min_value = float("inf")
-    mean = 0
     for el in num_arr:
-        mean += float(el)
         if float(el) < min_value:
             min_value = float(el)
-    mean /= len(num_arr)
     return min_value
+
+def get_max_from_array_string(arr):
+    arr = arr.strip("[]")
+    num_arr = arr.split(", ")
+    max_value = float("-inf")
+    for el in num_arr:
+        if float(el) > max_value:
+            max_value = float(el)
+    return max_value
 
 
 def fmt_int(x):

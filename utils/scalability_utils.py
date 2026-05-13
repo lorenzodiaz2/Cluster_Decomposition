@@ -4,6 +4,7 @@ from typing import Callable, Optional
 
 import numpy as np
 from matplotlib import pyplot as plt
+from sympy.printing.pretty.pretty_symbology import line_width
 
 from general.general_environment import General_Environment
 from general.general_solver import General_Solver
@@ -47,8 +48,8 @@ def read():
         print(n, right_arr)
         c += 1
 
-    _save_scalability_plot(points, "mcpa_parameters_selection_results", "Number of OD Pairs", False)
-    _save_scalability_plot(points, "mcpa_parameters_selection_results", "Number of OD Pairs", True)
+    _save_scalability_plot(points, "../results/mcpa/img/parameters_selection_results", "Number of OD Pairs", False)
+    _save_scalability_plot(points, "../results/mcpa/img/parameters_selection_results", "Number of OD Pairs", True)
 
 
 
@@ -64,19 +65,20 @@ def _save_scalability_plot(
     p90 = [points[x].p90_capped for x in xs]
     mx = [points[x].max_capped for x in xs]
 
-    plt.figure()
-    plt.plot(xs, med, marker="o", markersize=3, label="median")
-    plt.plot(xs, p90, marker="o", markersize=3, label="p90")
-    plt.plot(xs, mx, marker="o", markersize=3, label="max")
+    plt.figure(figsize=(14, 10))
+    plt.plot(xs, med, marker="o", alpha=1., markersize=10, linewidth=4, label="median")
+    plt.plot(xs, p90, marker="o", alpha=1., markersize=10, linewidth=4, label="p90")
+    plt.plot(xs, mx, marker="o", alpha=1., markersize=10, linewidth=4, label="max")
 
-    plt.xlabel(x_label)
-    plt.ylabel("Time (s)")
+    plt.xlabel(x_label, fontsize=35)
+    plt.ylabel("Time (s)", fontsize=35)
+    plt.tick_params(axis='both', which='major', labelsize=30)
+
     if logy:
         plt.yscale("log")
-    plt.grid(True)
-    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.5)
+    plt.legend(fontsize=30, markerscale=2)
     plt.tight_layout()
-    # plt.savefig(f"{name_file}_600dpi.pdf", dpi=600)
     plt.savefig(f"{name_file}{"_log" if logy else ""}.pdf", dpi=1200)
 
     plt.close()

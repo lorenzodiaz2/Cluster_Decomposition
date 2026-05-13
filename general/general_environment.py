@@ -350,37 +350,13 @@ class General_Environment(ABC):
             for e in cluster.elements:
                 labels[self._cluster_elements_index[e.id]] = c_idx
 
-        # sanity check: tutti assegnati?
-        # se non vuoi eccezioni, puoi solo ignorare; ma qui è meglio fail-fast
-        if np.any(labels < 0):
-            raise ValueError("Silhouette: alcuni elementi non risultano assegnati a nessun cluster.")
-
         return labels
 
 
     def _compute_silhouette_score(
         self,
-        normalize_distance: bool = False,
         distance_eps: float = 1e-12,
     ) -> None:
-        """
-        Calcola il silhouette score a partire da self.similarity_matrix e self.clusters.
-
-        - Converte la similarità S in una distanza D:
-              D = Smax - S
-          oppure (se normalize_distance=True):
-              D = (Smax - S) / (Smax + eps)
-
-        - silhouette per punto i:
-              s(i) = (b(i) - a(i)) / max(a(i), b(i))
-          dove:
-              a(i) = distanza media di i dagli altri punti nel suo cluster
-              b(i) = minimo, sui cluster diversi, della distanza media di i dai punti di quel cluster
-
-        Salva:
-          self.silhouette_score (media su punti validi)
-          self.element_silhouette_scores (array di lunghezza n, con NaN se non definibile)
-        """
         S = self.similarity_matrix
         if S is None or self.clusters is None or len(self.clusters) < 2:
             self.silhouette_score = 0.0
@@ -390,11 +366,9 @@ class General_Environment(ABC):
         n = S.shape[0]
         labels = self._build_cluster_labels()
 
-        # Cluster -> indici (nella matrice)
         cluster_ids = [self._cluster_element_indices(c) for c in self.clusters]
         cluster_sizes = np.array([len(ids) for ids in cluster_ids], dtype=int)
 
-        # Se qualche cluster ha 0 o se esiste un solo cluster non ha senso
         if np.sum(cluster_sizes > 0) < 2:
             self.silhouette_score = 0.0
             self.element_silhouette_scores = None
@@ -402,37 +376,24 @@ class General_Environment(ABC):
 
         Smax = float(S.max()) if n > 0 else 0.0
         if Smax <= 0.0:
-            # tutto zero -> tutte distanze uguali -> silhouette ~ 0
             self.silhouette_score = 0.0
             self.element_silhouette_scores = np.zeros(n, dtype=float)
             return
 
-        # distanza
         D = (Smax + 1 - S).astype(float)
-        if normalize_distance:
-            D = D / (Smax + distance_eps)
-
-        # silhouette per elemento
         s = np.full(n, np.nan, dtype=float)
 
-        # Precalcolo: per ogni i e cluster c, distanza media di i verso i punti in cluster c
-        # Nota: O(n^2) ma n nel tuo caso tipicamente non enorme; se serve si ottimizza dopo.
         for i in range(n):
             ci = labels[i]
             ids_ci = cluster_ids[ci]
             size_ci = len(ids_ci)
 
-            # a(i): media distanze verso il suo cluster (escludendo se stesso)
             if size_ci <= 1:
-                # silhouette non definita per singleton
                 continue
 
-            # somma distanze verso il cluster
-            # (include D[i,i]=0, quindi sottrarre e dividere per size-1)
             sum_intra = float(D[i, ids_ci].sum())
             a_i = (sum_intra - D[i, i]) / (size_ci - 1)
 
-            # b(i): minimo su cluster diversi della distanza media
             b_i = np.inf
             for c_idx, ids_c in enumerate(cluster_ids):
                 if c_idx == ci:
@@ -456,11 +417,9 @@ class General_Environment(ABC):
         valid = np.isfinite(s)
         if not np.any(valid):
             self.silhouette_score = 0.0
-            self.element_silhouette_scores = s
             return
 
         self.silhouette_score = float(np.nanmean(s))
-        self.element_silhouette_scores = s
 
 
     @abstractmethod

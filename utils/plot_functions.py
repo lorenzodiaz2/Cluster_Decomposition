@@ -161,52 +161,54 @@ def plot_paths(
     G: nx.Graph,
     od_pairs: list[OD_Pair],
     colors: dict | None = None,
+    name_file: str | None = "prova"
 ) -> None:
-    plt.figure(figsize=(8, 6), dpi=200)
+    plt.figure(figsize=(12, 10))
 
     pos = grid_layout(G)
 
     nx.draw(
         G, pos,
-        node_size=1, node_color="black",
-        edge_color="gray", with_labels=False
+        node_size=0.5, node_color="black",
+        edge_color="lightgray", with_labels=False
     )
 
     src_labels = {}
     dst_labels = {}
 
     for od_pair in od_pairs:
+        for path in od_pair.k_shortest_paths:
+            edges = list(zip(path.visits, path.visits[1:]))
+            edge_color = colors[od_pair.id] if colors else to_hex((random.random(), random.random(), random.random()))
+
+            nx.draw_networkx_edges(
+                G, pos,
+                edgelist=edges,
+                width=3.,
+                edge_color=edge_color,
+                alpha=1.,
+            )
         dijkstra_path = od_pair.k_shortest_paths[0].visits
-        edges = list(zip(dijkstra_path, dijkstra_path[1:]))
-        edge_color = colors[od_pair.id] if colors else to_hex((random.random(), random.random(), random.random()))
-
-        nx.draw_networkx_edges(
-            G, pos,
-            edgelist=edges,
-            width=2.5,
-            edge_color=edge_color,
-            alpha=0.95,
-        )
-
         src_labels[dijkstra_path[0]] = f"s_{od_pair.id}"
         dst_labels[dijkstra_path[-1]] = f"d_{od_pair.id}"
 
     nx.draw_networkx_labels(
         G, pos, labels=src_labels,
-        font_size=4, font_color="black", font_weight="bold",
+        font_size=5, font_color="black", font_weight="bold",
         bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="black", lw=0.6, alpha=0.9)
     )
 
     nx.draw_networkx_labels(
         G, pos, labels=dst_labels,
-        font_size=4, font_color="black", font_weight="bold",
+        font_size=5, font_color="black", font_weight="bold",
         bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="black", lw=0.6, alpha=0.9)
     )
 
-    ax = plt.gca()
-    draw_half_separators(ax, G)
+    # ax = plt.gca()
+    # draw_half_separators(ax, G)
     plt.axis("equal")
-    plt.show()
+    # plt.show()
+    plt.savefig(f"{name_file}.png", dpi=1200)
 
 
 def grid_layout(G: nx.Graph):
@@ -217,11 +219,11 @@ def plot_heatmap(df, columns):
     subset = df[columns]
     matrice_corr = subset.corr(method='spearman')
 
-    plt.figure(figsize=(12, 12))
+    plt.figure(figsize=(16, 16), dpi=300)
     sns.heatmap(matrice_corr,
                 annot=True,
                 cmap='coolwarm',
-                fmt=".2f",
+                fmt=".3f",
                 vmin=-1, vmax=1)
 
     plt.title('Correlation Matrix')
@@ -240,23 +242,23 @@ def plot_curves(curves, y_label, x_values, min_value, max_value, cbar_str, name_
         if max(curve) > y_limit:
             y_limit = max(curve)
         color = cmap(norm(n_el * q))
-        plt.plot(x_values, curve, marker='o', linestyle='-', color=color, alpha=0.7)
+        plt.plot(x_values, curve, marker='o', linestyle='-', color=color, alpha=1., linewidth=5, markersize=10)
 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
     cbar = plt.colorbar(sm, ax=plt.gca())
 
-    cbar.set_label(cbar_str, fontsize=24)
-    cbar.ax.tick_params(labelsize=24)
+    cbar.set_label(cbar_str, fontsize=30)
+    cbar.ax.tick_params(labelsize=30)
 
     plt.ylim((0, y_limit))
 
     plt.xticks(x_values)
     plt.grid(True, linestyle='--', alpha=0.5)
 
-    plt.xlabel("Offset", fontsize=30)
-    plt.ylabel(y_label, fontsize=30)
-    plt.tick_params(axis='both', which='major', labelsize=26)
+    plt.xlabel("Offset", fontsize=35)
+    plt.ylabel(y_label, fontsize=35)
+    plt.tick_params(axis='both', which='major', labelsize=30)
 
     plt.savefig(name_file, dpi=1200)
     # plt.show()
@@ -313,7 +315,6 @@ def get_offset_vs_speedup_curves(dir_path, offset_values):
                 lines = f.readlines()
             line = lines[j]
             arr = line[:-3].replace(" ", "").split("&")
-            print(arr)
             speedup = float(arr[-1])
             t_repair = float(arr[-5])
             unassigned = float(arr[-4])
@@ -332,3 +333,121 @@ def get_offset_vs_speedup_curves(dir_path, offset_values):
         unassigned_curves.append((unassigned_curve, n_elements))
 
     return speedup_curves, t_repair_curves, unassigned_curves, min_val, max_val
+
+
+def scatter_plot(x, y, z, w, name_file, cbar_label):
+    plt.figure(figsize=(14, 10))
+    cmap = plt.get_cmap("cividis")
+
+    # 1. Normalizzazione Colore (Speedup)
+    norm = mcolors.Normalize(vmin=y.min(), vmax=y.max())
+
+    # 2. Normalizzazione Grandezza (Time Heuristic)
+    # Definisci la dimensione minima e massima dei pallini che vuoi vedere nel grafico
+    min_marker_size = 50
+    max_marker_size = 1000
+
+    # Evita divisioni per zero se tutti i tempi sono uguali
+    if w.max() == w.min():
+        w_scaled = [300] * len(w)  # Dimensione media fissa
+    else:
+        # Formula Min-Max Scaling: porta i valori nell'intervallo [min_marker_size, max_marker_size]
+        w_scaled = min_marker_size + (w - w.min()) / (w.max() - w.min()) * (max_marker_size - min_marker_size)
+
+    # Nota: Uso w_scaled per 's' (dimensione), ma mantengo y per 'c' (colore)
+    sc = plt.scatter(x, z, c=y, cmap=cmap, norm=norm, marker='o', s=w_scaled, alpha=0.8, edgecolors='k', linewidth=0.5)
+
+    # Barra del colore (Speedup)
+    cbar = plt.colorbar(sc, ax=plt.gca())
+    cbar.set_label(cbar_label, fontsize=30)
+    cbar.ax.tick_params(labelsize=30)
+
+
+    kw = dict(prop="sizes", num=5, color="black", fmt="{x:.1f} s",
+              func=lambda s: (s - min_marker_size) / (max_marker_size - min_marker_size) * (
+                      w.max() - w.min()) + w.min())
+    plt.legend(*sc.legend_elements(**kw), loc="upper right", title="Time Heuristic", fontsize=20,
+                        title_fontsize=24)
+
+    plt.xlabel(r"$R_{sim}$", fontsize=35)
+    plt.ylabel("Gap", fontsize=35)
+
+    plt.tick_params(axis='both', which='major', labelsize=30)
+    plt.grid(True, linestyle='--', alpha=0.5)
+
+    plt.savefig(name_file, dpi=1200, bbox_inches='tight')
+    plt.show()
+
+
+
+def plot_all_paths(
+    G: nx.Graph,
+    od_pairs: list[OD_Pair],
+    colors: dict | None = None,
+    name_file: str | None = "prova"
+) -> None:
+    plt.figure(figsize=(8, 6))
+
+    pos = grid_layout(G)
+
+    nx.draw(
+        G, pos,
+        node_size=1, node_color="black",
+        edge_color="gray", with_labels=False
+    )
+
+    src_labels = {}
+    dst_labels = {}
+
+    for od_pair in od_pairs:
+        for obj_path in od_pair.k_shortest_paths:
+            path = obj_path.visits
+            edges = list(zip(path, path[1:]))
+            edge_color = colors[od_pair.id] if colors else to_hex((random.random(), random.random(), random.random()))
+
+            nx.draw_networkx_edges(
+                G, pos,
+                edgelist=edges,
+                width=3.5,
+                edge_color=edge_color,
+                alpha=0.95,
+            )
+
+        src_labels[od_pair.src] = fr"$s_{od_pair.id}$"
+        dst_labels[od_pair.dst] = fr"$d_{od_pair.id}$"
+
+    nx.draw_networkx_labels(
+        G, pos, labels=src_labels,
+        font_size=25, font_color="black", font_weight="bold",
+        bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="black", lw=0.6, alpha=0.9)
+    )
+
+    nx.draw_networkx_labels(
+        G, pos, labels=dst_labels,
+        font_size=25, font_color="black", font_weight="bold",
+        bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="black", lw=0.6, alpha=0.9)
+    )
+
+    # ax = plt.gca()
+    # draw_half_separators(ax, G)
+    plt.axis("equal")
+    plt.savefig(f"{name_file}.png", dpi=1200)
+    plt.show()
+
+
+
+
+
+def scatter_plot_(x, z, name_file):
+    plt.figure(figsize=(14, 10))
+
+    plt.scatter(x, z, s=200, marker='o', color="blue", alpha=0.8, edgecolors='k', linewidth=0.5)
+
+    plt.xlabel(r"$R_{sim}$", fontsize=35)
+    plt.ylabel("Gap", fontsize=35)
+
+    plt.tick_params(axis='both', which='major', labelsize=30)
+    plt.grid(True, linestyle='--', alpha=0.5)
+
+    plt.savefig(name_file, dpi=1200, bbox_inches='tight')
+    plt.show()
