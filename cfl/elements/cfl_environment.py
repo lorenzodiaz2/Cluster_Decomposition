@@ -78,7 +78,7 @@ class CFL_Environment(General_Environment):
 
     def _make_facility(self, quadrant: Quadrant, id_fac: int) -> Facility:
         pos = self._choose_position(quadrant, self.rng_facilities)
-        capacity = 170
+        capacity = 120
         opening_cost = 1000
         return Facility(id_fac, pos, capacity, opening_cost)
 

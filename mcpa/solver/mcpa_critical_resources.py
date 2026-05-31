@@ -17,6 +17,7 @@ class MCPA_Critical_Resources(General_Critical_Resources):
         super().__init__(od_pairs)
 
         self.critical_od_pairs = set()
+        self.violated_od_pairs = set()
 
 
     def _compute_residuals(self):

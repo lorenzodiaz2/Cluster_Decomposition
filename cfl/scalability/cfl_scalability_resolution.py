@@ -103,20 +103,3 @@ def run_mscfl_scalability_instance(grid_side, n, max_cluster_size, offset, k, df
     run_scalability(grid_side, n, max_cluster_size, offset, k, df, seed, q_range, n_iterations, env_maker, complete_solver_maker, cluster_solver_maker, critical_resources_maker, False, "mscfl_results")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

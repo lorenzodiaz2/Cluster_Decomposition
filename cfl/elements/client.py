@@ -63,7 +63,18 @@ class Client:
     def compute_similarity(c1, c2):
         ids1 = {f.id for f in c1.k_facilities}
         ids2 = {f.id for f in c2.k_facilities}
-        return len(ids1 & ids2)
+        intersection_size = len(ids1 & ids2)
+
+        min_demand = min(c1.demand, c2.demand)
+        options_c1 = len(ids1)
+        options_c2 = len(ids2)
+
+        if options_c1 > 0 and options_c2 > 0:
+            sim = min_demand * (intersection_size / (options_c1 * options_c2))
+        else:
+            sim = 0.0
+
+        return sim
 
 
 

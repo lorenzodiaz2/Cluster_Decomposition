@@ -4,7 +4,6 @@ from typing import Callable, Optional
 
 import numpy as np
 from matplotlib import pyplot as plt
-from sympy.printing.pretty.pretty_symbology import line_width
 
 from general.general_environment import General_Environment
 from general.general_solver import General_Solver
@@ -79,11 +78,11 @@ def _save_scalability_plot(
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.legend(fontsize=30, markerscale=2)
     plt.tight_layout()
-    plt.savefig(f"{name_file}{"_log" if logy else ""}.pdf", dpi=1200)
+    # plt.savefig(f"{name_file}{"_log" if logy else ""}.pdf", dpi=1200)
 
     plt.close()
 
-read()
+# read()
 
 def run_time_scalability(
     grid_side: int,

@@ -1,3 +1,8 @@
+import os
+from datetime import datetime
+
+import pandas as pd
+
 from cfl.elements.cfl_environment import CFL_Environment
 from cfl.solver.multi_source.mscfl_heuristic_solver import MSCFL_Heuristic_solver
 from cfl.solver.single_source.sscfl_heuristic_solver import SSCFL_Heuristic_solver
@@ -47,3 +52,89 @@ def run_cfl_time_scalability():
          logy_plot=True
     )
 
+
+
+def run_sscfl_time_scalability():
+    seed = 0
+    n = 10
+    n_runs = 10
+    csv_path = "results/cfl/ss/sscfl_global_solver.csv"
+
+    n_times_out = 0
+
+    while True:
+        rows = []
+        n_consecutive_time_limit = 0
+        for _ in range(n_runs):
+            env = CFL_Environment(50, 0, 1, n * 5, n, 0, 10, seed=seed)
+            print(datetime.now().strftime(f"%d-%m-%Y   %H:%M:%S    {env}   seed={seed}"))
+            global_solver = SSCFL_Heuristic_solver(env.G, env.elements, env.facilities)
+            global_solver.solve()
+            time = sum(global_solver.model_times) + sum(global_solver.resolution_times)
+            rows.append({
+                "n": n,
+                "seed": seed,
+                "time": time
+            })
+            seed += 1
+            if time >= global_solver.time_limit:
+                n_consecutive_time_limit += 1
+
+            if n_consecutive_time_limit >= 0.8 * n_runs:
+                break
+
+        if n_consecutive_time_limit >= 0.8 * n_runs:
+            n_times_out += 1
+        else:
+            n_times_out = 0
+        n += 5
+
+        df = pd.DataFrame(rows)
+        file_exists = os.path.isfile(csv_path)
+        df.to_csv(csv_path, mode='a', index=False, header=not file_exists)
+
+        if n_times_out >= 5:
+            break
+
+
+def run_mscfl_time_scalability():
+    seed = 0
+    n = 10
+    n_runs = 10
+    csv_path = "results/cfl/ms/mscfl_global_solver.csv"
+
+    n_times_out = 0
+
+    while True:
+        rows = []
+        n_consecutive_time_limit = 0
+        for _ in range(n_runs):
+            env = CFL_Environment(50, 0, 1, n_clients_per_quadrant=n * 5, n_facilities_per_quadrant=n, offset=0, k=10, seed=seed)
+            print(datetime.now().strftime(f"%d-%m-%Y   %H:%M:%S    {env}   seed={seed}"))
+            global_solver = MSCFL_Heuristic_solver(env.G, env.elements, env.facilities)
+            global_solver.solve()
+            time = sum(global_solver.model_times) + sum(global_solver.resolution_times)
+            rows.append({
+                "n": n,
+                "seed": seed,
+                "time": time
+            })
+            seed += 1
+            if time >= global_solver.time_limit:
+                n_consecutive_time_limit += 1
+
+            if n_consecutive_time_limit >= 0.8 * n_runs:
+                break
+
+        if n_consecutive_time_limit >= 0.8 * n_runs:
+            n_times_out += 1
+        else:
+            n_times_out = 0
+        n += 5
+
+        df = pd.DataFrame(rows)
+        file_exists = os.path.isfile(csv_path)
+        df.to_csv(csv_path, mode='a', index=False, header=not file_exists)
+
+        if n_times_out >= 5:
+            break

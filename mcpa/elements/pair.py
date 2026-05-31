@@ -28,7 +28,7 @@ class OD_Pair:
 
 
     @staticmethod
-    def compute_similarity(od1, od2) -> int:
+    def compute_similarity(od1, od2) -> float:
         vc1 = od1.visit_counts
         vc2 = od2.visit_counts
 
@@ -40,6 +40,15 @@ class OD_Pair:
             c2 = vc2.get((t, v))
             if c2:
                 sim += c1 * c2
+
+        min_demand = min(len(od1.agents), len(od2.agents))
+        options_od1 = len(od1.all_paths)
+        options_od2 = len(od2.all_paths)
+
+        if options_od1 > 0 and options_od2 > 0:
+            sim = min_demand * (sim / (options_od1 * options_od2))
+        else:
+            sim = 0.0
         return sim
 
     def delay_shortest_paths(self, T: int) -> None:

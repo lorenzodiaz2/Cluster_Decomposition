@@ -1,9 +1,14 @@
+import os
+from datetime import datetime
+
+import pandas as pd
+
 from mcpa.solver.mcpa_heuristic_solver import MCPA_Heuristic_Solver
 from mcpa.elements.mcpa_environment import MCPA_Environment
 from utils.scalability_utils import run_time_scalability
 
 
-def run_mcpa_tima_scalability():
+def run_mcpa_time_scalability():
     env_maker = lambda grid_side, k, n, seed: MCPA_Environment(
         grid_side=grid_side,
         max_cluster_size=0,
@@ -24,6 +29,48 @@ def run_mcpa_tima_scalability():
         x_label="Number of OD Pairs"
     )
 
+
+
+def run_mcpa_time_scalability_():
+    seed = 0
+    n = 50
+    n_runs = 10
+    csv_path = "results/mcpa/mcpa_global_solver.csv"
+
+    n_times_out = 0
+    while True:
+        rows = []
+        n_consecutive_time_limit = 0
+        for _ in range(n_runs):
+            env = MCPA_Environment(20, 0, 1, n, 0, 10, seed=seed)
+            print(datetime.now().strftime(f"%d-%m-%Y   %H:%M:%S    {env}   seed={seed}"))
+            global_solver = MCPA_Heuristic_Solver(env.G, env.elements)
+            global_solver.solve()
+            time = sum(global_solver.model_times) + sum(global_solver.resolution_times)
+            rows.append({
+                "n": n,
+                "seed": seed,
+                "time": time
+            })
+            seed += 1
+            if time >= global_solver.time_limit:
+                n_consecutive_time_limit += 1
+
+            if n_consecutive_time_limit >= 0.8 * n_runs:
+                break
+
+        if n_consecutive_time_limit >= 0.8 * n_runs:
+            n_times_out += 1
+        else:
+            n_times_out = 0
+        n += 5
+
+        df = pd.DataFrame(rows)
+        file_exists = os.path.isfile(csv_path)
+        df.to_csv(csv_path, mode='a', index=False, header=not file_exists)
+
+        if n_times_out >= 5:
+            break
 
 
 
