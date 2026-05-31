@@ -65,7 +65,7 @@ class Client:
         ids2 = {f.id for f in c2.k_facilities}
         intersection_size = len(ids1 & ids2)
 
-        min_demand = min(c1.demand, c2.demand)
+        min_demand = min(float(c1.demand), float(c2.demand))
         options_c1 = len(ids1)
         options_c2 = len(ids2)
 

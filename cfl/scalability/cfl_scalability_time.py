@@ -56,7 +56,7 @@ def run_cfl_time_scalability():
 
 def run_sscfl_time_scalability():
     seed = 0
-    n = 10
+    n = 160
     n_runs = 10
     csv_path = "results/cfl/ss/sscfl_global_solver.csv"
 
@@ -72,7 +72,7 @@ def run_sscfl_time_scalability():
             global_solver.solve()
             time = sum(global_solver.model_times) + sum(global_solver.resolution_times)
             rows.append({
-                "n": n,
+                "n": n * 5,
                 "seed": seed,
                 "time": time
             })
@@ -93,7 +93,7 @@ def run_sscfl_time_scalability():
         file_exists = os.path.isfile(csv_path)
         df.to_csv(csv_path, mode='a', index=False, header=not file_exists)
 
-        if n_times_out >= 5:
+        if n_times_out >= 3:
             break
 
 
@@ -115,7 +115,7 @@ def run_mscfl_time_scalability():
             global_solver.solve()
             time = sum(global_solver.model_times) + sum(global_solver.resolution_times)
             rows.append({
-                "n": n,
+                "n": n * 5,
                 "seed": seed,
                 "time": time
             })
@@ -136,5 +136,5 @@ def run_mscfl_time_scalability():
         file_exists = os.path.isfile(csv_path)
         df.to_csv(csv_path, mode='a', index=False, header=not file_exists)
 
-        if n_times_out >= 5:
+        if n_times_out >= 3:
             break
