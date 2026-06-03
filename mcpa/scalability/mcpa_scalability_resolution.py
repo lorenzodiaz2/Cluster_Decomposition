@@ -20,29 +20,142 @@ def run_mcpa_scalability(
     seed = starting_seed
 
     for n_quadrants in q_range:
-        grid_side = 2 * base_grid_side + 1 if n_quadrants <= 4 else 3 * base_grid_side + 2
+        grid_side = 2 * base_grid_side if n_quadrants <= 4 else 3 * base_grid_side
         for i in range(n_iterations):
-            print(datetime.now().strftime("%d-%m-%Y   %H:%M:%S    "), end="")
-
-            print(f"n quadrants = {n_quadrants}    n pairs per quadrant = {n_pairs_per_quadrant}    offset = {offset}    iteration {i}   ", end="")
-
             env = MCPA_Environment(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, offset, 10, seed=seed)
+            print(datetime.now().strftime(f"%d-%m-%Y   %H:%M:%S    {env}   seed={seed}   iteration={i}"))
 
-            complete_solver = MCPA_Heuristic_Solver(env.G, env.elements)
-            complete_solver.solve()
+            global_solver = MCPA_Heuristic_Solver(env.G, env.elements)
+            global_solver.solve()
 
             env.solve_clusters()
 
             critical_resources = None
-            final_solver = None
+            repair_solver = None
             if all(hs.status == "OPTIMAL" for hs in env.clusters_solvers):
                 critical_resources = MCPA_Critical_Resources(env.G, env.elements)
                 if not critical_resources.is_initially_feasible:
-                    final_solver = MCPA_Heuristic_Solver(env.G, env.elements, critical_resources)
-                    final_solver.solve()
+                    repair_solver = MCPA_Heuristic_Solver(env.G, env.elements, critical_resources)
+                    repair_solver.solve()
 
-            save_mcpa_results(env, critical_resources, final_solver, complete_solver, seed, df)
+            save_mcpa_results(env, critical_resources, repair_solver, global_solver, seed, df)
             seed += 1
-            df.to_csv(f"results/mcpa/mcpa_results.csv", index=False)
+        df.to_csv(f"results/mcpa/mcpa_results.csv", index=False)
         print()
+
+
+def save_results(
+    env: MCPA_Environment,
+    global_solver: MCPA_Heuristic_Solver,
+    seed: int,
+    df: DataFrame,
+    critical_resources: MCPA_Critical_Resources | None = None,
+    repair_solver: MCPA_Heuristic_Solver | None = None
+):
+    # INSTANCE PARAMETER
+    grid_side = env.grid_side
+    n_quadrants = env.n_quadrants
+    n_pairs_per_quadrant = env.n_elements_per_quadrant
+    n_agents = len(env.agents)
+    max_cluster_size = env.max_cluster_size
+    offset = env.offset
+    k = env.k
+
+    # GLOBAL SOLVER RESOLUTION
+    time_global = sum(global_solver.model_times) + sum(global_solver.resolution_times)
+    status_global = global_solver.status
+    LB_global = global_solver.m.ObjBound
+    UB_global = global_solver.m.ObjValue
+
+    # CLUSTERS FEATURES (BEFORE OPTMIZATION)
+    n_clusters = len(env.clusters)
+    n_agents_per_cluster = [c.n_agents for c in env.clusters]
+    similarity_index = env.similarity_index
+    min_cluster_similarity_index = min(env.cluster_similarity_indexes)
+    max_mean_intercluster_similarity = env.max_mean_intercluster_similarity
+    silhouette_score = env.silhouette_score
+    cluster_congestion_ratio_max = env.cluster_congestion_ratio_max
+    global_congestion_absolute = env.global_congestion_index_absolute
+    cross_congestion_absolute = env.cross_congestion_index_absolute
+    cross_congestion_rate = env.cross_congestion_rate
+    cross_congestion_share = env.cross_congestion_share
+
+    # HEURISTIC RESOLUTION
+    model_times_clusters = [sum(cl.model_times) for cl in env.clusters]
+    resolution_time_clusters = [sum(cl.resolution_times) for cl in env.clusters]
+    LB_heuristic = None
+    UB_heuristic = None
+    gap = None
+    unassigned_agents = None
+    final_tolerance = None
+
+    time_heuristic = env.matrix_time + env.nj_time + sum(hs.model_times for hs in env.clusters_solvers) + sum(hs.resolution_times for hs in env.clusters_solvers)
+    if critical_resources is not None:
+        time_heuristic += sum(critical_resources.creation_times)
+        if repair_solver is not None:
+            unassigned_agents = critical_resources.unassigned_items_per_tol if not critical_resources.is_initially_feasible else [0]
+            final_tolerance = critical_resources.current_tol
+            time_heuristic += sum(critical_resources.unassigning_times) + sum(repair_solver.model_times) + sum(repair_solver.resolution_times)
+            LB_heuristic, UB_heuristic = compute_heuristic_bounds(env, critical_resources, repair_solver)
+            gap = 100 * (UB_heuristic - UB_global) / UB_global
+        else:
+            delay = sum(a.delay for a in env.agents)
+            LB_heuristic = delay
+            UB_heuristic = delay
+            gap = 100 * (UB_heuristic - UB_global) / UB_global
+
+    row = {
+        "grid side": grid_side,
+        "n quadrants": n_quadrants,
+        "n pairs per quadrant": n_pairs_per_quadrant,
+        "n agents": n_agents,
+        "max cluster size": max_cluster_size,
+        "offset": offset,
+        "k": k,
+        "seed": seed,
+
+        "time global": time_global,
+        "status global": status_global,
+        "number of resolution": len(global_solver.resolution_times),
+        "LB global": LB_global,
+        "UB global": UB_global,
+
+        "n clusters": n_clusters,
+        "n agents per cluster": n_agents_per_cluster,
+        "similarity index": similarity_index,
+        "min cluster similarity index": min_cluster_similarity_index,
+        "max mean intercluster similarity": max_mean_intercluster_similarity,
+        "silhouette score": silhouette_score,
+        "cluster congestion ratio max": cluster_congestion_ratio_max,
+        "global congestion absolute": global_congestion_absolute,
+        "cross congestion absolute": cross_congestion_absolute,
+        "cross congestion rate": cross_congestion_rate,
+        "cross congestion share": cross_congestion_share,
+        "model times clusters": model_times_clusters,
+        "resolution time clusters": resolution_time_clusters,
+        "unassigned agents": unassigned_agents,
+        "final tolerance": final_tolerance,
+        "LB heuristic": LB_heuristic,
+        "UB heuristic": UB_heuristic,
+        "time heuristic": time_heuristic,
+        "gap": gap
+    }
+    df.loc[len(df)] = row
+
+
+
+
+def compute_heuristic_bounds(
+    env: MCPA_Environment,
+    critical_resources: MCPA_Critical_Resources,
+    repair_solver: MCPA_Heuristic_Solver
+):
+    removed_agents = set(critical_resources.removed_items)
+    fixed_delay = sum(a.delay for a in env.agents if a not in removed_agents)
+
+    LB = fixed_delay + repair_solver.m.ObjBound
+    UB = fixed_delay + repair_solver.m.ObjValue
+    return LB, UB
+
+
 
