@@ -39,6 +39,7 @@ class MCPA_Environment(General_Environment):
         max_cluster_size: int,
         n_quadrants: int,
         n_pairs_per_quadrant: int,
+        resources_capacity: int,
         offset: int,
         k: int,
         reproducibility_flag: bool | None = True,
@@ -52,6 +53,7 @@ class MCPA_Environment(General_Environment):
 
         Path.set_grid_side(grid_side)
         self.agents: list[Agent] = []
+        self.resources_capacity = resources_capacity
 
         self._set_environment()
 
@@ -143,7 +145,7 @@ class MCPA_Environment(General_Environment):
 
         for v in V:
             if v not in od_nodes:
-                self.G.nodes[v]["capacity"] = self.rng.randrange(5, 6)  #############
+                self.G.nodes[v]["capacity"] = self.resources_capacity  # self.rng.randrange(5, 6)  #############
 
 
     def solve_clusters(self):
@@ -201,6 +203,6 @@ class MCPA_Environment(General_Environment):
         pass
 
     def __str__(self):
-        return f"grid side: {self.grid_side}   n OD = {len(self.elements)}   k = {self.k}   n quadrants = {self.n_quadrants}"
+        return f"grid side={self.grid_side}   n OD quadrant={self.n_elements_per_quadrant}   n quadrants={self.n_quadrants}   offset={self.offset}"
 
 

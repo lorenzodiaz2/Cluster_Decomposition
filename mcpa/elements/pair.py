@@ -1,3 +1,4 @@
+import math
 from collections import defaultdict
 import networkx as nx
 from mcpa.elements.agent import Agent
@@ -27,29 +28,29 @@ class OD_Pair:
         self._build_visits_count()
 
 
-    @staticmethod
-    def compute_similarity(od1, od2) -> float:
-        vc1 = od1.visit_counts
-        vc2 = od2.visit_counts
-
-        if len(vc1) > len(vc2):
-            vc1, vc2 = vc2, vc1
-
-        sim = 0
-        for (t, v), c1 in vc1.items():
-            c2 = vc2.get((t, v))
-            if c2:
-                sim += c1 * c2
-
-        min_demand = min(len(od1.agents), len(od2.agents))
-        options_od1 = len(od1.all_paths)
-        options_od2 = len(od2.all_paths)
-
-        if options_od1 > 0 and options_od2 > 0:
-            sim = min_demand * (sim / (options_od1 * options_od2))
-        else:
-            sim = 0.0
-        return sim
+    # @staticmethod
+    # def compute_similarity(od1, od2) -> float:
+    #     vc1 = od1.visit_counts
+    #     vc2 = od2.visit_counts
+    #
+    #     if len(vc1) > len(vc2):
+    #         vc1, vc2 = vc2, vc1
+    #
+    #     sim = 0.0
+    #     for (t, v), c1 in vc1.items():
+    #         c2 = vc2.get((t, v))
+    #         if c2:
+    #             sim += c1 * c2
+    #
+    #     min_demand = min(len(od1.agents), len(od2.agents))
+    #     options_od1 = len(od1.all_paths)
+    #     options_od2 = len(od2.all_paths)
+    #
+    #     if options_od1 > 0 and options_od2 > 0:
+    #         sim = min_demand * (sim / (options_od1 * options_od2))
+    #     else:
+    #         sim = 0.0
+    #     return sim
 
     def delay_shortest_paths(self, T: int) -> None:
         for idx, base_path in enumerate(self.k_shortest_paths):
@@ -74,14 +75,76 @@ class OD_Pair:
         return all_paths
 
 
-    def _build_visits_count(self):
+    # def _build_visits_count(self):
+    #     paths = self.all_paths
+    #
+    #     # chiave = (t, node_id)  ->  value = conteggio
+    #     sig = defaultdict(int)
+    #     for path in paths:
+    #         enc = path.encoded
+    #         for t, node_id in enumerate(enc):
+    #             sig[(t, int(node_id))] += 1
+    #
+    #     self.visit_counts = sig
+
+
+
+
+
+    def _build_visits_count(self, weighting="exponential", beta=0.95):
         paths = self.all_paths
 
-        # chiave = (t, node_id)  ->  value = conteggio
-        sig = defaultdict(int)
+        min_len = len(self.k_shortest_paths[0].visits)
+
+        raw_weights = []
         for path in paths:
+            c = len(path.visits) - min_len
+
+            if weighting == "uniform":
+                w = 1.0
+            elif weighting == "inverse":
+                w = 1.0 / (c + 1.0)
+            elif weighting == "exponential":
+                w = math.exp(-beta * c)
+            else:
+                raise ValueError(f"'{weighting}' NOT supported")
+
+            raw_weights.append(w)
+
+        total_weight = sum(raw_weights)
+        norm_weights = [w / total_weight for w in raw_weights]
+
+        sig = defaultdict(float)
+        for idx, path in enumerate(paths):
             enc = path.encoded
+            w_norm = norm_weights[idx]
+
             for t, node_id in enumerate(enc):
-                sig[(t, int(node_id))] += 1
+                sig[(t, int(node_id))] += w_norm
 
         self.visit_counts = sig
+
+
+    @staticmethod
+    def compute_similarity(od1, od2) -> float:
+        vc1 = od1.visit_counts
+        vc2 = od2.visit_counts
+
+        if len(vc1) > len(vc2):
+            vc1, vc2 = vc2, vc1
+
+        sim = 0.0
+        for (t, v), c1 in vc1.items():
+            c2 = vc2.get((t, v))
+            if c2:
+                sim += c1 * c2
+
+
+        min_demand = min(len(od1.agents), len(od2.agents))
+
+        if len(od1.all_paths) > 0 and len(od2.all_paths) > 0:
+            sim = min_demand * sim
+        else:
+            sim = 0.0
+        return sim
+

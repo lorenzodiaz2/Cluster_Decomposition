@@ -161,7 +161,7 @@ class General_Environment(ABC):
     ):
         start = time.perf_counter()
         n = len(self.elements)
-        self.similarity_matrix = np.zeros((n, n), dtype=int)
+        self.similarity_matrix = np.zeros((n, n), dtype=float)
         self._cluster_elements_index = {el.id: i for i, el in enumerate(self.elements)}
 
         with mp.Pool(
