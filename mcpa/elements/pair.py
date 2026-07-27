@@ -20,12 +20,13 @@ class OD_Pair:
         return f"id = {self.id}    {self.src} , {self.dst}    ->    {len(self.agents)} agents,    {len(self.k_shortest_paths)} shortest paths"
 
     # todo gestire il caso in cui non ci sono k shortest path per una coppia
-    def compute_k_shortest_paths(self, G, k) -> None:
+    def compute_k_shortest_paths(self, G, k, sim_method) -> None:
         gen = nx.shortest_simple_paths(G, self.src, self.dst)
         self.k_shortest_paths = [Path(next(gen)) for _ in range(k)]
         self.T = len(self.k_shortest_paths[-1].visits)
         self.delay_shortest_paths(self.T)
-        self._build_visits_count()
+        weighting, beta = sim_method
+        self._build_visits_count(weighting, beta)
 
 
     # @staticmethod
@@ -91,7 +92,7 @@ class OD_Pair:
 
 
 
-    def _build_visits_count(self, weighting="exponential", beta=0.95):
+    def _build_visits_count(self, weighting: str, beta: float | None):
         paths = self.all_paths
 
         min_len = len(self.k_shortest_paths[0].visits)

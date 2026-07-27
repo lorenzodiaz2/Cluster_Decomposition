@@ -15,15 +15,16 @@ def run_mcpa_scalability(
     df: DataFrame,
     starting_seed: int,
     q_range: list[int],
-    n_iterations: int
+    n_iterations: int,
+    sim_method: tuple[str, float| None]
 ):
     seed = starting_seed
 
     for n_quadrants in q_range:
         grid_side = 2 * base_grid_side if n_quadrants <= 4 else 3 * base_grid_side
         for i in range(n_iterations):
-            env = MCPA_Environment(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, resources_capacity, offset, 10, seed=seed)
-            print(datetime.now().strftime(f"%d-%m-%Y   %H:%M:%S    {env}   cap={env.resources_capacity}   seed={seed}   iteration={i}"), end="   ")
+            env = MCPA_Environment(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, resources_capacity, offset, 10, seed=seed, sim_method=sim_method)
+            print(datetime.now().strftime(f"%d-%m-%Y   %H:%M:%S    {env}   cap={env.resources_capacity}   seed={seed}   method={sim_method[0]}   iteration={i}"), end="   ")
 
             global_solver = MCPA_Heuristic_Solver(env.G, env.elements)
             global_solver.solve()
@@ -40,7 +41,7 @@ def run_mcpa_scalability(
 
             save_results(env, global_solver, seed, df, critical_resources, repair_solver)
             seed += 1
-            df.to_csv(f"results/mcpa/small_instances_exponential.csv", index=False)
+            df.to_csv(f"results/mcpa/small_instances_{sim_method[0]}.csv", index=False)
 
 
 def save_results(

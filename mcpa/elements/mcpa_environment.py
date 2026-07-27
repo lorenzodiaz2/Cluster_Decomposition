@@ -46,6 +46,7 @@ class MCPA_Environment(General_Environment):
         remove_rnd_nodes_flag: bool | None = False,
         remove_percentage: float | None = 0.1,
         seed: int | None = 42,
+        sim_method: tuple[str, float| None] | None = ("uniform", None),
         instance_file: str | None = None
     ):
         super().__init__(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, offset, k,
@@ -54,6 +55,7 @@ class MCPA_Environment(General_Environment):
         Path.set_grid_side(grid_side)
         self.agents: list[Agent] = []
         self.resources_capacity = resources_capacity
+        self.sim_method = sim_method
 
         self._set_environment()
 
@@ -69,7 +71,7 @@ class MCPA_Environment(General_Environment):
         with mp.Pool(
             processes=mp.cpu_count(),
             initializer=init_mcpa,
-            initargs=(self.G, self.k),
+            initargs=(self.G, self.k, self.sim_method),
         ) as pool:
             results = pool.map(compute_paths_for_quadrant, tasks)
 

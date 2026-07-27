@@ -8,12 +8,14 @@ from cfl.elements.facility import Facility
 _GLOBAL_G: nx.Graph | None = None
 _GLOBAL_K: int | None = None
 _GLOBAL_FACILITIES: list[Facility] | None = None
+_GLOBAL_SIM_METHOD: tuple[str, float| None] | None = ("uniform", None)
 
 
-def init_mcpa(G: nx.Graph, k: int):
-    global _GLOBAL_G, _GLOBAL_K
+def init_mcpa(G: nx.Graph, k: int, sim_method: tuple[str, float| None]):
+    global _GLOBAL_G, _GLOBAL_K, _GLOBAL_SIM_METHOD
     _GLOBAL_G = G
     _GLOBAL_K = k
+    _GLOBAL_SIM_METHOD = sim_method
 
 
 # ----- per i k-shortest paths per quadrante -----
@@ -21,7 +23,7 @@ def init_mcpa(G: nx.Graph, k: int):
 
 def compute_paths_for_quadrant(od_list):
     for od in od_list:
-        od.compute_k_shortest_paths(_GLOBAL_G, _GLOBAL_K)
+        od.compute_k_shortest_paths(_GLOBAL_G, _GLOBAL_K, _GLOBAL_SIM_METHOD)
     return od_list
 
 
