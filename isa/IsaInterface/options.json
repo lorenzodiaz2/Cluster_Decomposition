@@ -30,7 +30,7 @@
   "cloister": { "pval": 0.05, "cthres": 0.7 },
   "pythia": {
     "cvfolds": 5,
-    "ispolykrnl": false,
+    "ispolykrnl": true,
     "useweights": false,
     "use_grid_search": true
   },

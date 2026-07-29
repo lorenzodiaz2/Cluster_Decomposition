@@ -6,7 +6,7 @@ from mcpa.solver.mcpa_critical_resources import MCPA_Critical_Resources
 from mcpa.elements.mcpa_environment import MCPA_Environment
 
 
-def run_mcpa_scalability(
+def run_mcpa(
     base_grid_side: int,
     n_pairs_per_quadrant: int,
     max_cluster_size: int,
@@ -107,16 +107,13 @@ def save_results(
             model_times_repair = repair_solver.model_times
             resolution_times_repair = repair_solver.resolution_times
             final_tolerance = critical_resources.current_tol
-            time_heuristic += sum(critical_resources.unassigning_times) + sum(repair_solver.model_times) + sum(
-                repair_solver.resolution_times)
+            time_heuristic += sum(critical_resources.unassigning_times) + sum(repair_solver.model_times) + sum(repair_solver.resolution_times)
 
             LB_heuristic, UB_heuristic = compute_heuristic_bounds(env, critical_resources, repair_solver)
 
-            # --- INIZIO NUOVO CONTROLLO ---
             if LB_heuristic is None or UB_heuristic is None:
                 print(f"Impossibile trovare ObjVal/ObjBound. Nessun salvataggio per seed={seed}.")
-                return  # Interrompe save_results; la riga non verrà aggiunta al DataFrame
-            # --- FINE NUOVO CONTROLLO ---
+                return
 
             gap = 100 * (UB_heuristic - UB_global) / UB_global
             print(f"gap={gap}   speedup={round(time_global / time_heuristic, 2)}")

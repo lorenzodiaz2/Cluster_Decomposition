@@ -16,53 +16,6 @@ def set_replicated_quadrants(grid_side, n_quadrants, off):
 
 
 
-def set_divided_quadrants(grid_side, n_quadrants, off):
-    left_up = (0, 0)
-    right_down = (grid_side - 1, grid_side - 1)
-    quadrants: list[Quadrant] = []
-
-    if n_quadrants == 2:
-        quadrants = _divide_by_2(left_up, right_down, off)
-    elif n_quadrants == 3:
-        quadrants = _divide_by_3(left_up, right_down, off)
-    elif n_quadrants >= 4:
-        q = n_quadrants // 4
-        r = n_quadrants - q * 4
-
-        quadrants = _divide_by_4(left_up, right_down, off)
-
-        if q == 1:
-            for i in range(r):
-                lu, rd = quadrants[i]
-                quadrants.extend(_divide_by_2(lu, rd, off))
-            del quadrants[:r]
-
-        if q == 2:
-            for i in range(4):
-                lu, rd = quadrants[i]
-                if i < r:
-                    quadrants.extend(_divide_by_3(lu, rd, off))
-                else:
-                    quadrants.extend(_divide_by_2(lu, rd, off))
-            del quadrants[:4]
-
-        if q == 3:
-            for i in range(4):
-                lu, rd = quadrants[i]
-                if i < r:
-                    quadrants.extend(_divide_by_4(lu, rd, off))
-                else:
-                    quadrants.extend(_divide_by_3(lu, rd, off))
-            del quadrants[:4]
-
-        if q == 4 and r == 0:
-            for i in range(4):
-                lu, rd = quadrants[i]
-                quadrants.extend(_divide_by_4(lu, rd, off))
-            del quadrants[:4]
-
-    return quadrants
-
 
 def _divide_by_2(
     left_up: Coord,

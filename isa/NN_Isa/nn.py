@@ -76,27 +76,54 @@ class SimpleFeedforward(nn.Module):
 
 class NN_Isa:
 
-    def __init__(self, df: pd.DataFrame, feat_names: List[str], target_alg, baseline_alg, hidden_size=128):
+    def __init__(self, df: pd.DataFrame, feat_names: List[str], alg_col: str,
+                 epsilon: float = 10.0, max_perf: bool = False, hidden_size=128):
 
         self.df = df
-        # self.instance_col_name = instance_col_name
         self.feat_names = feat_names
-        self.target_alg = target_alg
-        self.baseline_alg = baseline_alg
+        self.alg_col = alg_col
         self.hidden_size = hidden_size
-        self.df['improvement_perc'] = 100 * (df[self.baseline_alg] - df[self.target_alg]) / df[self.baseline_alg]
-        self.df['improvement'] = ((self.df.improvement_perc - self.df.improvement_perc.min()) /
-                                  (self.df.improvement_perc.max() - self.df.improvement_perc.min()))
 
-        print('classes distribution', self.df.improvement[df.improvement > 0.5].shape[0],
-              self.df.improvement[df.improvement < 0.5].shape[0])
+        if max_perf:
+            self.df['improvement'] = (df[alg_col] >= epsilon).astype(float)
+        else:
+            self.df['improvement'] = (df[alg_col] <= epsilon).astype(float)
+
+        print('classes distribution',
+              self.df.improvement[self.df.improvement > 0.5].shape[0],
+              self.df.improvement[self.df.improvement < 0.5].shape[0])
 
         self.label = None
         self.train_dataloader, self.test_dataloader, self.X_tensor, self.Y_tensor = None, None, None, None
-
         self.model = SimpleFeedforward(len(self.feat_names), hidden_size)
-
         self.accuracy = None
+
+
+
+
+# class NN_Isa:
+#
+#     def __init__(self, df: pd.DataFrame, feat_names: List[str], target_alg, baseline_alg, hidden_size=128):
+#
+#         self.df = df
+#         # self.instance_col_name = instance_col_name
+#         self.feat_names = feat_names
+#         self.target_alg = target_alg
+#         self.baseline_alg = baseline_alg
+#         self.hidden_size = hidden_size
+#         self.df['improvement_perc'] = 100 * (df[self.baseline_alg] - df[self.target_alg]) / df[self.baseline_alg]
+#         self.df['improvement'] = ((self.df.improvement_perc - self.df.improvement_perc.min()) /
+#                                   (self.df.improvement_perc.max() - self.df.improvement_perc.min()))
+#
+#         print('classes distribution', self.df.improvement[df.improvement > 0.5].shape[0],
+#               self.df.improvement[df.improvement < 0.5].shape[0])
+#
+#         self.label = None
+#         self.train_dataloader, self.test_dataloader, self.X_tensor, self.Y_tensor = None, None, None, None
+#
+#         self.model = SimpleFeedforward(len(self.feat_names), hidden_size)
+#
+#         self.accuracy = None
 
     def run(self, batch_size=128, epochs=1000, alpha=0.1, lr=0.0001, train_test_ratio=0.5):
         self.train_dataloader, self.test_dataloader, self.X_tensor, self.Y_tensor = (

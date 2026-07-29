@@ -1,0 +1,5 @@
+Row,Avg_Perf_all_instances,Std_Perf_all_instances,Probability_of_good,Avg_Perf_selected_instances,Std_Perf_selected_instances,CV_model_accuracy,CV_model_precision,CV_model_recall,BoxConstraint,KernelScale
+gap,11.952,15.014,0.562,1.5,4.396,95.061,83.517,74.534,4.471,0.002
+dummy_solver,28.091,24.808,0.438,12.798,21.82,74.405,83.358,94.546,0.004,0.016
+Oracle,1.131,2.597,1.0,,,,,,,
+Selector,20.288,15.29,0.137,20.288,15.29,,25.018,13.736,,
