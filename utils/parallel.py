@@ -47,11 +47,13 @@ def find_facilities_for_clients(clients):
 
 _ELEMENTS: list | None = None
 _SIM_FN: Callable[[Any, Any], float] | None = None
+_RESOURCE_WEIGHTS: dict | None = None
 
-def init_similarity(elements, sim_fn: Callable[[Any, Any], float]):
-    global _ELEMENTS, _SIM_FN
+def init_similarity(elements, sim_fn: Callable[[Any, Any], float], resource_weights: dict | None = None):
+    global _ELEMENTS, _SIM_FN, _RESOURCE_WEIGHTS
     _ELEMENTS = elements
     _SIM_FN = sim_fn
+    _RESOURCE_WEIGHTS = resource_weights if resource_weights is not None else {}
 
 def compute_similarity_row(i: int):
     n = len(_ELEMENTS)

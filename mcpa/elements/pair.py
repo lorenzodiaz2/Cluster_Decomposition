@@ -3,6 +3,7 @@ from collections import defaultdict
 import networkx as nx
 from mcpa.elements.agent import Agent
 from mcpa.elements.path import Path
+import utils.parallel as parallel
 
 class OD_Pair:
     def __init__(self, pair_id, src, dst, agents):
@@ -29,30 +30,6 @@ class OD_Pair:
         self._build_visits_count(weighting, beta)
 
 
-    # @staticmethod
-    # def compute_similarity(od1, od2) -> float:
-    #     vc1 = od1.visit_counts
-    #     vc2 = od2.visit_counts
-    #
-    #     if len(vc1) > len(vc2):
-    #         vc1, vc2 = vc2, vc1
-    #
-    #     sim = 0.0
-    #     for (t, v), c1 in vc1.items():
-    #         c2 = vc2.get((t, v))
-    #         if c2:
-    #             sim += c1 * c2
-    #
-    #     min_demand = min(len(od1.agents), len(od2.agents))
-    #     options_od1 = len(od1.all_paths)
-    #     options_od2 = len(od2.all_paths)
-    #
-    #     if options_od1 > 0 and options_od2 > 0:
-    #         sim = min_demand * (sim / (options_od1 * options_od2))
-    #     else:
-    #         sim = 0.0
-    #     return sim
-
     def delay_shortest_paths(self, T: int) -> None:
         for idx, base_path in enumerate(self.k_shortest_paths):
             L = len(base_path.visits) - 1
@@ -74,20 +51,6 @@ class OD_Pair:
         for paths_list in self.delayed_shortest_paths.values():
             all_paths.extend(paths_list)
         return all_paths
-
-
-    # def _build_visits_count(self):
-    #     paths = self.all_paths
-    #
-    #     # chiave = (t, node_id)  ->  value = conteggio
-    #     sig = defaultdict(int)
-    #     for path in paths:
-    #         enc = path.encoded
-    #         for t, node_id in enumerate(enc):
-    #             sig[(t, int(node_id))] += 1
-    #
-    #     self.visit_counts = sig
-
 
 
 
@@ -134,12 +97,14 @@ class OD_Pair:
         if len(vc1) > len(vc2):
             vc1, vc2 = vc2, vc1
 
-        sim = 0.0
-        for (t, v), c1 in vc1.items():
-            c2 = vc2.get((t, v))
-            if c2:
-                sim += c1 * c2
+        rw = parallel._RESOURCE_WEIGHTS or {}
 
+        sim = 0.0
+        for r, c1 in vc1.items():
+            c2 = vc2.get(r)
+            if c2:
+                w_r = rw.get(r, 1.0)
+                sim += c1 * c2 * w_r
 
         min_demand = min(len(od1.agents), len(od2.agents))
 

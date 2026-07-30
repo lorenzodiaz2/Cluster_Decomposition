@@ -1,3 +1,4 @@
+import math
 from collections import defaultdict
 import multiprocessing as mp
 
@@ -47,6 +48,7 @@ class MCPA_Environment(General_Environment):
         remove_percentage: float | None = 0.1,
         seed: int | None = 42,
         sim_method: tuple[str, float| None] | None = ("uniform", None),
+        resource_weighting: str = "linear",
         instance_file: str | None = None
     ):
         super().__init__(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, offset, k,
@@ -56,6 +58,7 @@ class MCPA_Environment(General_Environment):
         self.agents: list[Agent] = []
         self.resources_capacity = resources_capacity
         self.sim_method = sim_method
+        self.resource_weighting = resource_weighting
 
         self._set_environment()
 
@@ -151,11 +154,40 @@ class MCPA_Environment(General_Environment):
 
 
     def solve_clusters(self):
+        resource_weights = self._compute_resource_weights() if self.resource_weighting != "uniform" else {}
+
         self._solve_clusters(
             OD_Pair.compute_similarity,
-            lambda env, c: MCPA_Heuristic_Solver(env.G, c.elements)
+            lambda env, c: MCPA_Heuristic_Solver(env.G, c.elements),
+            post_fn=None,
+            resource_weights=resource_weights
         )
 
+
+    def _compute_resource_weights(self) -> dict[tuple[int, int], float]:
+        weights = {}
+        D = defaultdict(float)
+
+        for od in self.elements:
+            b_e = len(od.agents)
+            for r, a_er in od.visit_counts.items():
+                D[r] += b_e * a_er
+
+        for r, d_val in D.items():
+            t, v = r
+            cap = float(self.G.nodes[v].get("capacity", 1.0))
+
+            ratio = d_val / cap
+
+            if self.resource_weighting == "linear":
+                w = ratio
+            elif self.resource_weighting == "exponential":
+                w = math.exp(ratio - 1.0)
+            else:
+                w = 1.0
+
+            weights[r] = w
+        return weights
 
 
     def _congestion_from_occ(self, occ: dict[tuple[int, int], float]) -> tuple[float, float]:
@@ -205,6 +237,6 @@ class MCPA_Environment(General_Environment):
         pass
 
     def __str__(self):
-        return f"grid side={self.grid_side}   n OD quadrant={self.n_elements_per_quadrant}   n quadrants={self.n_quadrants}   offset={self.offset}"
+        return f"grid side={self.grid_side}   n OD quadrant={self.n_elements_per_quadrant}   n quadrants={self.n_quadrants}   offset={self.offset}   max cluster size={self.max_cluster_size}"
 
 

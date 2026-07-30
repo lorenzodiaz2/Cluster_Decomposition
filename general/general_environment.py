@@ -157,7 +157,8 @@ class General_Environment(ABC):
 
     def compute_clusters(
         self,
-        sim_fn: Callable
+        sim_fn: Callable,
+        resource_weights: dict | None = None
     ):
         start = time.perf_counter()
         n = len(self.elements)
@@ -167,7 +168,7 @@ class General_Environment(ABC):
         with mp.Pool(
             processes=mp.cpu_count(),
             initializer=init_similarity,
-            initargs=(self.elements, sim_fn),
+            initargs=(self.elements, sim_fn, resource_weights),
         ) as pool:
             results = pool.map(compute_similarity_row, range(n - 1))
 
@@ -241,14 +242,15 @@ class General_Environment(ABC):
     def _solve_clusters(
         self,
         sim_fn: Callable,
-        solver_factory: Callable,
-        post_fn: Callable | None = None
+        solver_maker: Callable,
+        post_fn: Callable | None = None,
+        resource_weights: dict | None = None
     ):
-        self.compute_clusters(sim_fn)
+        self.compute_clusters(sim_fn, resource_weights)
         self.clusters_solvers = []
 
         for cluster in self.clusters:
-            hs = solver_factory(self, cluster)
+            hs = solver_maker(self, cluster)
             hs.solve()
             self.clusters_solvers.append(hs)
 
