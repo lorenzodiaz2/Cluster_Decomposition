@@ -15,19 +15,9 @@ def _build_occ_for_ods(ods) -> dict[tuple[int, int], float]:
     occ: dict[tuple[int, int], float] = {}
 
     for od in ods:
-        n_agents_od = len(od.agents)
-        paths = od.all_paths
-        n_paths = len(paths)
-
-        visit_counts: dict[tuple[int, int], int] = defaultdict(int)
-        for path in paths:
-            enc = path.encoded
-            for t, node_id in enumerate(enc):
-                visit_counts[(t, int(node_id))] += 1
-
-        for key, count_paths in visit_counts.items():
-            frac = count_paths / n_paths
-            occ[key] = occ.get(key, 0.0) + n_agents_od * frac
+        b_e = len(od.agents)
+        for r, a_er in od.visit_counts.items():
+            occ[r] = occ.get(r, 0.0) + (b_e * a_er)
 
     return occ
 
@@ -167,6 +157,7 @@ class MCPA_Environment(General_Environment):
     def _compute_resource_weights(self) -> dict[tuple[int, int], float]:
         weights = {}
         D = defaultdict(float)
+        n_side = self.grid_side
 
         for od in self.elements:
             b_e = len(od.agents)
@@ -174,7 +165,12 @@ class MCPA_Environment(General_Environment):
                 D[r] += b_e * a_er
 
         for r, d_val in D.items():
-            t, v = r
+            t, node_id = r
+
+            i = node_id // n_side
+            j = node_id % n_side
+            v = (i, j)
+
             cap = float(self.G.nodes[v].get("capacity", 1.0))
 
             ratio = d_val / cap
