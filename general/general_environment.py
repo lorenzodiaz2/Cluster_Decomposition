@@ -72,6 +72,9 @@ class General_Environment(ABC):
         self.max_mean_intercluster_similarity = None
         self.silhouette_score = None
 
+        self.normalized_macro_components = None  # Valore Z/N
+        self.max_eigengap = None  # Salto massimo nello spettro
+
         # mi servono come cache per il calcolo degli indici di congestione
         self._cluster_occ_cache = None
         self._global_occ_cache = None
@@ -190,6 +193,7 @@ class General_Environment(ABC):
         self._compute_similarity_index()
         self._compute_max_mean_intercluster_similarity()
         self._compute_silhouette_score()
+        self._compute_spectral_metrics()
 
 
     def _merge(self, clusters, condition_fn: Callable):
@@ -422,6 +426,47 @@ class General_Environment(ABC):
             return
 
         self.silhouette_score = float(np.nanmean(s))
+
+
+    def _compute_spectral_metrics(self, zero_tol: float = 1e-9) -> None:
+        S = self.similarity_matrix
+        if S is None or not self.clusters:
+            return
+
+        N = len(self.clusters)
+
+        if N < 2:
+            self.normalized_macro_components = 1.0
+            self.max_eigengap = 0.0
+            return
+
+        W_cond = np.zeros((N, N), dtype=float)
+        cluster_ids = [self._cluster_element_indices(c) for c in self.clusters]
+
+        for i in range(N):
+            idx_i = cluster_ids[i]
+            if len(idx_i) == 0:
+                continue
+            for j in range(i + 1, N):
+                idx_j = cluster_ids[j]
+                if len(idx_j) == 0:
+                    continue
+
+                cross_sim = float(S[np.ix_(idx_i, idx_j)].sum())
+                W_cond[i, j] = cross_sim
+                W_cond[j, i] = cross_sim
+
+        degrees = W_cond.sum(axis=1)
+        D_cond = np.diag(degrees)
+        L = D_cond - W_cond
+
+        eigenvalues = np.linalg.eigvalsh(L)
+
+        Z = np.sum(eigenvalues <= zero_tol)
+        self.normalized_macro_components = float(Z) / N
+
+        eigengaps = np.diff(eigenvalues)
+        self.max_eigengap = float(np.max(eigengaps)) if len(eigengaps) > 0 else 0.0
 
 
     @abstractmethod
