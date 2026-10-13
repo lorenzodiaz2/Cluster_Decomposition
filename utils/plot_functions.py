@@ -6,7 +6,7 @@ import seaborn as sns
 import matplotlib.colors as mcolors
 import matplotlib as mpl
 
-from mcpa.elements.pair import OD_Pair
+from caps.mcpa.elements.pair import OD_Pair
 
 from typing import Any, Iterable, Optional
 

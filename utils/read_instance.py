@@ -1,14 +1,13 @@
 from pathlib import Path
 from typing import Callable, Any
 import networkx as nx
-import numpy as np
 import pandas as pd
 
-from cfl.elements.client import Client
-from cfl.elements.facility import Facility
+from caps.cfl.elements.client import Client
+from caps.cfl.elements.facility import Facility
 
 
-def read_OR_instance(
+def read_or_instance(
     filepath: str | Path,
     k: int | None = None,
     *,
@@ -89,7 +88,7 @@ def read_OR_instance(
 
 
 
-def read_TBED1_instance(
+def read_tbed1_instance(
     filepath: str | Path,
     k: int,
     *,
@@ -125,9 +124,6 @@ def read_TBED1_instance(
         I = int(next(it))  # customers / clients
     except StopIteration:
         raise ValueError(f"File '{filepath}' troncato: mancano J e I.")
-
-    if k is None:
-        k = J
 
     if node_id is None:
         node_id = lambda kind, idx: (kind, idx)
@@ -226,6 +222,8 @@ def set_client_facility_lists_from_cost_graph(
             f: Facility = G.nodes[fnode]["obj"]
             cost = G[cnode][fnode]["cost"]
             scored.append((cost, -f.capacity, f.id, f))  # f.id per determinismo
+
+            c.distances_to_facilities[f.id] = cost
 
         scored.sort(key=lambda t: (t[0], t[1], t[2]))
         ordered = [f for *_ , f in scored]

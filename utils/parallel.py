@@ -2,7 +2,7 @@ import numpy as np
 import networkx as nx
 from typing import Callable, Any
 
-from cfl.elements.facility import Facility
+from caps.cfl.elements.facility import Facility
 
 
 _GLOBAL_G: nx.Graph | None = None

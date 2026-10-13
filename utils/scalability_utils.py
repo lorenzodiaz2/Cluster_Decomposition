@@ -5,8 +5,8 @@ from typing import Callable, Optional
 import numpy as np
 from matplotlib import pyplot as plt
 
-from general.general_environment import General_Environment
-from general.general_solver import General_Solver
+from caps.general.general_environment import General_Environment
+from caps.general.general_solver import General_Solver
 
 
 @dataclass
