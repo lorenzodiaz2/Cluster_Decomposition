@@ -4,13 +4,21 @@ from isa import ISA
 
 
 def test_isa(df, dir):
+    print(f"Starting df length: {len(df)}")
+    df = df[df["status heuristic"] == "OPTIMAL"]
+    print(f"Truncated non optimal instances df length: {len(df)}")
+    # df = df[df["mean resource capacity"].isin([5, 6])]
+    # print(f"Truncated 7, 8, 9 capacities instances df length: {len(df)}")
+    df = df[df["final unassigned agents"] / df["n agents"] < 0.65]
+    print(f"Truncated too many removed agents instances df length: {len(df)}")
+
     df["instance"] = np.array(range(df.shape[0])).astype(str)
 
     feat_names = [ # aggiungere la grid side
         'n agents', 'max cluster size', 'mean resource capacity', 'n clusters', 'similarity index',
         'min cluster similarity index', 'global congestion absolute', 'cross congestion absolute', 'global congestion ratio max',
-        'cross congestion rate', 'cross congestion share',
-        'silhouette score', 'max mean intercluster similarity'
+        'cross congestion rate', 'cross congestion share', 'silhouette score', 'max mean intercluster similarity',
+        'normalized macro components', 'max eigengap', 'clustering distortion ratio', 'absorption rate', 'forced fragmentation'
     ]
 
     feat_names = [f for f in feat_names if df[f].nunique() > 1]
@@ -68,11 +76,5 @@ def test_isa(df, dir):
 
 
 
-df = pd.read_csv("../../results/mcpa/small/small_instances_exponential.csv")
-test_isa(df, "../test/exponential")
-print("\n\n\n\n===========================================================================================================\n\n\n\n")
-df = pd.read_csv("../../results/mcpa/small/small_instances_uniform.csv")
-test_isa(df, "../test/uniform")
-print("\n\n\n\n===========================================================================================================\n\n\n\n")
-df = pd.read_csv("../../results/mcpa/small/small_instances_inverse.csv")
-test_isa(df, "../test/inverse")
+df = pd.read_csv("../../results/mcpa/big/big_instances_EXP_LIN.csv")
+test_isa(df, "../test/big/exp_lin")

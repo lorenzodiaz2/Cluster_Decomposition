@@ -1,7 +1,8 @@
-from typing import List
+from typing import Union, List
 
 import torch
 import torch.nn as nn
+from torch.ao.nn.quantized.functional import threshold
 from torch.utils.data import DataLoader, TensorDataset, random_split, WeightedRandomSampler
 import pandas as pd
 import numpy as np
@@ -76,56 +77,35 @@ class SimpleFeedforward(nn.Module):
 
 class NN_Isa:
 
-    def __init__(self, df: pd.DataFrame, feat_names: List[str], alg_col: str,
-                 epsilon: float = 10.0, max_perf: bool = False, hidden_size=128):
+    def __init__(self, df: pd.DataFrame, feat_names: List[str], target_alg, baseline_alg, hidden_size=128):
 
-        self.df = df
+        self.df = df.copy(deep=True)
+        # self.instance_col_name = instance_col_name
         self.feat_names = feat_names
-        self.alg_col = alg_col
+        self.target_alg = target_alg
+        self.baseline_alg = baseline_alg
         self.hidden_size = hidden_size
+        self.df['improvement_perc'] = 100 * (df[self.baseline_alg] - df[self.target_alg]) / df[self.baseline_alg]
+        self.df['improvement'] = ((self.df.improvement_perc - self.df.improvement_perc.min()) /
+                                  (self.df.improvement_perc.max() - self.df.improvement_perc.min()))
 
-        if max_perf:
-            self.df['improvement'] = (df[alg_col] >= epsilon).astype(float)
-        else:
-            self.df['improvement'] = (df[alg_col] <= epsilon).astype(float)
+        self.df['improvement'] = df.gap
+        self.df.loc[self.df.improvement > 100, 'improvement'] = 100
+        self.df.improvement = (100 - self.df.improvement) / 100
+        self.df.loc[self.df.improvement >= 0.9, 'improvement'] = 1
+        self.df.loc[self.df.improvement < 0.9, 'improvement'] = 0
 
-        print('classes distribution',
-              self.df.improvement[self.df.improvement > 0.5].shape[0],
-              self.df.improvement[self.df.improvement < 0.5].shape[0])
+        print('classes distribution', self.df.improvement[self.df.improvement > 0.9].shape[0],
+              self.df.improvement[self.df.improvement <= 0.9].shape[0])
 
         self.label = None
         self.train_dataloader, self.test_dataloader, self.X_tensor, self.Y_tensor = None, None, None, None
+
         self.model = SimpleFeedforward(len(self.feat_names), hidden_size)
+
         self.accuracy = None
 
-
-
-
-# class NN_Isa:
-#
-#     def __init__(self, df: pd.DataFrame, feat_names: List[str], target_alg, baseline_alg, hidden_size=128):
-#
-#         self.df = df
-#         # self.instance_col_name = instance_col_name
-#         self.feat_names = feat_names
-#         self.target_alg = target_alg
-#         self.baseline_alg = baseline_alg
-#         self.hidden_size = hidden_size
-#         self.df['improvement_perc'] = 100 * (df[self.baseline_alg] - df[self.target_alg]) / df[self.baseline_alg]
-#         self.df['improvement'] = ((self.df.improvement_perc - self.df.improvement_perc.min()) /
-#                                   (self.df.improvement_perc.max() - self.df.improvement_perc.min()))
-#
-#         print('classes distribution', self.df.improvement[df.improvement > 0.5].shape[0],
-#               self.df.improvement[df.improvement < 0.5].shape[0])
-#
-#         self.label = None
-#         self.train_dataloader, self.test_dataloader, self.X_tensor, self.Y_tensor = None, None, None, None
-#
-#         self.model = SimpleFeedforward(len(self.feat_names), hidden_size)
-#
-#         self.accuracy = None
-
-    def run(self, batch_size=128, epochs=1000, alpha=0.1, lr=0.0001, train_test_ratio=0.5):
+    def run(self, batch_size=128, epochs=2000, alpha=0.1, lr=0.0001, train_test_ratio=0.5):
         self.train_dataloader, self.test_dataloader, self.X_tensor, self.Y_tensor = (
             self.prepare_datasets(self.df, self.feat_names, self.df.improvement, batch_size=batch_size, train_test_ratio=train_test_ratio))
         self.train_model(self.model, self.train_dataloader, self.test_dataloader, alpha=alpha, epochs=epochs, lr=lr)
@@ -144,8 +124,11 @@ class NN_Isa:
         x_target = self.X_tensor[torch.where(self.Y_tensor < 0.5)[0]]
         _, _, res_target = self.model.evaluate(x_target)
 
+        _, _, res_global = self.model.evaluate(self.X_tensor)
+
         self.accuracy = {'baseline': (torch.round(accuracy_x_baseline).sum() / accuracy_x_baseline.shape[0]).item(),
-                         'target': ((1 - torch.round(res_target)).sum() / res_target.shape[0]).item()}
+                         'target': ((1 - torch.round(res_target)).sum() / res_target.shape[0]).item(),
+                         'global': 1 - ((torch.round(res_global) - torch.round(self.Y_tensor)).abs().sum()/self.Y_tensor.shape[0]).item()}
         print('Accuracy:', self.accuracy)
 
     def predict(self, x):
@@ -236,7 +219,7 @@ class NN_Isa:
     def loss_fun(prediction, target, x, x_batch, alpha=1):
         # return alpha * torch.mean((torch.abs(target - 0.5) + 0.1 * (target - 0.5)/torch.abs(target - 0.5)) * (prediction - target)**2) + torch.mean((x - x_batch)**2)
         loss = nn.BCELoss()
-        return loss(prediction, target) + 0.0001 * torch.mean((x - x_batch) ** 2)
+        return loss(prediction, target) + 0.1 * torch.mean((x - x_batch) ** 2)
 
     # Example training loop structure
     def train_model(self, model, train_loader, test_loader, alpha, epochs, lr):
