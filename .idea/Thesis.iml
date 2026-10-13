@@ -6,7 +6,7 @@
       <excludeFolder url="file://$MODULE_DIR$/results" />
       <excludeFolder url="file://$MODULE_DIR$/isa/test" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.13 virtualenv at C:\Users\utente\PycharmProjects\Cluster_Decomposition\.venv" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.10 (Thesis)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
