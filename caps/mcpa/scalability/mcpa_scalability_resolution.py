@@ -1,6 +1,8 @@
+import os
 from datetime import datetime
 
 import numpy as np
+import pandas as pd
 from pandas import DataFrame
 
 from caps.mcpa.solver.mcpa_heuristic_solver import MCPA_Heuristic_Solver
@@ -14,13 +16,14 @@ def run_mcpa(
     max_cluster_size: int,
     resources_capacity: int,
     offset: int,
-    df: DataFrame,
+    df_results: DataFrame,
     starting_seed: int,
     q_range: list[int],
     n_iterations: int,
     sim_method: tuple[str, float| None],
     resource_weighting: str,
-    out_file: str,
+    out_results_file: str,
+    out_incumbent_file: str,
     instance_file: str | None = None
 ):
     seed = starting_seed
@@ -44,16 +47,35 @@ def run_mcpa(
                     repair_solver = MCPA_Heuristic_Solver(env.G, env.elements, critical_resources)
                     repair_solver.solve()
 
-            save_results(env, global_solver, seed, df, critical_resources, repair_solver)
+            save_results(env, global_solver, seed, df_results, out_incumbent_file, critical_resources, repair_solver)
             seed += 1
-            df.to_csv(out_file, index=False)
+            df_results.to_csv(out_results_file, index_label="id")
+
+
+def save_incumbent(global_solver: MCPA_Heuristic_Solver, out_incumbent_file: str, _id: int):
+    incumbent = global_solver.incumbent
+    if not incumbent.solutions:
+        return
+
+    df_new = pd.DataFrame({
+        "id": _id,
+        "time": incumbent.times,
+        "solution": incumbent.solutions
+    })
+
+    file_exists = os.path.isfile(out_incumbent_file)
+    df_new.to_csv(out_incumbent_file, mode='a', index=False, header=not file_exists)
+
+
+
 
 
 def save_results(
     env: MCPA_Environment,
     global_solver: MCPA_Heuristic_Solver,
     seed: int,
-    df: DataFrame,
+    df_results: DataFrame,
+    out_incumbent_file: str,
     critical_resources: MCPA_Critical_Resources | None = None,
     repair_solver: MCPA_Heuristic_Solver | None = None
 ):
@@ -189,6 +211,19 @@ def save_results(
         "clustering distortion ratio": clustering_distortion_ratio,
         "absorption rate": absorption_rate,
         "forced fragmentation": forced_fragmentation,
+        "interaction_density": interaction_density,
+        "similarity_gini": similarity_gini,
+        "similarity_skewness": similarity_skewness,
+        "mass_cv": mass_cv,
+        "boundary_entities_ratio": boundary_entities_ratio,
+        "partition_entropy": partition_entropy,
+        "critical_resources_ratio": critical_resources_ratio,
+        "congestion_gini": congestion_gini,
+        "cross_cluster_footprint_density": cross_cluster_footprint_density,
+        "average_footprint_breadth": average_footprint_breadth,
+        "average_guaranteed_slack": average_guaranteed_slack,
+        "space_to_mass_ratio": space_to_mass_ratio,
+        "spatial density": n_agents / (grid_side ** 2),
         "model times clusters": model_times_clusters,
         "resolution times clusters": resolution_time_clusters,
         "unassigned agents": unassigned_agents,
@@ -203,7 +238,11 @@ def save_results(
         "gap": gap,
         "speedup": time_global / time_heuristic
     }
-    df.loc[len(df)] = row
+
+    new_id = df_results.index.max() + 1 if not df_results.empty else 0
+    df_results.loc[new_id] = row
+
+    save_incumbent(global_solver, out_incumbent_file, new_id)
 
 
 

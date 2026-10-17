@@ -54,7 +54,7 @@ class CFL_Critical_Resources(General_Critical_Resources, ABC):
     def _get_candidates(self, resource_id: int):
         self._current_fid = resource_id
         f = self.fac_by_id[resource_id]
-        return [self.client_by_id[cid] for cid, q in f.shipment_by_client.items() if q > 0]
+        return [self.client_by_id[cid] for cid, q in f.shipment_by_client.items() if q > 1e-6]
 
 
     def _update_residuals(self):

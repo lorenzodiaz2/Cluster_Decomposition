@@ -9,6 +9,7 @@ from caps.mcpa.elements.mcpa_cluster import MCPA_Cluster
 from caps.mcpa.elements.pair import OD_Pair
 from caps.mcpa.elements.path import Path
 from utils.parallel import init_mcpa, compute_paths_for_quadrant
+from utils.instance_generators import sample_pair_uniform, make_hotspots, sample_pair_hotspot
 
 
 def _build_occ_for_ods(ods) -> dict[tuple[int, int], float]:
@@ -39,14 +40,24 @@ class MCPA_Environment(General_Environment):
         seed: int | None = 42,
         sim_method: tuple[str, float| None] | None = ("uniform", None),
         resource_weights: str = "linear",
-        instance_file: str | None = None
+        instance_file: str | None = None,
+        demand_min: int = 5,
+        demand_max: int = 5,
+        capacity_delta: int = 0,
+        partitioner: str = "nj",
+        family: str = "quadrants",
+        family_params: dict | None = None
     ):
         super().__init__(grid_side, max_cluster_size, n_quadrants, n_pairs_per_quadrant, resources_capacity, offset, k,
-                         reproducibility_flag, remove_rnd_nodes_flag, remove_percentage, seed, sim_method, resource_weights, instance_file)
+                         reproducibility_flag, remove_rnd_nodes_flag, remove_percentage, seed, sim_method, resource_weights, instance_file,
+                         partitioner=partitioner, family=family, family_params=family_params)
 
         if grid_side:
             Path.set_grid_side(grid_side)
         self.agents: list[Agent] = []
+        self.demand_min = demand_min          # agenti per coppia OD estratti uniformemente in [demand_min, demand_max]
+        self.demand_max = demand_max
+        self.capacity_delta = capacity_delta  # capacità dei nodi (non estremi OD) uniforme in [cap - delta, cap + delta]
 
         self._set_environment()
 
@@ -58,6 +69,11 @@ class MCPA_Environment(General_Environment):
             od_by_quadrant[q].append(od)
 
         tasks = list(od_by_quadrant.values())
+        # con un solo quadrante (famiglie senza quadranti) divido comunque il lavoro tra i processi
+        if len(tasks) < mp.cpu_count():
+            all_ods = [od for task in tasks for od in task]
+            n_chunks = min(mp.cpu_count(), len(all_ods))
+            tasks = [all_ods[i::n_chunks] for i in range(n_chunks)]
 
         with mp.Pool(
             processes=mp.cpu_count(),
@@ -89,6 +105,14 @@ class MCPA_Environment(General_Environment):
     def _choose_elements(self):
         self._next_agent_id = 0
 
+        if self.family not in ("quadrants", "uniform", "hotspots"):
+            raise ValueError(f"family '{self.family}' non supportata")
+        if self.family != "quadrants":
+            self._nodes = list(self.G.nodes)
+            self._node_set = set(self._nodes)
+        if self.family == "hotspots":
+            self._hotspot_centers, self._hotspot_weights = make_hotspots(self._nodes, self.rng, self.family_params["n_hotspots"])
+
         if self.n_elements_per_quadrant:
             self._spawn_in_quadrants(
                 n_per_quadrant=self.n_elements_per_quadrant,
@@ -104,21 +128,27 @@ class MCPA_Environment(General_Environment):
         self._start_parallel()
 
     def _make_od_pair(self, quadrant: Quadrant, id_pair: int) -> OD_Pair:
-        top, left = quadrant[0]
-        bottom, right = quadrant[1]
-        row_range = range(top, bottom + 1)
-        col_range = range(left, right + 1)
+        if self.family == "uniform":
+            src, dst = sample_pair_uniform(self.G, self._nodes, self.rng, self.family_params.get("L_min"), self.family_params.get("L_max"))
+        elif self.family == "hotspots":
+            src, dst = sample_pair_hotspot(self._nodes, self._node_set, self.rng, self._hotspot_centers, self._hotspot_weights,
+                                           self.family_params["sigma"], self.family_params.get("noise", 0.0))
+        else:
+            top, left = quadrant[0]
+            bottom, right = quadrant[1]
+            row_range = range(top, bottom + 1)
+            col_range = range(left, right + 1)
 
-        while True:
-            src = (self.rng.choice(row_range), self.rng.choice(col_range))
-            dst = (self.rng.choice(row_range), self.rng.choice(col_range))
-            if src == dst:
-                continue
-            if src not in self.G.nodes() or dst not in self.G.nodes():
-                continue
-            break
+            while True:
+                src = (self.rng.choice(row_range), self.rng.choice(col_range))
+                dst = (self.rng.choice(row_range), self.rng.choice(col_range))
+                if src == dst:
+                    continue
+                if src not in self.G.nodes() or dst not in self.G.nodes():
+                    continue
+                break
 
-        n_agents = self.rng.randrange(5, 6)
+        n_agents = self.rng.randint(self.demand_min, self.demand_max)   # con min = max = 5 equivale al vecchio randrange(5, 6)
         start = self._next_agent_id
         agents = [Agent(i, src, dst) for i in range(start, start + n_agents)]
         self._next_agent_id += n_agents
@@ -127,7 +157,7 @@ class MCPA_Environment(General_Environment):
 
 
     def _set_capacities(self):
-        od_nodes = [node for od_pair in self.elements for node in (od_pair.src, od_pair.dst)]
+        od_nodes = {node for od_pair in self.elements for node in (od_pair.src, od_pair.dst)}
         V = list(self.G.nodes)
         for v in V:
             self.G.nodes[v]['capacity'] = 0
@@ -139,7 +169,11 @@ class MCPA_Environment(General_Environment):
 
         for v in V:
             if v not in od_nodes:
-                self.G.nodes[v]["capacity"] = self.resources_capacity
+                if self.capacity_delta > 0:
+                    delta = self.rng.randint(-self.capacity_delta, self.capacity_delta)
+                    self.G.nodes[v]["capacity"] = max(1, self.resources_capacity + delta)
+                else:
+                    self.G.nodes[v]["capacity"] = self.resources_capacity
 
 
     def solve_clusters(self):

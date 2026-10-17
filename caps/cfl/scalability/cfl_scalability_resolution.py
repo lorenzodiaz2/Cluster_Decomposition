@@ -265,7 +265,7 @@ def save_results(
         "average_footprint_breadth": average_footprint_breadth,
         "average_guaranteed_slack": average_guaranteed_slack,
         "space_to_mass_ratio": space_to_mass_ratio,
-
+        "spatial density": (n_clients_per_quadrant * n_quadrants) / (grid_side ** 2), # todo check
         "model times clusters": model_times_clusters,
         "resolution times clusters": resolution_time_clusters,
         "unassigned items": unassigned_items,

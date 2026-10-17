@@ -1,0 +1,402 @@
+Index: main.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import pandas as pd\r\n\r\nfrom mcpa.scalability.mcpa_scalability_resolution import run_mcpa_scalability\r\n\r\nif __name__ == '__main__':\r\n    df = pd.read_csv(\"results/mcpa/results.csv\")\r\n    run_mcpa_scalability(20, 150, 750, -1, df, 0, [2, 3], 3)\r\n    run_mcpa_scalability(20, 150, 750, 0, df, 0, [2, 3], 3)\r\n    run_mcpa_scalability(20, 150, 750, 1, df, 0, [2, 3], 3)\r\n    run_mcpa_scalability(20, 150, 750, 2, df, 0, [2, 3], 3)\r\n\r\n\r\n\r\n    columns = [\r\n        \"grid side\",\r\n        \"n quadrants\",\r\n        \"n pairs per quadrant\",\r\n        \"n agents\",\r\n        \"max cluster size\",\r\n        \"offset\",\r\n        \"k\",\r\n        \"seed\",\r\n\r\n        \"time global\",\r\n        \"status global\",\r\n        \"number of resolution\",\r\n        \"LB global\",\r\n        \"UB global\",\r\n\r\n        \"n clusters\",\r\n        \"n agents per cluster\",\r\n        \"similarity index\",\r\n        \"min cluster similarity index\",\r\n        \"max mean intercluster similarity\",\r\n        \"silhouette score\",\r\n        \"cluster congestion ratio max\",\r\n        \"global congestion absolute\",\r\n        \"cross congestion absolute\",\r\n        \"cross congestion rate\",\r\n        \"cross congestion share\",\r\n        \"model times clusters\",\r\n        \"resolution time clusters\",\r\n        \"unassigned agents\",\r\n        \"final tolerance\",\r\n        \"LB heuristic\",\r\n        \"UB heuristic\",\r\n        \"time heuristic\",\r\n        \"gap\"\r\n    ]\r\n\r\n    df = pd.DataFrame(columns=columns)\r\n    df.to_csv(\"results/mcpa/results.csv\", index=False)\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n# todo single source sono apposto\r\n# todo TB sono apposto quando uso Multi Source, quando uso Single Source sembrerebbe apposto quando modifico SSCFL_Heuristic_solver -> _compute_shipping_cost -> vedere commento\r\n# todo multi source (TEST_BED_C) sono da trovare le soluzioni. Esistono anche TEST_BED_A e TEST_BED_C a questo link: http://wpage.unina.it/sforza/test/
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.py b/main.py
+--- a/main.py	(revision 440d92e78e3bf1d29d647b6bf3a6a120e0c21751)
++++ b/main.py	(date 1791900220263)
+@@ -1,56 +1,217 @@
+ import pandas as pd
++import matplotlib.pyplot as plt
++import numpy as np
++import matplotlib as mpl
++import matplotlib.colors as mcolors
++import ast
++import seaborn as sns
++
++from utils.plot_functions import scatter_plot_
++
++
++def plot_frequency_gap(df):
++    # --- Grafico: Frequenza dei Valori di Gap per Range (es. 0-10, 10-20) ---
++    # Trova il massimo e minimo per definire dinamicamente i "bin" (intervalli di 10)
++    max_gap = max(0, df['gap'].max())
++    min_gap = min(0, df['gap'].min())
++    bins = np.arange(np.floor(min_gap / 10) * 10, np.ceil(max_gap / 10) * 10 + 10, 10)
++
++    plt.figure(figsize=(10, 6))
++    # Crea l'istogramma di base per mostrare i range
++    out, bins_edges, patches = plt.hist(df['gap'], bins=bins, color='skyblue', edgecolor='black')
++
++    # Calcola il punto centrale di ogni range per disegnare la linea di tendenza continua
++    bin_centers = 0.5 * (bins_edges[:-1] + bins_edges[1:])
++    plt.plot(bin_centers, out, marker='o', linestyle='-', color='red', linewidth=2)
++
++    plt.xticks(bins)
++    plt.title('Frequenza del Gap per Range (0-10, 10-20, ...)')
++    plt.xlabel('Range del Gap')
++    plt.ylabel('Frequenza (Numero di istanze)')
++    plt.grid(True, axis='y')
++    plt.show()
++
++
++def plot_optimization_csv(csv_path, gap_out="gap_plot.png", speedup_out="speedup_plot.png"):
++    # 1. Lettura dati
++    df = pd.read_csv(csv_path)
++    df = df[df["status heuristic"] == "OPTIMAL"]
++    df = df[df["mean resource capacity"].isin([5, 6])]
++
++
++    # 2. Raggruppamento per tipologia di istanza e calcolo della mediana (aggrega i vari seed)
++    agg_df = df.groupby(['n quadrants', 'n pairs per quadrant', 'offset'])[['gap', 'speedup']].median().reset_index()
++
++    # 3. Calcolo dimensione istanza per la colorbar
++    agg_df['size'] = agg_df['n quadrants'] * agg_df['n pairs per quadrant']
++    min_size = agg_df['size'].min()
++    max_size = agg_df['size'].max()
++
++    # 4. Impostazioni mappa colori
++    cmap = mpl.colormaps["cividis"]
++    norm = mcolors.Normalize(vmin=min_size, vmax=max_size)
++
++    # Raggruppo per singola linea da disegnare (combinazione univoca di quadrants e pairs)
++    curves = agg_df.groupby(['n quadrants', 'n pairs per quadrant'])
++
++    # Funzione di supporto per evitare duplicazioni di codice tra i due plot
++    def create_plot(y_column, y_label, output_file):
++        plt.figure(figsize=(14, 10))
++        y_limit = 0
++
++        for (n_quads, n_pairs), group in curves:
++            # Ordino per offset per evitare linee "a zig zag"
++            group = group.sort_values('offset')
++            color = cmap(norm(n_quads * n_pairs))
++
++            plt.plot(group['offset'], group[y_column], marker='o', linestyle='-',
++                     color=color, alpha=1., linewidth=5, markersize=10)
++
++            if group[y_column].max() > y_limit:
++                y_limit = group[y_column].max()
++
++        # Colorbar
++        sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
++        sm.set_array([])
++        cbar = plt.colorbar(sm, ax=plt.gca())
++        cbar.set_label("Instance Dimension (number of OD pairs)", fontsize=30)
++        cbar.ax.tick_params(labelsize=30)
++
++        # Limiti e margini Y (10% extra sopra il massimo per respirabilità)
++        plt.ylim((0, y_limit * 1.1))
++
++        # Sulle X forzo i tick sui valori esatti dell'offset presenti nei dati
++        unique_offsets = sorted(agg_df['offset'].unique())
++        plt.xticks(unique_offsets)
++
++        # Griglia e Testi
++        plt.grid(True, linestyle='--', alpha=0.5)
++        plt.xlabel("Offset", fontsize=35)
++        plt.ylabel(y_label, fontsize=35)
++        plt.tick_params(axis='both', which='major', labelsize=30)
++
++        plt.tight_layout()
++        plt.savefig(output_file, dpi=600)
++        plt.show()
++        plt.close()
+ 
+-from mcpa.scalability.mcpa_scalability_resolution import run_mcpa_scalability
++    # 5. Generazione dei due grafici
++    create_plot('gap', 'Gap', gap_out)
++    create_plot('speedup', 'Speedup', speedup_out)
++
++
++def plot_repair_statistics(csv_path, unassigned_out="unassigned_plot.png", repair_out="repair_plot.png"):
++    # 1. Lettura dati e filtri iniziali
++    df = pd.read_csv(csv_path)
++    df = df[df["status heuristic"] == "OPTIMAL"]
++    df = df[df["mean resource capacity"].isin([5, 6])]
++
++    # 1.5 Calcolo delle nuove metriche
++
++    # Se 'final unassigned agents' è NaN nei log, forziamo il valore a 0
++    df['final unassigned agents'] = df['final unassigned agents'].fillna(0)
++    df['unassigned_ratio'] = df['final unassigned agents'] / df['n agents'] * 100
++
++    # Funzione di appoggio per convertire la stringa e sommare gli elementi.
++    # Se la cella è vuota (NaN), restituisce direttamente 0.
++    def parse_and_sum(val):
++        if pd.isna(val):
++            return 0
++        try:
++            return sum(ast.literal_eval(str(val)))
++        except Exception:
++            return 0
++
++    def calc_repair_ratio(row):
++        total_sum = parse_and_sum(row['model times repair']) + parse_and_sum(row['resolution times repair'])
++
++        # Ritorna 0 per evitare divisioni per zero se 'time heuristic' dovesse essere esattamente 0
++        if row['time heuristic'] == 0:
++            return 0
++
++        return (total_sum / row['time heuristic']) * 100
++
++    df['repair_time_ratio'] = df.apply(calc_repair_ratio, axis=1)
++
++    # 2. Raggruppamento per tipologia di istanza e calcolo della mediana (aggrega i vari seed)
++    agg_df = df.groupby(['n quadrants', 'n pairs per quadrant', 'offset'])[
++        ['unassigned_ratio', 'repair_time_ratio']].median().reset_index()
++
++    # (Rimosso il dropna per non perdere le righe che prima venivano marcate come invalide)
++
++    # 3. Calcolo dimensione istanza per la colorbar
++    agg_df['size'] = agg_df['n quadrants'] * agg_df['n pairs per quadrant']
++    min_size = agg_df['size'].min()
++    max_size = agg_df['size'].max()
++
++    # 4. Impostazioni mappa colori
++    cmap = mpl.colormaps["cividis"]
++    norm = mcolors.Normalize(vmin=min_size, vmax=max_size)
++
++    # Raggruppo per singola linea da disegnare (combinazione univoca di quadrants e pairs)
++    curves = agg_df.groupby(['n quadrants', 'n pairs per quadrant'])
++
++    # Funzione di supporto fedele al tuo codice originale
++    def create_plot(y_column, y_label, output_file):
++        plt.figure(figsize=(14, 10))
++        y_limit = 0
++
++        for (n_quads, n_pairs), group in curves:
++            # Ordino per offset per evitare linee "a zig zag"
++            group = group.sort_values('offset')
++            color = cmap(norm(n_quads * n_pairs))
++
++            plt.plot(group['offset'], group[y_column], marker='o', linestyle='-',
++                     color=color, alpha=1., linewidth=5, markersize=10)
++
++            if group[y_column].max() > y_limit:
++                y_limit = group[y_column].max()
++
++        # Colorbar
++        sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
++        sm.set_array([])
++        cbar = plt.colorbar(sm, ax=plt.gca())
++        cbar.set_label("Instance Dimension (number of OD pairs)", fontsize=30)
++        cbar.ax.tick_params(labelsize=30)
++
++        # Limiti e margini Y
++        y_max = y_limit * 1.1 if y_limit > 0 else 0.1
++        plt.ylim((0, y_max))
++
++        # Sulle X forzo i tick sui valori esatti dell'offset presenti nei dati
++        unique_offsets = sorted(agg_df['offset'].unique())
++        plt.xticks(unique_offsets)
++
++        # Griglia e Testi
++        plt.grid(True, linestyle='--', alpha=0.5)
++        plt.xlabel("Offset", fontsize=35)
++        plt.ylabel(y_label, fontsize=35)
++        plt.tick_params(axis='both', which='major', labelsize=30)
++
++        plt.tight_layout()
++        plt.savefig(output_file, dpi=300)
++        # plt.show()
++        # plt.close()
++
++    # 5. Generazione dei due grafici
++    create_plot('unassigned_ratio', '% Removed Units', unassigned_out)
++    create_plot('repair_time_ratio', '% Repair Time', repair_out)
++
+ 
+ if __name__ == '__main__':
+-    df = pd.read_csv("results/mcpa/results.csv")
+-    run_mcpa_scalability(20, 150, 750, -1, df, 0, [2, 3], 3)
+-    run_mcpa_scalability(20, 150, 750, 0, df, 0, [2, 3], 3)
+-    run_mcpa_scalability(20, 150, 750, 1, df, 0, [2, 3], 3)
+-    run_mcpa_scalability(20, 150, 750, 2, df, 0, [2, 3], 3)
+-
++    # plot_repair_statistics("results/mcpa/big/big_instances_EXP_LIN.csv")
++    # plot_optimization_csv("results/mcpa/big/big_instances_EXP_LIN.csv")
+ 
++    df = pd.read_csv("results/mcpa/big/big_instances_EXP_LIN.csv")
++    df = df[df["status heuristic"] == "OPTIMAL"]
++    df = df[df["mean resource capacity"].isin([5, 6])]
++    print(len(df))
++    df = df[df["final unassigned agents"] / df["n agents"] < 0.65]
++    print(len(df))
+ 
+-    columns = [
+-        "grid side",
+-        "n quadrants",
+-        "n pairs per quadrant",
+-        "n agents",
+-        "max cluster size",
+-        "offset",
+-        "k",
+-        "seed",
+-
+-        "time global",
+-        "status global",
+-        "number of resolution",
+-        "LB global",
+-        "UB global",
+-
+-        "n clusters",
+-        "n agents per cluster",
+-        "similarity index",
+-        "min cluster similarity index",
+-        "max mean intercluster similarity",
+-        "silhouette score",
+-        "cluster congestion ratio max",
+-        "global congestion absolute",
+-        "cross congestion absolute",
+-        "cross congestion rate",
+-        "cross congestion share",
+-        "model times clusters",
+-        "resolution time clusters",
+-        "unassigned agents",
+-        "final tolerance",
+-        "LB heuristic",
+-        "UB heuristic",
+-        "time heuristic",
+-        "gap"
+-    ]
+-
+-    df = pd.DataFrame(columns=columns)
+-    df.to_csv("results/mcpa/results.csv", index=False)
+-
++    x = df["similarity index"]
++    z = df["gap"]
++    scatter_plot_(x, z, "correlation.png")
+ 
+ 
+ 
+Index: .idea/codeStyles/codeStyleConfig.xml
+===================================================================
+diff --git a/.idea/codeStyles/codeStyleConfig.xml b/.idea/codeStyles/codeStyleConfig.xml
+deleted file mode 100644
+--- a/.idea/codeStyles/codeStyleConfig.xml	(revision 440d92e78e3bf1d29d647b6bf3a6a120e0c21751)
++++ /dev/null	(revision 440d92e78e3bf1d29d647b6bf3a6a120e0c21751)
+@@ -1,5 +0,0 @@
+-<component name="ProjectCodeStyleConfiguration">
+-  <state>
+-    <option name="PREFERRED_PROJECT_CODE_STYLE" value="Default" />
+-  </state>
+-</component>
+\ No newline at end of file
+Index: .idea/.gitignore
+===================================================================
+diff --git a/.idea/.gitignore b/.idea/.gitignore
+deleted file mode 100644
+--- a/.idea/.gitignore	(revision 440d92e78e3bf1d29d647b6bf3a6a120e0c21751)
++++ /dev/null	(revision 440d92e78e3bf1d29d647b6bf3a6a120e0c21751)
+@@ -1,5 +0,0 @@
+-# Default ignored files
+-/shelf/
+-/workspace.xml
+-# Editor-based HTTP Client requests
+-/httpRequests/
+Index: .idea/dictionaries/project.xml
+===================================================================
+diff --git a/.idea/dictionaries/project.xml b/.idea/dictionaries/project.xml
+deleted file mode 100644
+--- a/.idea/dictionaries/project.xml	(revision 440d92e78e3bf1d29d647b6bf3a6a120e0c21751)
++++ /dev/null	(revision 440d92e78e3bf1d29d647b6bf3a6a120e0c21751)
+@@ -1,15 +0,0 @@
+-<component name="ProjectDictionaryState">
+-  <dictionary name="project">
+-    <words>
+-      <w>cids</w>
+-      <w>fnode</w>
+-      <w>idxs</w>
+-      <w>mcpa</w>
+-      <w>mscfl</w>
+-      <w>rmax</w>
+-      <w>selvars</w>
+-      <w>sscfl</w>
+-      <w>tbed</w>
+-    </words>
+-  </dictionary>
+-</component>
+\ No newline at end of file
+Index: .idea/Thesis.iml
+===================================================================
+diff --git a/.idea/Thesis.iml b/.idea/Thesis.iml
+deleted file mode 100644
+--- a/.idea/Thesis.iml	(revision 440d92e78e3bf1d29d647b6bf3a6a120e0c21751)
++++ /dev/null	(revision 440d92e78e3bf1d29d647b6bf3a6a120e0c21751)
+@@ -1,12 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<module type="PYTHON_MODULE" version="4">
+-  <component name="NewModuleRootManager">
+-    <content url="file://$MODULE_DIR$">
+-      <excludeFolder url="file://$MODULE_DIR$/.venv" />
+-      <excludeFolder url="file://$MODULE_DIR$/results" />
+-      <excludeFolder url="file://$MODULE_DIR$/isa/test" />
+-    </content>
+-    <orderEntry type="jdk" jdkName="Python 3.13 virtualenv at C:\Users\utente\PycharmProjects\Cluster_Decomposition\.venv" jdkType="Python SDK" />
+-    <orderEntry type="sourceFolder" forTests="false" />
+-  </component>
+-</module>
+\ No newline at end of file
+Index: .idea/modules.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ProjectModuleManager\">\r\n    <modules>\r\n      <module fileurl=\"file://$PROJECT_DIR$/.idea/Thesis.iml\" filepath=\"$PROJECT_DIR$/.idea/Thesis.iml\" />\r\n    </modules>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/modules.xml b/.idea/modules.xml
+--- a/.idea/modules.xml	(revision 440d92e78e3bf1d29d647b6bf3a6a120e0c21751)
++++ b/.idea/modules.xml	(date 1791905208892)
+@@ -2,7 +2,7 @@
+ <project version="4">
+   <component name="ProjectModuleManager">
+     <modules>
+-      <module fileurl="file://$PROJECT_DIR$/.idea/Thesis.iml" filepath="$PROJECT_DIR$/.idea/Thesis.iml" />
++      <module fileurl="file://$PROJECT_DIR$/.idea/Cluster_Decomposition.iml" filepath="$PROJECT_DIR$/.idea/Cluster_Decomposition.iml" />
+     </modules>
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"VcsDirectoryMappings\">\r\n    <mapping directory=\"$PROJECT_DIR$\" vcs=\"Git\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+--- a/.idea/vcs.xml	(revision 440d92e78e3bf1d29d647b6bf3a6a120e0c21751)
++++ b/.idea/vcs.xml	(date 1791905208925)
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="VcsDirectoryMappings">
+-    <mapping directory="$PROJECT_DIR$" vcs="Git" />
++    <mapping directory="" vcs="Git" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"Black\">\r\n    <option name=\"sdkName\" value=\"Python 3.10 (Thesis)\" />\r\n  </component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" project-jdk-name=\"Python 3.13 virtualenv at C:\\Users\\utente\\PycharmProjects\\Cluster_Decomposition\\.venv\" project-jdk-type=\"Python SDK\" />\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 440d92e78e3bf1d29d647b6bf3a6a120e0c21751)
++++ b/.idea/misc.xml	(date 1791905215650)
+@@ -1,7 +1,4 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+-  <component name="Black">
+-    <option name="sdkName" value="Python 3.10 (Thesis)" />
+-  </component>
+-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.13 virtualenv at C:\Users\utente\PycharmProjects\Cluster_Decomposition\.venv" project-jdk-type="Python SDK" />
++  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (Cluster_Decomposition)" project-jdk-type="Python SDK" />
+ </project>
+\ No newline at end of file

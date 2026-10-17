@@ -17,7 +17,7 @@ import sys
 import os
 from pathlib import Path
 
-from shapely.geometry import Polygon, MultiPolygon
+from shapely.geometry import MultiPolygon
 
 
 class ISA:

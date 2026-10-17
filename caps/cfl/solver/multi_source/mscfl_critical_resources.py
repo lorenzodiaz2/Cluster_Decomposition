@@ -1,6 +1,9 @@
+import math
 from caps.cfl.elements.client import Client
 from caps.cfl.elements.facility import Facility
 from caps.cfl.solver.cfl_critical_resources import CFL_Critical_Resources
+
+EPS = 1e-6
 
 
 class MSCFL_Critical_Resources(CFL_Critical_Resources):
@@ -22,30 +25,37 @@ class MSCFL_Critical_Resources(CFL_Critical_Resources):
         f = self.fac_by_id[fid]
         cid = candidate.id
 
-        # 1) togli 1 unità dalla facility -> client
-        prev = f.shipment_by_client[cid]
-        if prev == 1:
-            f.shipment_by_client.pop(cid)
-        else:
-            f.shipment_by_client[cid] -= 1
+        prev = f.shipment_by_client.get(cid, 0)
+        if prev <= EPS:
+            f.shipment_by_client.pop(cid, None)
+            candidate.shipment_by_facility.pop(fid, None)
+            return
 
-        # 2) mantieni coerenza anche lato client
-        prev_c = candidate.shipment_by_facility[fid]
-        if prev_c <= 1:
-            candidate.shipment_by_facility.pop(fid)
+        # 1) fractional-first: release the decimal part, otherwise one unit (never more than prev)
+        frac = prev - math.floor(prev)
+        if EPS < frac < 1 - EPS:
+            delta = frac
         else:
-            candidate.shipment_by_facility[fid] -= 1
+            delta = min(1, prev)
+
+        # 2) update both sides consistently
+        new = prev - delta
+        if new <= EPS:
+            f.shipment_by_client.pop(cid, None)
+            candidate.shipment_by_facility.pop(fid, None)
+        else:
+            f.shipment_by_client[cid] = new
+            candidate.shipment_by_facility[fid] = new
 
         # 3) bookkeeping
-        self.removed_units_by_client[cid] += 1
+        self.removed_units_by_client[cid] += delta
         self.removed_items.add(cid)
         self.critical_clients.add(candidate)
 
-        # 4) aggiorna residuo della facility
-        new_residual = self.residuals[fid] + 1
+        # 4) update the residual by the amount actually released
+        self._post_residual_update(fid, self.residuals[fid] + delta)
 
-        # 5) parte comune
-        self._post_residual_update(fid, new_residual)
+
 
 
 

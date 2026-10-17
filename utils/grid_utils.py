@@ -161,3 +161,49 @@ def _divide_by_9(
         for (c_start, c_end) in col_intervals
     ]
 
+
+
+# ----- ostacoli: ritornano l'insieme dei nodi da rimuovere dalla griglia -----
+
+
+def walls_with_gates(grid_side: int, n_walls: int, n_gates: int, rng) -> set[Coord]:
+    """
+    n_walls muri orizzontali e n_walls verticali equidistanti. Ogni tratto di muro compreso tra due incroci
+    (o tra un incrocio e il bordo) ha n_gates varchi scelti a caso, quindi tutte le stanze restano collegate.
+    """
+    positions = [round((w + 1) * grid_side / (n_walls + 1)) for w in range(n_walls)]
+    pos_set = set(positions)
+    removed: set[Coord] = set()
+
+    for horizontal in (True, False):
+        for p in positions:
+            cells = [(p, j) if horizontal else (j, p) for j in range(grid_side)]
+            removed.update(cells)
+
+            # tratti del muro separati dagli incroci con i muri dell'altra direzione
+            segment: list[Coord] = []
+            for j, cell in enumerate(cells):
+                if j in pos_set:
+                    _open_gates(segment, n_gates, rng, removed)
+                    segment = []
+                else:
+                    segment.append(cell)
+            _open_gates(segment, n_gates, rng, removed)
+
+    return removed
+
+
+def _open_gates(segment: list[Coord], n_gates: int, rng, removed: set[Coord]):
+    for cell in rng.sample(segment, min(n_gates, len(segment))):
+        removed.discard(cell)
+
+
+def city_blocks(grid_side: int, block_size: int, street_width: int) -> set[Coord]:
+    """Isolati quadrati block_size x block_size separati da strade larghe street_width (la prima riga/colonna è strada)."""
+    period = block_size + street_width
+    return {
+        (i, j)
+        for i in range(grid_side) for j in range(grid_side)
+        if i % period >= street_width and j % period >= street_width
+    }
+

@@ -53,7 +53,7 @@ class MSCFL_Heuristic_solver(CFL_Heuristic_Solver):
         client_by_id = {c.id: c for c in self.clients}
 
         for (fid, cid), var in self.y.items():
-            q = int(round(var.X))
+            q = var.X
             if q <= 0:
                 continue
 

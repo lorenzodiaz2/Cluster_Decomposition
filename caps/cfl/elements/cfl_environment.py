@@ -29,13 +29,17 @@ class CFL_Environment(General_Environment):
         seed: int | None = 42,
         sim_method: tuple[str, float | None] | None = ("uniform", None),
         resource_weights: str = "linear",
-        instance_file: str | None = None
+        instance_file: str | None = None,
+        partitioner: str = "nj",
+        family: str = "quadrants",
+        family_params: dict | None = None
     ):
         super().__init__(grid_side, max_cluster_size, n_quadrants, n_clients_per_quadrant, resources_capacities, offset, k,
-                         reproducibility_flag, remove_rnd_nodes_flag, remove_percentage, seed, sim_method, resource_weights, instance_file)
+                         reproducibility_flag, remove_rnd_nodes_flag, remove_percentage, seed, sim_method, resource_weights, instance_file,
+                         partitioner=partitioner, family=family, family_params=family_params)
 
         self.rng_clients = random.Random(seed if reproducibility_flag else None)
-        self.rng_facilities = random.Random(seed if reproducibility_flag else None)
+        self.rng_facilities = random.Random((seed + 1) if reproducibility_flag else None)
 
         self.n_facilities_per_quadrant = n_facilities_per_quadrant
         self.facilities = []

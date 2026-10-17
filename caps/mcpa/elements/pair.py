@@ -1,5 +1,6 @@
 import math
 from collections import defaultdict
+from itertools import islice
 import networkx as nx
 from caps.mcpa.elements.agent import Agent
 from caps.mcpa.elements.path import Path
@@ -20,10 +21,10 @@ class OD_Pair:
     def __str__(self) -> str:
         return f"id = {self.id}    {self.src} , {self.dst}    ->    {len(self.agents)} agents,    {len(self.k_shortest_paths)} shortest paths"
 
-    # todo gestire il caso in cui non ci sono k shortest path per una coppia
+
     def compute_k_shortest_paths(self, G, k, sim_method) -> None:
         gen = nx.shortest_simple_paths(G, self.src, self.dst)
-        self.k_shortest_paths = [Path(next(gen)) for _ in range(k)]
+        self.k_shortest_paths = [Path(p) for p in islice(gen, k)]
         self.T = len(self.k_shortest_paths[-1].visits) ###########################
         self.delay_shortest_paths(self.T)
         weighting, beta = sim_method

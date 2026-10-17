@@ -8,8 +8,9 @@ import networkx as nx
 import numpy as np
 
 from caps.general.general_cluster import General_Cluster
-from caps.general.nj.tree_partition import TreePartition
-from utils.grid_utils import set_replicated_quadrants
+from clustering.nj.tree_partition import TreePartition
+from clustering.random.random_partition import RandomPartition
+from utils.grid_utils import set_replicated_quadrants, walls_with_gates, city_blocks
 from utils.parallel import init_similarity, compute_similarity_row
 
 Coord = tuple[int, int]
@@ -33,7 +34,10 @@ class General_Environment(ABC):
         seed: int | None = None,
         sim_method: tuple[str, float | None] | None = ("uniform", None),
         resource_weights: str = "linear",
-        instance_file: str | None = None
+        instance_file: str | None = None,
+        partitioner: str = "nj",
+        family: str = "quadrants",
+        family_params: dict | None = None
     ):
         self.grid_side = grid_side
         self.max_cluster_size = max_cluster_size
@@ -48,7 +52,11 @@ class General_Environment(ABC):
         self.set_time = None
         self.matrix_time = None
         self.nj_time = None
-        self.rng = random.Random(seed if reproducibility_flag else None)
+        self.seed = seed if reproducibility_flag else None
+        self.rng = random.Random(self.seed)
+        self.partitioner = partitioner                   # "nj" oppure "random"
+        self.family = family                             # "quadrants", "uniform", "hotspots"
+        self.family_params = family_params or {}         # parametri della famiglia (L_min, L_max, n_hotspots, sigma, noise, obstacles, ...)
         self.remove_rnd_nodes_flag = remove_rnd_nodes_flag
         self.remove_percentage = remove_percentage
         self.quadrants: list[Quadrant] = []
@@ -140,10 +148,24 @@ class General_Environment(ABC):
                          [((i, j), (i, j + 1)) for i in range(n) for j in range(n - 1)])
 
 
+        removed = set()
         if self.remove_rnd_nodes_flag:
-            V = self.G.nodes()
-            self.G.remove_nodes_from({v for v in V if self.rng.random() < self.remove_percentage})
-            self.G.remove_nodes_from({v for v in V if self.G.degree(v) == 0})
+            removed |= {v for v in self.G.nodes() if self.rng.random() < self.remove_percentage}
+
+        obstacles = self.family_params.get("obstacles")
+        if obstacles == "walls":
+            removed |= walls_with_gates(n, self.family_params.get("n_walls", 2), self.family_params.get("n_gates", 1), self.rng)
+        elif obstacles == "blocks":
+            removed |= city_blocks(n, self.family_params.get("block_size", 3), self.family_params.get("street_width", 1))
+        elif obstacles is not None:
+            raise ValueError(f"obstacles '{obstacles}' non supportato")
+
+        if removed:
+            self.G.remove_nodes_from(removed)
+            # tengo solo la componente connessa più grande, così ogni coppia di nodi rimasti è collegata
+            if self.G.number_of_nodes() > 0:
+                largest_cc = max(nx.connected_components(self.G), key=len)
+                self.G.remove_nodes_from([v for v in list(self.G.nodes) if v not in largest_cc])
 
 
     def _compute_similarity_index(self):
@@ -212,7 +234,12 @@ class General_Environment(ABC):
 
         start = time.perf_counter()
         weight_for_element = self._build_weight()
-        tree = TreePartition(self.similarity_matrix, weight_for_element, self.max_cluster_size)
+        if self.partitioner == "nj":
+            tree = TreePartition(self.similarity_matrix, weight_for_element, self.max_cluster_size)
+        elif self.partitioner == "random":
+            tree = RandomPartition(self.similarity_matrix, weight_for_element, self.max_cluster_size, seed=self.seed)
+        else:
+            raise ValueError(f"partitioner '{self.partitioner}' non supportato")
         tree.compute_clusters()
 
         self._build_clusters(tree)
@@ -514,7 +541,7 @@ class General_Environment(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def _build_clusters(self, tree: TreePartition):
+    def _build_clusters(self, tree: TreePartition | RandomPartition):
         raise NotImplementedError
 
     @abstractmethod

@@ -1,4 +1,4 @@
-from caps.general.nj.nj_torch import NjTree, Node
+from clustering.nj.nj_torch import NjTree, Node
 
 
 class TreePartition(NjTree):
@@ -85,7 +85,7 @@ class TreePartition(NjTree):
         if len(nodes) == 3:
             n_agents = nodes[0].n_agents + nodes[1].n_agents
 
-            if n_agents < self.max_cluster_size:
+            if n_agents <= self.max_cluster_size:
                 self.clusters.remove(nodes[0])
                 self.clusters.remove(nodes[1])
                 root.n_agents = n_agents

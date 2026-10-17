@@ -66,8 +66,8 @@ class MCPA_Critical_Resources(General_Critical_Resources):
 
     def _compute_score(self, candidate: Agent):
         a_visits = tuple(candidate.path.visits)
-        alternatives = (visited_nodes for visited_nodes in self.paths_by_od[self.od_by_agent[candidate]] if
-                        visited_nodes != a_visits)
+        own = {(v, t) for t, v in enumerate(a_visits)}  # risorse che il candidato libererebbe
+        alternatives = (visited_nodes for visited_nodes in self.paths_by_od[self.od_by_agent[candidate]] if visited_nodes != a_visits)
 
         score = float("-inf")
         for alternative in alternatives:
@@ -75,6 +75,8 @@ class MCPA_Critical_Resources(General_Critical_Resources):
             for (v, t) in self.resources_by_path[alternative]:
                 occ = len(self.agents_per_resource.get((v, t), ()))
                 res = self.residuals.get((v, t), self.capacities[v] - occ)
+                if (v, t) in own:
+                    res += 1
                 if res < _min:
                     _min = res
                     if _min <= score:
