@@ -174,6 +174,9 @@ class MCPA_Environment(General_Environment):
                     self.G.nodes[v]["capacity"] = max(1, self.resources_capacity + delta)
                 else:
                     self.G.nodes[v]["capacity"] = self.resources_capacity
+            else:
+                # estremi OD: capacità aumentata fino a contenere i propri agenti, ma mai inferiore a quella base della rete
+                self.G.nodes[v]["capacity"] = max(self.resources_capacity, self.G.nodes[v]["capacity"])
 
 
     def solve_clusters(self):

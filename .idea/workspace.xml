@@ -5,88 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="Major code refactor and new results">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_13_10_2026_17_39_[Changes]/shelved.patch" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_13_10_2026_17_39__Changes_.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Thesis.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/caps/mcpa/scalability/mcpa_runner.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/clustering/random/random_partition.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/footprint_heuristic_fails_best.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/footprint_heuristic_fails_good.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/binary_performance_heuristic_fails.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/binary_svm_heuristic_fails.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_average guaranteed slack.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_boundary entities ratio.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_critical resources ratio.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_cross cluster footprint density.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_interaction density.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_mass cv.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_partition entropy.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_silhouette score.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_similarity gini.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_similarity skewness.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_space to mass ratio.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_performance_global_normalized_heuristic_fails.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_performance_individual_normalized_heuristic_fails.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/footprint_heuristic_fails.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/instance_generators.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Thesis.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Cluster_Decomposition.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/project.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/elements/cfl_environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/elements/cfl_environment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/scalability/cfl_scalability_resolution.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/scalability/cfl_scalability_resolution.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/solver/cfl_critical_resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/solver/cfl_critical_resources.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/solver/multi_source/mscfl_critical_resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/solver/multi_source/mscfl_critical_resources.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/solver/multi_source/mscfl_heuristic_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/solver/multi_source/mscfl_heuristic_solver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/general/general_environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/general/general_environment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/general/nj/nj_torch.py" beforeDir="false" afterPath="$PROJECT_DIR$/clustering/nj/nj_torch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/general/nj/tree_partition.py" beforeDir="false" afterPath="$PROJECT_DIR$/clustering/nj/tree_partition.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/mcpa/elements/mcpa_environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/mcpa/elements/mcpa_environment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/mcpa/elements/pair.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/mcpa/elements/pair.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/mcpa/scalability/mcpa_scalability_resolution.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/mcpa/scalability/mcpa_scalability_resolution.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/mcpa/solver/mcpa_critical_resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/mcpa/solver/mcpa_critical_resources.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/IsaInterface/isa.py" beforeDir="false" afterPath="$PROJECT_DIR$/isa/IsaInterface/isa.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/IsaInterface/test_isa.py" beforeDir="false" afterPath="$PROJECT_DIR$/isa/IsaInterface/test_isa.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/algorithm_bin.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/algorithm_bin.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/algorithm_process.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/algorithm_process.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/algorithm_raw.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/algorithm_raw.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/algorithm_svm.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/algorithm_svm.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/beta_easy.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/beta_easy.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/bounds.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/bounds.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/bounds_prunned.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/bounds_prunned.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/coordinates.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/coordinates.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/feature_process.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/feature_process.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/feature_raw.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/feature_raw.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/footprint_gap_best.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/footprint_gap_best.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/footprint_gap_good.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/footprint_gap_good.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/footprint_performance.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/footprint_performance.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/good_algos.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/good_algos.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/portfolio.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/portfolio.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/portfolio_svm.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/portfolio_svm.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/projection_matrix.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/projection_matrix.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/svm_table.csv" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/csv/svm_table.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/img/binary_performance_gap.png" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/binary_performance_gap.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/img/binary_svm_gap.png" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/binary_svm_gap.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_beta_score.png" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_beta_score.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_absorption rate.png" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_absorption rate.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_clustering distortion ratio.png" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_clustering distortion ratio.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_cross congestion rate.png" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_cross congestion rate.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_min cluster similarity index.png" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_feature_min cluster similarity index.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_number_good_algos.png" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_number_good_algos.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_performance_global_normalized_gap.png" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_performance_global_normalized_gap.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_performance_individual_normalized_gap.png" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_performance_individual_normalized_gap.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_portfolio.png" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_portfolio.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_svm_portfolio.png" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/distribution_svm_portfolio.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/img/footprint_gap.png" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/footprint_gap.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/test/big/exp_lin/img/footprint_portfolio.png" beforeDir="false" afterPath="$PROJECT_DIR$/isa/test/big/exp_lin/img/footprint_portfolio.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/big/big_instances_EXP_LIN_results.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/big/big_instances_EXP_LIN_results.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/grid_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/grid_utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -203,8 +123,18 @@
       <workItem from="1792187669154" duration="3330000" />
       <workItem from="1792229995393" duration="3585000" />
       <workItem from="1792240534560" duration="3462000" />
-      <workItem from="1792246191313" duration="2231000" />
+      <workItem from="1792246191313" duration="3060000" />
+      <workItem from="1792255341904" duration="721000" />
     </task>
+    <task id="LOCAL-00001" summary="Major code refactor and new results">
+      <option name="closed" value="true" />
+      <created>1792248784603</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1792248784603</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -1,4 +1,6 @@
 import argparse
+import hashlib
+import json
 from dataclasses import replace
 
 from caps.mcpa.scalability.mcpa_runner import MCPA_Runner, MCPA_Instance_Settings
@@ -9,7 +11,7 @@ BASE_GRID_SIDE = 20         # lato di un quadrante n0
 N_PAIRS_BASE = 150          # |E_q*|: coppie OD per quadrante a densità rho = 1
 M_STAR = 750                # M* = 5 * |E_q*|
 K = 10
-SEEDS = range(5)            # stessi seed per tutte le configurazioni: confronti appaiati tra configurazioni
+SEEDS = range(5)            # indici di replica: il seed vero di ogni istanza è derivato da parametri + replica (_independent_seeds)
 THREADS = 12
 
 OFFSETS = [-1, 0, 1, 2, 3, 5]
@@ -28,13 +30,28 @@ def _quadrant_settings(q: int, offset: int, seed: int, **kw) -> MCPA_Instance_Se
     return MCPA_Instance_Settings(**params)
 
 
+def _independent_seeds(settings_list: list[MCPA_Instance_Settings]) -> list[MCPA_Instance_Settings]:
+    """
+    Nelle liste il campo seed contiene l'indice di replica; qui viene sostituito con un seed derivato da tutti i parametri
+    dell'istanza + replica, così istanze diverse non condividono la sequenza casuale (deterministico: rilanciando si ottengono
+    gli stessi seed, quindi la ripresa di una campagna funziona).
+    """
+    out = []
+    for st in settings_list:
+        key = {k: v for k, v in st.instance_dict().items() if k != "seed"}
+        key["replica"] = st.seed
+        seed = int(hashlib.sha1(json.dumps(key, sort_keys=True).encode()).hexdigest(), 16) % (2 ** 31)
+        out.append(replace(st, seed=seed))
+    return out
+
+
 def campaign_A_base() -> list[MCPA_Instance_Settings]:
     # A1: c = 5, b = 5, rho = 1  ->  6 offset x 4 q x 5 seed = 120
-    return [_quadrant_settings(q, o, s) for q in Q_ALL for o in OFFSETS for s in SEEDS]
+    return _independent_seeds([_quadrant_settings(q, o, s) for q in Q_ALL for o in OFFSETS for s in SEEDS])
 
 
 def campaign_A() -> list[MCPA_Instance_Settings]:
-    settings = campaign_A_base()
+    settings = []
     for q in Q_ALL:
         for o in OFFSETS:
             for s in SEEDS:
@@ -42,7 +59,7 @@ def campaign_A() -> list[MCPA_Instance_Settings]:
                 settings.append(_quadrant_settings(q, o, s, demand_min=1, demand_max=9))                # A3 domanda: 120
                 settings += [_quadrant_settings(q, o, s, n_pairs_per_quadrant=round(rho * N_PAIRS_BASE))
                              for rho in (0.5, 1.5)]                                                     # A4 densità: 240
-    return settings   # 720 istanze
+    return campaign_A_base() + _independent_seeds(settings)   # 720 istanze
 
 
 def campaign_B() -> list[MCPA_Instance_Settings]:
@@ -75,7 +92,7 @@ def campaign_B() -> list[MCPA_Instance_Settings]:
                 settings.append(MCPA_Instance_Settings(**base, family="uniform",
                                                        family_params={**medium, "obstacles": "walls", "n_gates": gates}))
             settings.append(MCPA_Instance_Settings(**base, family="uniform", family_params={**medium, "obstacles": "blocks"}))
-    return settings   # 200 istanze
+    return _independent_seeds(settings)   # 200 istanze
 
 
 def run_ablations_A(runner: MCPA_Runner):
@@ -93,8 +110,12 @@ def run_ablations_A(runner: MCPA_Runner):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Campagne MCPA")
-    parser.add_argument("campaign", choices=["A", "B", "ablations_A"], nargs="+")
+    # senza argomenti (es. pulsante Run di PyCharm) lancia A e B; rilanciando riprende dai run non ancora completati
+    parser.add_argument("campaign", nargs="*", default=["A", "B"], help="campagne da lanciare: A, B, ablations_A (default: A B)")
     args = parser.parse_args()
+    invalid = [c for c in args.campaign if c not in ("A", "B", "ablations_A")]
+    if invalid:
+        parser.error(f"campagne non valide: {invalid} (scegliere tra A, B, ablations_A)")
 
     for campaign in args.campaign:
         if campaign == "A":
