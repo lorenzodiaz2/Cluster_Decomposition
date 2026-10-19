@@ -8,7 +8,7 @@ from caps.cfl.elements.cfl_cluster import CFL_Cluster
 from caps.cfl.elements.client import Client
 from caps.cfl.elements.facility import Facility
 from caps.general.general_environment import General_Environment, Quadrant, Coord
-from utils.parallel import init_cfl, find_facilities_for_clients
+from caps.cfl.elements.cfl_parallel import init_cfl, find_facilities_for_clients
 from utils.read_instance import read_or_instance, read_tbed1_instance
 
 

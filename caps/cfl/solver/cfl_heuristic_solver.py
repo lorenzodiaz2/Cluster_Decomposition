@@ -50,7 +50,7 @@ class CFL_Heuristic_Solver(General_Solver, ABC):
         self.critical_resources = critical_resources
         if critical_resources:
             if not critical_resources.is_initially_feasible:
-                self.critical_resources.unassign_items()
+                self.critical_resources.release_units()
             self.fixed_cost_before = total_solution_cost(self.clients, self.facilities)
 
 
@@ -109,7 +109,7 @@ class CFL_Heuristic_Solver(General_Solver, ABC):
     def _handle_infeasibility(self):
         if self.critical_resources:
             self.critical_resources.increment_tol()
-            self.critical_resources.unassign_items()
+            self.critical_resources.release_units()
             self.fixed_cost_before = total_solution_cost(self.clients, self.facilities)
             return True
 

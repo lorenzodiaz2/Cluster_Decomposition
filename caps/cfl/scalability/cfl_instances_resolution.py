@@ -78,7 +78,7 @@ def solve_cfl_instances(root):
                 if critical_resources.is_initially_feasible:
                     print("Feasible da subito")
                 else:
-                    critical_resources.unassign_items()
+                    critical_resources.release_units()
                     repair_solver = SSCFL_Heuristic_Solver(env.G, env.elements, env.facilities, critical_resources)
                     repair_solver.solve()
                     print(f"final value = {total_solution_cost(env.elements, env.facilities, is_TB_instance)}   status = {repair_solver.status}")

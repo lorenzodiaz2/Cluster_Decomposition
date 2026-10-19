@@ -8,7 +8,7 @@ from caps.mcpa.elements.agent import Agent
 from caps.mcpa.elements.mcpa_cluster import MCPA_Cluster
 from caps.mcpa.elements.pair import OD_Pair
 from caps.mcpa.elements.path import Path
-from utils.parallel import init_mcpa, compute_paths_for_quadrant
+from caps.mcpa.elements.mcpa_parallel import init_mcpa, compute_paths_for_pairs
 from utils.instance_generators import sample_pair_uniform, make_hotspots, sample_pair_hotspot
 
 
@@ -80,7 +80,7 @@ class MCPA_Environment(General_Environment):
             initializer=init_mcpa,
             initargs=(self.G, self.k, self.sim_method),
         ) as pool:
-            results = pool.map(compute_paths_for_quadrant, tasks)
+            results = pool.map(compute_paths_for_pairs, tasks)
 
         self.elements = sorted(
             (pair for group in results for pair in group),

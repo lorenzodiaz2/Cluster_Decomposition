@@ -65,12 +65,21 @@ class MCPA_Critical_Resources(General_Critical_Resources):
 
 
     def _compute_score(self, candidate: Agent):
+        """
+        Ritorna una tupla confrontata in ordine lessicografico (vince la più grande):
+          1. score: max sulle alternative del residuo minimo lungo l'alternativa (+1 sui nodi condivisi con il path attuale)
+          2. numero di risorse critiche sul path attuale: rilasciarlo alleggerisce più violazioni insieme
+          3. -(aumento di ritardo) verso l'alternativa che determina lo score (a parità di residuo minimo, la più corta)
+          4. -id dell'agente: spareggio finale deterministico
+        """
         a_visits = tuple(candidate.path.visits)
         own = {(v, t) for t, v in enumerate(a_visits)}  # risorse che il candidato libererebbe
         alternatives = (visited_nodes for visited_nodes in self.paths_by_od[self.od_by_agent[candidate]] if visited_nodes != a_visits)
 
         score = float("-inf")
+        best_len = None
         for alternative in alternatives:
+            alt_len = len(alternative)
             _min = float("inf")
             for (v, t) in self.resources_by_path[alternative]:
                 occ = len(self.agents_per_resource.get((v, t), ()))
@@ -79,11 +88,15 @@ class MCPA_Critical_Resources(General_Critical_Resources):
                     res += 1
                 if res < _min:
                     _min = res
-                    if _min <= score:
+                    if _min < score or (_min == score and alt_len >= best_len):
                         break
-            if _min > score:
+            if _min > score or (_min == score and alt_len < best_len):
                 score = _min
-        return score
+                best_len = alt_len
+
+        n_critical = len(own & self.critical_resources)
+        delay_increase = best_len - len(a_visits) if best_len is not None else float("inf")
+        return score, n_critical, -delay_increase, -candidate.id
 
 
     def _get_candidates(self, resource):
@@ -110,17 +123,17 @@ class MCPA_Critical_Resources(General_Critical_Resources):
             if new_residual == self.capacities[v]:
                 self.residuals.pop(key, None)
 
-        self.removed_items.add(agent)
+        self.released_units.add(agent)
 
 
     def _update_residuals(self):
         self.residuals = {(v, t): (self.capacities[v] - len(agents)) for (v, t), agents in self.agents_per_resource.items()}
 
-    def _finalize_unassign(self):
-        fixed = set(self.agents) - self.removed_items
+    def _finalize_release(self):
+        fixed = set(self.agents) - self.released_units
         used_caps = defaultdict(int)
         for agent in fixed:
             for t, v in enumerate(agent.path.visits):
                 used_caps[v, t] += 1
         self.left_caps = {(v, t): self.G.nodes[v]["capacity"] - used_cap for (v, t), used_cap in used_caps.items()}
-        self.critical_od_pairs = set(od_pair for od_pair in self.elements if any(agent in self.removed_items for agent in od_pair.agents))
+        self.critical_od_pairs = set(od_pair for od_pair in self.elements if any(agent in self.released_units for agent in od_pair.agents))

@@ -20,12 +20,26 @@ Q_REDUCED = [4, 9]          # per gli sweep su M e k delle ablazioni
 
 OUT_A = "results/mcpa/campaign_A"
 OUT_B = "results/mcpa/campaign_B"
+OUT_TUNING = "results/mcpa/tuning"
+
+# ----- similarità -----
+# 1) con TUNING_DONE = False il Run esegue solo la taratura, stampa l'analisi e si ferma
+# 2) scelta la variante, impostare qui SIMILARITY e TUNING_DONE = True: il Run lancia le campagne vere
+TUNING_DONE = False
+SIMILARITY = dict(sim_weighting="exponential", sim_beta=1.0, resource_weights="linear")
+
+TUNING_VARIANTS = [dict(sim_weighting=w, sim_beta=b, resource_weights=r)
+                   for w, b in (("uniform", None), ("exponential", 0.5), ("exponential", 1.0))
+                   for r in ("uniform", "linear")]
+TUNING_REPLICAS = range(100, 103)   # indici di replica diversi da quelli delle campagne: istanze indipendenti
+TUNING_OFFSETS = [0, 1, 2, 3]
+TUNING_Q = [4, 6]
 
 
 def _quadrant_settings(q: int, offset: int, seed: int, **kw) -> MCPA_Instance_Settings:
     grid_side = 2 * BASE_GRID_SIDE if q <= 4 else 3 * BASE_GRID_SIDE
     params = dict(grid_side=grid_side, n_quadrants=q, n_pairs_per_quadrant=N_PAIRS_BASE, resources_capacity=5,
-                  offset=offset, seed=seed, max_cluster_size=M_STAR, k=K)
+                  offset=offset, seed=seed, max_cluster_size=M_STAR, k=K, **SIMILARITY)
     params.update(kw)
     return MCPA_Instance_Settings(**params)
 
@@ -69,7 +83,7 @@ def campaign_B() -> list[MCPA_Instance_Settings]:
     for grid_side, n_pairs in sizes:
         for s in SEEDS:
             base = dict(grid_side=grid_side, n_quadrants=1, n_pairs_per_quadrant=n_pairs, resources_capacity=5, offset=0,
-                        seed=s, max_cluster_size=M_STAR, k=K)
+                        seed=s, max_cluster_size=M_STAR, k=K, **SIMILARITY)
 
             # B1 lunghezza degli spostamenti x capacità omogenea/eterogenea: 3 x 2 x 2 dimensioni x 5 seed = 60
             for L in ({"L_min": 2, "L_max": 6}, {"L_min": 6, "L_max": 14}, {}):
@@ -95,6 +109,19 @@ def campaign_B() -> list[MCPA_Instance_Settings]:
     return _independent_seeds(settings)   # 200 istanze
 
 
+def campaign_tuning() -> list[MCPA_Instance_Settings]:
+    # istanze di taratura (tipo A1): 4 offset x 2 q x 3 repliche = 24, con la prima variante di similarità
+    return _independent_seeds([_quadrant_settings(q, o, r, **TUNING_VARIANTS[0])
+                               for q in TUNING_Q for o in TUNING_OFFSETS for r in TUNING_REPLICAS])
+
+
+def run_tuning(runner: MCPA_Runner):
+    instances = campaign_tuning()
+    runner.run_all(instances)                                                                   # 24 run con il globale
+    for variant in TUNING_VARIANTS[1:]:
+        runner.run_all([replace(st, **variant) for st in instances], run_global=False)         # 5 x 24 run solo euristica
+
+
 def run_ablations_A(runner: MCPA_Runner):
     # da lanciare dopo la campagna A, nella stessa cartella (servono i run di riferimento con il globale)
     base = campaign_A_base()
@@ -111,11 +138,20 @@ def run_ablations_A(runner: MCPA_Runner):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Campagne MCPA")
     # senza argomenti (es. pulsante Run di PyCharm) lancia A e B; rilanciando riprende dai run non ancora completati
-    parser.add_argument("campaign", nargs="*", default=["A", "B"], help="campagne da lanciare: A, B, ablations_A (default: A B)")
+    parser.add_argument("campaign", nargs="*", default=["A", "B"], help="campagne da lanciare: tuning, A, B, ablations_A (default: A B)")
     args = parser.parse_args()
-    invalid = [c for c in args.campaign if c not in ("A", "B", "ablations_A")]
+    invalid = [c for c in args.campaign if c not in ("tuning", "A", "B", "ablations_A")]
     if invalid:
-        parser.error(f"campagne non valide: {invalid} (scegliere tra A, B, ablations_A)")
+        parser.error(f"campagne non valide: {invalid} (scegliere tra tuning, A, B, ablations_A)")
+
+    # finché la taratura non è conclusa si esegue solo quella, poi ci si ferma per analizzarla
+    if not TUNING_DONE or "tuning" in args.campaign:
+        from caps.mcpa.scalability.mcpa_tuning_analysis import analyze_tuning
+        run_tuning(MCPA_Runner(OUT_TUNING, threads=THREADS))
+        analyze_tuning(OUT_TUNING)
+        print("\nTaratura conclusa: scegliere la variante, impostare SIMILARITY e TUNING_DONE = True in main.py "
+              "e rilanciare per eseguire le campagne.")
+        raise SystemExit(0)
 
     for campaign in args.campaign:
         if campaign == "A":

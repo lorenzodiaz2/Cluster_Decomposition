@@ -28,7 +28,7 @@ class MCPA_Heuristic_Solver(General_Solver):
         self.critical_resources = critical_resources
         if critical_resources:
             if not critical_resources.is_initially_feasible:
-                self.critical_resources.unassign_items()
+                self.critical_resources.release_units()
         self.G = G
         self.od_pairs = od_pairs
         self.A: list[Agent] = [a for od_pair in self.od_pairs for a in od_pair.agents]
@@ -38,10 +38,10 @@ class MCPA_Heuristic_Solver(General_Solver):
 
     def _handle_infeasibility(self):
         if self.critical_resources:
-            before = len(self.critical_resources.removed_items)
+            before = len(self.critical_resources.released_units)
             self.critical_resources.increment_tol()
-            self.critical_resources.unassign_items()
-            after = len(self.critical_resources.removed_items)
+            self.critical_resources.release_units()
+            after = len(self.critical_resources.released_units)
         else:
             before = sum(len(od.all_paths) for od in self.od_pairs)
             for od_pair in self.od_pairs:
@@ -74,7 +74,7 @@ class MCPA_Heuristic_Solver(General_Solver):
 
     def _set_constraints(self):
         if self.critical_resources:
-            self.m.addConstrs(gp.quicksum(self.x[od_pair.id, j] for j in self.K[od_pair]) == sum(1 for a in od_pair.agents if a in self.critical_resources.removed_items) for od_pair in self.critical_resources.critical_od_pairs)
+            self.m.addConstrs(gp.quicksum(self.x[od_pair.id, j] for j in self.K[od_pair]) == sum(1 for a in od_pair.agents if a in self.critical_resources.released_units) for od_pair in self.critical_resources.critical_od_pairs)
             self.m.addConstrs(gp.quicksum(self.x[od_pair.id, j] for (od_pair, j) in self.E[v, t]) <= self.critical_resources.left_caps.get((v, t), self.G.nodes[v]["capacity"]) for (v, t) in self.E.keys())
         else:
             self.m.addConstrs(gp.quicksum(self.x[od_pair.id, j] for j in self.K[od_pair]) == len(od_pair.agents) for od_pair in self.od_pairs)
@@ -84,7 +84,7 @@ class MCPA_Heuristic_Solver(General_Solver):
 
     def _assign_solutions(self):
         if self.status == "OPTIMAL" and self.m.SolCount > 0:
-            not_assigned_agents = {od_pair.id: [a for a in od_pair.agents] for od_pair in self.od_pairs} if not self.critical_resources else {od_pair.id: [a for a in od_pair.agents if a in self.critical_resources.removed_items] for od_pair in self.critical_resources.critical_od_pairs}
+            not_assigned_agents = {od_pair.id: [a for a in od_pair.agents] for od_pair in self.od_pairs} if not self.critical_resources else {od_pair.id: [a for a in od_pair.agents if a in self.critical_resources.released_units] for od_pair in self.critical_resources.critical_od_pairs}
             for (od_pair, j), p in self.P.items():
                 n_agents = round(self.x[od_pair.id, j].X)
                 if n_agents > 0:

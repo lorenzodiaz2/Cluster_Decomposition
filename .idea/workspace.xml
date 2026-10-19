@@ -4,7 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="Minor refactors" />
+    <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="Minor refactor">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/cfl/elements/cfl_environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/elements/cfl_environment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/cfl/scalability/cfl_instances_resolution.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/scalability/cfl_instances_resolution.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/cfl/scalability/cfl_scalability_resolution.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/scalability/cfl_scalability_resolution.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/cfl/solver/cfl_critical_resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/solver/cfl_critical_resources.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/cfl/solver/cfl_heuristic_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/solver/cfl_heuristic_solver.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/cfl/solver/multi_source/mscfl_critical_resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/solver/multi_source/mscfl_critical_resources.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/cfl/solver/single_source/sscfl_critical_resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/solver/single_source/sscfl_critical_resources.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/general/general_critical_resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/general/general_critical_resources.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/general/general_environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/general/general_environment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/general/general_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/general/general_solver.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/mcpa/elements/mcpa_environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/mcpa/elements/mcpa_environment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/mcpa/scalability/mcpa_runner.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/mcpa/scalability/mcpa_runner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/mcpa/scalability/mcpa_scalability_resolution.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/mcpa/scalability/mcpa_scalability_resolution.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/mcpa/solver/mcpa_critical_resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/mcpa/solver/mcpa_critical_resources.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/caps/mcpa/solver/mcpa_heuristic_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/mcpa/solver/mcpa_heuristic_solver.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clustering/nj/nj_torch.py" beforeDir="false" afterPath="$PROJECT_DIR$/clustering/nj/nj_torch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clustering/nj/tree_partition.py" beforeDir="false" afterPath="$PROJECT_DIR$/clustering/nj/tree_partition.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clustering/random/random_partition.py" beforeDir="false" afterPath="$PROJECT_DIR$/clustering/random/random_partition.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/parallel.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/parallel.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -121,7 +143,9 @@
       <workItem from="1792229995393" duration="3585000" />
       <workItem from="1792240534560" duration="3462000" />
       <workItem from="1792246191313" duration="3060000" />
-      <workItem from="1792255341904" duration="1027000" />
+      <workItem from="1792255341904" duration="1310000" />
+      <workItem from="1792322197714" duration="140000" />
+      <workItem from="1792446119249" duration="7061000" />
     </task>
     <task id="LOCAL-00001" summary="Major code refactor and new results">
       <option name="closed" value="true" />
@@ -139,7 +163,15 @@
       <option name="project" value="LOCAL" />
       <updated>1792256118271</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Minor refactor">
+      <option name="closed" value="true" />
+      <created>1792256399497</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1792256399497</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -159,7 +191,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Major code refactor and new results" />
     <MESSAGE value="Minor refactors" />
-    <option name="LAST_COMMIT_MESSAGE" value="Minor refactors" />
+    <MESSAGE value="Minor refactor" />
+    <option name="LAST_COMMIT_MESSAGE" value="Minor refactor" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$test_isa.coverage" NAME="test_isa Coverage Results" MODIFIED="1792159456329" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/isa/IsaInterface" />

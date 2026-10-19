@@ -47,7 +47,7 @@ class General_Solver(ABC):
     def _set_model(self):
         start = time.perf_counter()
 
-        self.m = gp.Model("heuristic")
+        self.m = gp.Model("model")
         self.m.Params.OutputFlag = self.output_flag
 
         self._set_variables()

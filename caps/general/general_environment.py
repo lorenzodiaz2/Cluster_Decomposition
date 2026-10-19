@@ -51,7 +51,7 @@ class General_Environment(ABC):
         self.similarity_matrix = None
         self.set_time = None
         self.matrix_time = None
-        self.nj_time = None
+        self.partition_time = None
         self.seed = seed if reproducibility_flag else None
         self.rng = random.Random(self.seed)
         self.partitioner = partitioner                   # "nj" oppure "random"
@@ -78,7 +78,7 @@ class General_Environment(ABC):
         self.global_congestion_ratio_max = None          # il peggior collo di bottiglia dell’intera istanza
 
         self.cross_congestion_index_absolute = None      # quanta congestione nasce solo perché cluster diversi condividono le stesse risorse
-        self.cross_congestion_rate = None                # quanta congestione inter-cluster c’è per agente (o altra cosa se per altri problemi)
+        self.cross_congestion_rate = None                # quanta congestione inter-cluster c’è per unità di massa (somma dei pesi delle entità)
         self.cross_congestion_share = None               # di tutta la congestione che c’è nel completo, quanta è colpa dell’interazione tra cluster
 
         self._cluster_elements_index = None
@@ -244,7 +244,7 @@ class General_Environment(ABC):
 
         self._build_clusters(tree)
 
-        self.nj_time = time.perf_counter() - start
+        self.partition_time = time.perf_counter() - start
         self._compute_congestion_indexes()
         self._compute_similarity_index()
         self._compute_max_mean_intercluster_similarity()

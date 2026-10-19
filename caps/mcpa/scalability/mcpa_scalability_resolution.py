@@ -144,16 +144,16 @@ def save_results(
     resolution_times_repair = None
     final_tolerance = None
 
-    time_heuristic = env.matrix_time + env.nj_time + sum(sum(hs.model_times) for hs in env.clusters_solvers) + sum(sum(hs.resolution_times) for hs in env.clusters_solvers)
+    time_heuristic = env.matrix_time + env.partition_time + sum(sum(hs.model_times) for hs in env.clusters_solvers) + sum(sum(hs.resolution_times) for hs in env.clusters_solvers)
     if critical_resources is not None:
         time_heuristic += sum(critical_resources.creation_times)
         if repair_solver is not None:
-            unassigned_agents = critical_resources.unassigned_items_per_tol if not critical_resources.is_initially_feasible else [0]
+            unassigned_agents = critical_resources.released_units_per_tol if not critical_resources.is_initially_feasible else [0]
             final_unassigned_agents = unassigned_agents[-1]
             model_times_repair = repair_solver.model_times
             resolution_times_repair = repair_solver.resolution_times
             final_tolerance = critical_resources.current_tol
-            time_heuristic += sum(critical_resources.unassigning_times) + sum(repair_solver.model_times) + sum(repair_solver.resolution_times)
+            time_heuristic += sum(critical_resources.release_times) + sum(repair_solver.model_times) + sum(repair_solver.resolution_times)
 
             LB_heuristic, UB_heuristic = compute_heuristic_bounds(env, critical_resources, repair_solver)
 
@@ -258,7 +258,7 @@ def compute_heuristic_bounds(
     except Exception:
         return None, None
 
-    removed_agents = set(critical_resources.removed_items)
+    removed_agents = set(critical_resources.released_units)
     fixed_delay = sum(a.delay for a in env.agents if a not in removed_agents)
 
     LB = fixed_delay + repair_lb

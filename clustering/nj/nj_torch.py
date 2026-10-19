@@ -4,23 +4,23 @@ from matplotlib import pyplot as plt
 
 
 class Node:
-    def __init__(self, idx, is_leaf=False, is_cherry=False, n_agents=0):
+    def __init__(self, idx, is_leaf=False, is_cherry=False, mass=0):
         self.id = idx
         self.is_leaf = is_leaf
         self.is_cherry = is_cherry
         self.adj_nodes = []
-        self.n_agents = n_agents
+        self.mass = mass
         self.cluster = [self.id] if is_leaf else []
 
-    # Serve per sapere quanti agenti avrebbe un cluster se accettassi questo nodo come cluster
-    def compute_n_agents(self):
-        n_agents = 0
+    # massa (somma dei pesi) che avrebbe il cluster se accettassi questo nodo come cluster
+    def compute_mass(self):
+        mass = 0
         for adj_node in self.adj_nodes:
-            n_agents += adj_node.n_agents
-        return n_agents
+            mass += adj_node.mass
+        return mass
 
-    def merge(self, n_agents):
-        self.n_agents += n_agents
+    def merge(self, mass):
+        self.mass += mass
         for adj_node in self.adj_nodes:
             if adj_node.is_leaf:
                 self.cluster += adj_node.cluster
@@ -38,15 +38,15 @@ class Node:
 
 
 class NjTree:
-    def __init__(self, similarity_matrix, n_agents, max_cluster_size):
+    def __init__(self, similarity_matrix, weights, max_cluster_size):
         self.d = similarity_matrix
         self.n_taxa = similarity_matrix.shape[0]
         self.max_cluster_size = max_cluster_size
         self.cherries = []
         self.n_nodes = 2 * self.n_taxa - 2
-        self.n_agents = n_agents
+        self.weights = weights
 
-        self.nodes = ([Node(i, is_leaf=True, n_agents=self.n_agents[i]) for i in range(self.n_taxa)] +
+        self.nodes = ([Node(i, is_leaf=True, mass=self.weights[i]) for i in range(self.n_taxa)] +
                       [Node(j) for j in range(self.n_taxa, self.n_nodes)])
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 

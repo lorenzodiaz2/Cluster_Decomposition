@@ -130,12 +130,24 @@ def _changed_horizons(env: MCPA_Environment, reference_T: dict[int, int]) -> dic
     return {od.id: od.T for od in env.elements if od.T != reference_T[od.id]}
 
 
-def _apply_horizons(env: MCPA_Environment, horizons: dict) -> None:
+def _apply_horizons(env: MCPA_Environment, horizons: dict, refresh_footprints: bool = False) -> None:
     od_by_id = {od.id: od for od in env.elements}
     for od_id, T in horizons.items():
         od = od_by_id[int(od_id)]
         od.delay_shortest_paths(T)
         od.T = T
+    if refresh_footprints:
+        _refresh_footprints(env, horizons.keys())
+
+
+def _refresh_footprints(env: MCPA_Environment, od_ids) -> None:
+    # dopo un'estensione di T l'impronta (visit_counts) va ricalcolata sulle opzioni nuove, prima del clustering:
+    # da lei dipendono similarità, pesi delle risorse e indicatori di congestione
+    ids = {int(i) for i in od_ids}
+    weighting, beta = env.sim_method
+    for od in env.elements:
+        if od.id in ids:
+            od.build_visits_count(weighting, beta)
 
 
 def _check_feasibility(env: MCPA_Environment) -> tuple[int, int]:
@@ -181,7 +193,7 @@ def load_instance(instance_path: str, settings: MCPA_Instance_Settings | None = 
         raise ValueError(f"L'istanza rigenerata non coincide con quella salvata ({instance_path}): il generatore è cambiato?")
 
     if stage == "global":
-        _apply_horizons(env, data["T_after_global"])
+        _apply_horizons(env, data["T_after_global"], refresh_footprints=True)
     elif stage != "initial":
         raise ValueError(f"stage '{stage}' non supportato")
 
@@ -263,7 +275,9 @@ class MCPA_Runner:
                     row["global_error"] = traceback.format_exc(limit=3).strip().splitlines()[-1]
                 row.update(self._global_columns(global_solver))
                 incumbent_rows = self._incumbent_rows(run_id, global_solver)
-                data_to_save = self._instance_data(settings, env, _changed_horizons(env, initial_T))
+                T_after_global = _changed_horizons(env, initial_T)
+                _refresh_footprints(env, T_after_global)
+                data_to_save = self._instance_data(settings, env, T_after_global)
             else:
                 reference = self.global_references.get(instance_id)
                 if reference is None:
@@ -380,7 +394,7 @@ class MCPA_Runner:
     def _clustering_columns(env: MCPA_Environment) -> dict:
         cols = {
             "similarity_matrix_time": env.matrix_time,
-            "partition_time": env.nj_time,
+            "partition_time": env.partition_time,
             "n_clusters": len(env.clusters),
             "n_paths_heuristic": sum(len(od.all_paths) for od in env.elements),
             "min_cluster_similarity_index": min(env.cluster_similarity_indexes) if env.cluster_similarity_indexes else None,
@@ -432,12 +446,12 @@ class MCPA_Runner:
             "heuristic_violated_resources": None,
             "heuristic_feasible": False,
         }
-        time_heuristic = env.matrix_time + env.nj_time + cluster_time
+        time_heuristic = env.matrix_time + env.partition_time + cluster_time
 
         if critical_resources is not None:
             cols["merge_feasible"] = critical_resources.is_initially_feasible
             cols["initial_critical_resources"] = critical_resources.critical_resources_per_tol[0]
-            cols["critical_resources_time"] = sum(critical_resources.creation_times) + sum(critical_resources.unassigning_times)
+            cols["critical_resources_time"] = sum(critical_resources.creation_times) + sum(critical_resources.release_times)
             time_heuristic += cols["critical_resources_time"]
 
             if repair_solver is None:
@@ -448,12 +462,12 @@ class MCPA_Runner:
                 cols["repair_n_resolutions"] = len(repair_solver.resolution_times)
                 cols["repair_time"] = sum(repair_solver.model_times) + sum(repair_solver.resolution_times)
                 cols["final_tolerance"] = critical_resources.current_tol
-                cols["released_agents"] = len(critical_resources.removed_items)
+                cols["released_agents"] = len(critical_resources.released_units)
                 time_heuristic += cols["repair_time"]
 
                 repair_ub, repair_lb = _attr(repair_solver.m, "ObjVal"), _attr(repair_solver.m, "ObjBound")
                 if repair_ub is not None:
-                    removed = set(critical_resources.removed_items)
+                    removed = set(critical_resources.released_units)
                     fixed_delay = sum(a.delay for a in env.agents if a not in removed)
                     cols["heuristic_UB"] = fixed_delay + repair_ub
                     cols["heuristic_LB"] = fixed_delay + repair_lb

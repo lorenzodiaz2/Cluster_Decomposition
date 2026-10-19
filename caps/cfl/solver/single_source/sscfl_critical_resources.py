@@ -44,7 +44,7 @@ class SSCFL_Critical_Resources(CFL_Critical_Resources):
         # 3) bookkeeping
         prev_removed = self.removed_units_by_client.get(cid, 0)
         self.removed_units_by_client[cid] = max(prev_removed, int(q))
-        self.removed_items.add(cid)
+        self.released_units.add(cid)
         self.critical_clients.add(candidate)
 
         # print(f"removed client {cid} with demand removed = {self.removed_units_by_client[cid]}")

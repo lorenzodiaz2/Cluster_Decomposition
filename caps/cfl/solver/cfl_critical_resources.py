@@ -60,9 +60,9 @@ class CFL_Critical_Resources(General_Critical_Resources, ABC):
     def _update_residuals(self):
         self.residuals = self._compute_residuals()
 
-    def _finalize_unassign(self):
+    def _finalize_release(self):
         self.left_caps = {fid: max(0, r) for fid, r in self.residuals.items()}
-        self.critical_clients = {self.client_by_id[cid] for cid in self.removed_items}
+        self.critical_clients = {self.client_by_id[cid] for cid in self.released_units}
 
 
     def _post_residual_update(self, fid: int, new_residual: float) -> None:

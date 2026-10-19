@@ -22,7 +22,7 @@ class General_Critical_Resources(ABC):
         self.scores = {}
 
         self.left_caps = None
-        self.removed_items = set()
+        self.released_units = set()
 
         self._heap = []
         self._build_heap()
@@ -30,14 +30,14 @@ class General_Critical_Resources(ABC):
 
         # solo per logging
         self.creation_times = [time.perf_counter() - start]
-        self.unassigning_times = []
+        self.release_times = []
         self.starting_tol = 0
-        self.unassigned_items_per_tol = []
+        self.released_units_per_tol = []
         self.critical_resources_per_tol = [len(self.critical_resources)]
 
 
 
-    def unassign_items(self):
+    def release_units(self):
         start = time.perf_counter()
         while self.critical_resources:
             worst_resource = self._pop_worst()
@@ -58,9 +58,9 @@ class General_Critical_Resources(ABC):
 
             self._recompute(max(self.scores, key=self.scores.get))
 
-        self._finalize_unassign()
-        self.unassigning_times.append(time.perf_counter() - start)
-        self.unassigned_items_per_tol.append(len(self.removed_items))
+        self._finalize_release()
+        self.release_times.append(time.perf_counter() - start)
+        self.released_units_per_tol.append(len(self.released_units))
 
 
     def _assign_scores(self, candidates):
@@ -129,7 +129,7 @@ class General_Critical_Resources(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def _finalize_unassign(self):
+    def _finalize_release(self):
         raise NotImplementedError
 
     @abstractmethod

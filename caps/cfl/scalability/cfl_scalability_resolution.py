@@ -181,16 +181,16 @@ def save_results(
     total_cost = total_solution_cost(env.elements, env.facilities)
 
 
-    time_heuristic = env.matrix_time + env.nj_time + sum(sum(hs.model_times) for hs in env.clusters_solvers) + sum(sum(hs.resolution_times) for hs in env.clusters_solvers)
+    time_heuristic = env.matrix_time + env.partition_time + sum(sum(hs.model_times) for hs in env.clusters_solvers) + sum(sum(hs.resolution_times) for hs in env.clusters_solvers)
     if critical_resources is not None:
         time_heuristic += sum(critical_resources.creation_times)
         if repair_solver is not None:
-            unassigned_items = critical_resources.unassigned_items_per_tol if not critical_resources.is_initially_feasible else [0]
+            unassigned_items = critical_resources.released_units_per_tol if not critical_resources.is_initially_feasible else [0]
             final_unassigned_items = unassigned_items[-1]
             model_times_repair = repair_solver.model_times
             resolution_times_repair = repair_solver.resolution_times
             final_tolerance = critical_resources.current_tol
-            time_heuristic += sum(critical_resources.unassigning_times) + sum(repair_solver.model_times) + sum(repair_solver.resolution_times)
+            time_heuristic += sum(critical_resources.release_times) + sum(repair_solver.model_times) + sum(repair_solver.resolution_times)
 
             try:
                 UB_heuristic = repair_solver.fixed_cost_before + repair_solver.m.ObjVal

@@ -3,12 +3,12 @@ from clustering.nj.nj_torch import NjTree, Node
 
 class TreePartition(NjTree):
 
-    def __init__(self, similarity_matrix, n_agents, max_cluster_size):
-        super().__init__(similarity_matrix, n_agents, max_cluster_size)
+    def __init__(self, similarity_matrix, weights, max_cluster_size):
+        super().__init__(similarity_matrix, weights, max_cluster_size)
 
 
     def get_min_cherry(self):
-        return min(self.cherries, key=lambda ch: ch.compute_n_agents())
+        return min(self.cherries, key=lambda ch: ch.compute_mass())
 
     def update_and_prune_leaves(self, cherry):
 
@@ -57,9 +57,9 @@ class TreePartition(NjTree):
         while self.n_nodes >= 5:
 
             cherry: Node = self.get_min_cherry()
-            n_agents = cherry.compute_n_agents()
-            if n_agents <= self.max_cluster_size:
-                cherry.merge(n_agents)
+            mass = cherry.compute_mass()
+            if mass <= self.max_cluster_size:
+                cherry.merge(mass)
                 self.cherries.remove(cherry)
                 self.update_and_prune_leaves(cherry)
                 parent = cherry.get_parent()
@@ -74,35 +74,34 @@ class TreePartition(NjTree):
             # self.draw()
 
         self.last_step(self.root)
-        self.clusters = sorted(self.clusters, key=lambda x: x.n_agents, reverse=True)
+        self.clusters = sorted(self.clusters, key=lambda x: x.mass, reverse=True)
 
-        # clusters_list = [Cluster(idx, [pair for pair in self.od_pairs if pair.id in cluster_node.cluster]) for idx, cluster_node in enumerate(self.clusters)]
 
 
 
     def last_step(self, root: Node):
-        nodes = sorted(root.adj_nodes, key=lambda node: node.n_agents)
+        nodes = sorted(root.adj_nodes, key=lambda node: node.mass)
         if len(nodes) == 3:
-            n_agents = nodes[0].n_agents + nodes[1].n_agents
+            mass = nodes[0].mass + nodes[1].mass
 
-            if n_agents <= self.max_cluster_size:
+            if mass <= self.max_cluster_size:
                 self.clusters.remove(nodes[0])
                 self.clusters.remove(nodes[1])
-                root.n_agents = n_agents
+                root.mass = mass
                 root.cluster += nodes[0].cluster + nodes[1].cluster
                 self.clusters.append(root)
 
                 if len(nodes) > 2:
-                    n_agents = root.n_agents + nodes[2].n_agents
-                    if n_agents < self.max_cluster_size:
-                        root.n_agents = n_agents
+                    mass = root.mass + nodes[2].mass
+                    if mass < self.max_cluster_size:
+                        root.mass = mass
                         root.cluster += nodes[2].cluster
                         self.clusters.remove(nodes[2])  ############################
         else:
-            n_agents = root.n_agents + nodes[0].n_agents
-            if n_agents < self.max_cluster_size:
+            mass = root.mass + nodes[0].mass
+            if mass < self.max_cluster_size:
                 self.clusters.remove(nodes[0])
                 self.clusters.remove(root)
-                root.n_agents = n_agents
+                root.mass = mass
                 root.cluster += nodes[0].cluster
                 self.clusters.append(root)

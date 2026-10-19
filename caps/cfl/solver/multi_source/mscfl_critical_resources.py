@@ -49,7 +49,7 @@ class MSCFL_Critical_Resources(CFL_Critical_Resources):
 
         # 3) bookkeeping
         self.removed_units_by_client[cid] += delta
-        self.removed_items.add(cid)
+        self.released_units.add(cid)
         self.critical_clients.add(candidate)
 
         # 4) update the residual by the amount actually released
