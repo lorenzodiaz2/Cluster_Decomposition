@@ -39,7 +39,8 @@ class MCPA_Heuristic_Solver(General_Solver):
     def _handle_infeasibility(self):
         if self.critical_resources:
             before = len(self.critical_resources.released_units)
-            self.critical_resources.increment_tol()
+            if not self.critical_resources.increment_tol():   # niente più da rilasciare: la repair si ferma
+                return False
             self.critical_resources.release_units()
             after = len(self.critical_resources.released_units)
         else:

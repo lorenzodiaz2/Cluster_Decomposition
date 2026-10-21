@@ -53,6 +53,21 @@ def sample_pair_hotspot(nodes: list[Coord], node_set: set[Coord], rng, centers: 
             return src, dst
 
 
+# ----- generatori di singole posizioni (es. clienti CFL) -----
+
+
+def sample_point_hotspot(nodes: list[Coord], node_set: set[Coord], rng, centers: list[Coord], weights: list[float],
+                         sigma: float, noise: float) -> Coord:
+    """
+    Con probabilità noise un nodo uniforme; altrimenti si sceglie un hotspot (in base al peso) e si estrae un nodo
+    da una gaussiana discretizzata di deviazione sigma attorno al centro.
+    """
+    if rng.random() < noise:
+        return rng.choice(nodes)
+    center = rng.choices(centers, weights=weights)[0]
+    return _gaussian_node(center, sigma, rng, node_set)
+
+
 def _gaussian_node(center: Coord, sigma: float, rng, node_set: set[Coord]) -> Coord:
     while True:
         v = (round(rng.gauss(center[0], sigma)), round(rng.gauss(center[1], sigma)))

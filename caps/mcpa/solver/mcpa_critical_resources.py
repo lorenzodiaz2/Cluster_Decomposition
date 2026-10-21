@@ -45,19 +45,19 @@ class MCPA_Critical_Resources(General_Critical_Resources):
             for a in od.agents:
                 self.od_by_agent[a] = od
 
-        if not self.violated_resources:
-            self.violated_od_pairs = set()
-            return None
-
         self.violated_od_pairs = {
             self.od_by_agent[a]
             for vr in self.violated_resources
             for a in self.agents_per_resource.get(vr, ())
         }
+        # coppie OD coinvolte: quelle in violazione e quelle con agenti già rilasciati (le risorse rilevanti si allargano)
+        involved = self.violated_od_pairs | {self.od_by_agent[a] for a in self.released_units}
+        if not involved:
+            return None
 
         rel = {
             r
-            for od in self.violated_od_pairs
+            for od in involved
             for path_visits in self.paths_by_od[od]
             for r in self.resources_by_path[path_visits]
         }

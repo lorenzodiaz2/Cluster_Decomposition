@@ -22,6 +22,10 @@ class SSCFL_Heuristic_Solver(CFL_Heuristic_Solver):
 
 
 
+    def _is_repair_candidate(self, client: Client, fid: int) -> bool:
+        # single source: il cliente va servito per intero da una sola facility, quindi serve capacità residua >= domanda rilasciata
+        return self.critical_resources.left_caps.get(fid, 0) >= self.repair_demand[client.id]
+
     def _set_variables(self):
         super()._set_variables()
 

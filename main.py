@@ -4,6 +4,7 @@ import json
 from dataclasses import replace
 
 from caps.mcpa.scalability.mcpa_runner import MCPA_Runner, MCPA_Instance_Settings
+from caps.mcpa.scalability.mcpa_stress_test import run_mcpa_stress_test
 
 
 # ----- parametri fissi (dallo stress test) -----
@@ -21,6 +22,12 @@ Q_REDUCED = [4, 9]          # per gli sweep su M e k delle ablazioni
 OUT_A = "results/mcpa/campaign_A"
 OUT_B = "results/mcpa/campaign_B"
 OUT_TUNING = "results/mcpa/tuning"
+OUT_STRESS = "results/mcpa/stress_test_c3"
+
+# ----- stress test (c = 3, la capacità più stretta della campagna) -----
+# con STRESS_DONE = False il Run esegue solo lo stress test e si ferma; scelto M* dai grafici, aggiornare N_PAIRS_BASE / M_STAR
+# e impostare STRESS_DONE = True
+STRESS_DONE = False
 
 # ----- similarità -----
 # 1) con TUNING_DONE = False il Run esegue solo la taratura, stampa l'analisi e si ferma
@@ -143,6 +150,13 @@ if __name__ == '__main__':
     invalid = [c for c in args.campaign if c not in ("tuning", "A", "B", "ablations_A")]
     if invalid:
         parser.error(f"campagne non valide: {invalid} (scegliere tra tuning, A, B, ablations_A)")
+
+    # prima di tutto lo stress test per M*: alla fine ci si ferma per scegliere M* dai grafici
+    if not STRESS_DONE:
+        run_mcpa_stress_test(OUT_STRESS, resources_capacity=3, grid_side=BASE_GRID_SIDE, k=K, threads=THREADS)
+        print("\nStress test concluso: scegliere M* dai grafici, aggiornare N_PAIRS_BASE e M_STAR, impostare STRESS_DONE = True "
+              "in main.py e rilanciare.")
+        raise SystemExit(0)
 
     # finché la taratura non è conclusa si esegue solo quella, poi ci si ferma per analizzarla
     if not TUNING_DONE or "tuning" in args.campaign:

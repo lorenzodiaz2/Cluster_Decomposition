@@ -9,6 +9,7 @@ from caps.cfl.elements.client import Client
 from caps.cfl.elements.facility import Facility
 from caps.general.general_environment import General_Environment, Quadrant, Coord
 from caps.cfl.elements.cfl_parallel import init_cfl, find_facilities_for_clients
+from utils.instance_generators import make_hotspots, sample_point_hotspot
 from utils.read_instance import read_or_instance, read_tbed1_instance
 
 
@@ -32,7 +33,12 @@ class CFL_Environment(General_Environment):
         instance_file: str | None = None,
         partitioner: str = "nj",
         family: str = "quadrants",
-        family_params: dict | None = None
+        family_params: dict | None = None,
+        generator: str = "legacy",
+        capacity_ratio: float = 3.0,
+        opening_cost_scale: float = 1.0,
+        demand_range: tuple[int, int] = (5, 35),
+        capacity_range: tuple[float, float] = (10, 160)
     ):
         super().__init__(grid_side, max_cluster_size, n_quadrants, n_clients_per_quadrant, resources_capacities, offset, k,
                          reproducibility_flag, remove_rnd_nodes_flag, remove_percentage, seed, sim_method, resource_weights, instance_file,
@@ -45,10 +51,32 @@ class CFL_Environment(General_Environment):
         self.facilities = []
         self.quadrant_by_facility_id: dict[int, Quadrant] = {}
 
+        # "legacy": domanda 20, capacità resources_capacities e costo di apertura 1000 uguali per tutti (istanze della tesi)
+        # "cornuejols": generatore di Cornuéjols, Sridharan e Thizy (1991) -> domande, capacità e costi eterogenei
+        if generator not in ("legacy", "cornuejols"):
+            raise ValueError(f"generator '{generator}' non supportato")
+        self.generator = generator
+        self.capacity_ratio = capacity_ratio            # r = capacità totale / domanda totale, imposto in ogni quadrante
+        self.opening_cost_scale = opening_cost_scale    # moltiplicatore dei costi di apertura (da tarare)
+        self.demand_range = demand_range
+        self.capacity_range = capacity_range
+        self._opening_cost_draws: dict[int, tuple[float, float]] = {}
+
         self._set_environment()
 
 
     def _choose_elements(self):
+        # famiglie: "quadrants" (come prima), "uniform" (clienti e facility uniformi su tutta la griglia),
+        # "hotspots" (clienti attorno a hotspot, facility uniformi); per le ultime due serve un solo quadrante = tutta la griglia
+        if self.family not in ("quadrants", "uniform", "hotspots"):
+            raise ValueError(f"family '{self.family}' non supportata")
+        if self.family != "quadrants" and self.n_quadrants != 1:
+            raise ValueError(f"la famiglia '{self.family}' richiede n_quadrants = 1")
+        if self.family == "hotspots":
+            self._nodes = list(self.G.nodes)
+            self._node_set = set(self._nodes)
+            self._hotspot_centers, self._hotspot_weights = make_hotspots(self._nodes, self.rng_clients, self.family_params["n_hotspots"])
+
         seen_positions: set[tuple[int, int]] = set()
         if self.n_elements_per_quadrant:
             self._spawn_in_quadrants(
@@ -73,6 +101,9 @@ class CFL_Environment(General_Environment):
                 seen=seen_positions
             )
 
+        if self.generator == "cornuejols":
+            self._apply_cornuejols()   # prima della ricerca delle facility più vicine, che usa le capacità
+
         self._start_parallel()
         weighting, beta = self.sim_method if self.sim_method else ("uniform", None)
         for client in self.elements:
@@ -80,16 +111,52 @@ class CFL_Environment(General_Environment):
 
 
     def _make_client(self, quadrant: Quadrant, id_client: int) -> Client:
-        pos = self._choose_position(quadrant, self.rng_clients)
-        demand = 20
+        if self.family == "hotspots":
+            pos = sample_point_hotspot(self._nodes, self._node_set, self.rng_clients, self._hotspot_centers, self._hotspot_weights,
+                                       self.family_params["sigma"], self.family_params.get("noise", 0.0))
+        else:
+            pos = self._choose_position(quadrant, self.rng_clients)   # con un solo quadrante: uniforme su tutta la griglia
+        if self.generator == "cornuejols":
+            demand = self.rng_clients.randint(*self.demand_range)
+        else:
+            demand = 20
         return Client(id_client, pos, demand)
 
 
     def _make_facility(self, quadrant: Quadrant, id_fac: int, cap: int | None = 0) -> Facility:
         pos = self._choose_position(quadrant, self.rng_facilities)
-        capacity = cap
-        opening_cost = 1000
+        if self.generator == "cornuejols":
+            # capacità grezza (riscalata dopo in _apply_cornuejols) e le due estrazioni del costo di apertura
+            capacity = self.rng_facilities.uniform(*self.capacity_range)
+            self._opening_cost_draws[id_fac] = (self.rng_facilities.uniform(0, 90), self.rng_facilities.uniform(100, 110))
+            opening_cost = 0
+        else:
+            capacity = cap
+            opening_cost = 1000
         return Facility(id_fac, pos, capacity, opening_cost)
+
+
+    def _apply_cornuejols(self):
+        """
+        Riscala le capacità in modo che in ogni quadrante capacità totale / domanda totale = capacity_ratio (capacità intere, almeno 1),
+        poi calcola i costi di apertura f_j = (U[0, 90] + U[100, 110] * sqrt(s_j)) * opening_cost_scale, arrotondati a intero.
+        """
+        demand_by_quadrant = defaultdict(float)
+        for c in self.elements:
+            demand_by_quadrant[self.quadrant_by_element_id[c.id]] += c.demand
+
+        facilities_by_quadrant = defaultdict(list)
+        for f in self.facilities:
+            facilities_by_quadrant[self.quadrant_by_facility_id[f.id]].append(f)
+
+        for q, facs in facilities_by_quadrant.items():
+            raw_total = sum(f.capacity for f in facs)
+            target = self.capacity_ratio * demand_by_quadrant.get(q, 0.0)
+            factor = target / raw_total if raw_total > 0 else 0.0
+            for f in facs:
+                f.capacity = max(1, round(f.capacity * factor))
+                a, b = self._opening_cost_draws[f.id]
+                f.activation_cost = round((a + b * math.sqrt(f.capacity)) * self.opening_cost_scale)
 
     def _choose_position(self, quadrant: Quadrant, rng: random.Random) -> Coord:
         top, left = quadrant[0]
@@ -109,6 +176,11 @@ class CFL_Environment(General_Environment):
             client_by_quadrant[q].append(c)
 
         tasks = list(client_by_quadrant.values())
+        # con pochi quadranti (es. famiglie senza quadranti) divido comunque il lavoro tra i processi
+        if len(tasks) < mp.cpu_count():
+            all_clients = [c for task in tasks for c in task]
+            n_chunks = min(mp.cpu_count(), len(all_clients))
+            tasks = [all_clients[i::n_chunks] for i in range(n_chunks)]
 
         with mp.Pool(
             processes=mp.cpu_count(),

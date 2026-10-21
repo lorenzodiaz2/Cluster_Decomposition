@@ -63,24 +63,28 @@ class CFL_Heuristic_Solver(General_Solver, ABC):
         self.repair_demand: dict[int, int] = {}
 
     def _set_variables(self):
+        E = defaultdict(list)
         if self.critical_resources:
             self.repair_clients = [c for c in self.clients if self.critical_resources.removed_units_by_client.get(c.id, 0) > 0]
             self.repair_demand = {c.id: self.critical_resources.removed_units_by_client[c.id] for c in self.repair_clients}
-            active_clients = self.repair_clients
-            cand_fac_ids = {f.id for c in active_clients for f in c.k_facilities if self.critical_resources.left_caps.get(f.id, 0) > 0}
+            for c in self.repair_clients:
+                for f in c.k_facilities:
+                    if self._is_repair_candidate(c, f.id):
+                        E[f.id].append(c.id)
         else:
-            active_clients = self.clients
-            cand_fac_ids = {f.id for f in self.facilities}
-
-        E = defaultdict(list)
-        for c in active_clients:
-            for f in c.k_facilities:
-                if f.id in cand_fac_ids:
-                    E[f.id].append(c.id)
+            fac_ids = {f.id for f in self.facilities}
+            for c in self.clients:
+                for f in c.k_facilities:
+                    if f.id in fac_ids:
+                        E[f.id].append(c.id)
         self.E = dict(E)
 
         fac_ids = sorted(self.E.keys())
         self.x = self.m.addVars(fac_ids, vtype=GRB.BINARY)
+
+    def _is_repair_candidate(self, client: Client, fid: int) -> bool:
+        # facility utilizzabile nella repair: basta capacità residua positiva (domanda divisibile); il single source lo ridefinisce
+        return self.critical_resources.left_caps.get(fid, 0) > 0
 
     def _set_objective(self):
         self._precompute_costs()
@@ -108,17 +112,26 @@ class CFL_Heuristic_Solver(General_Solver, ABC):
 
     def _handle_infeasibility(self):
         if self.critical_resources:
-            self.critical_resources.increment_tol()
+            # il progresso si misura sulla quantità rilasciata: nel caso a domanda divisibile si rilasciano unità anche da clienti già rilasciati
+            before = sum(self.critical_resources.removed_units_by_client.values())
+            if not self.critical_resources.increment_tol():   # niente più da rilasciare: la repair si ferma (prima ciclava all'infinito)
+                return False
             self.critical_resources.release_units()
             self.fixed_cost_before = total_solution_cost(self.clients, self.facilities)
-            return True
+            return sum(self.critical_resources.removed_units_by_client.values()) > before
 
         else:
+            # ogni cliente del modello infeasible riceve la facility successiva in ordine di distanza (come T + 1 in MCPA);
+            # le facility nuove entrano anche nel modello: per un cluster self.facilities è la lista cluster.facilities
             changed = False
             for client in self.clients:
                 if len(client.k_facilities) < len(client.all_facilities):
                     client.add_facility()
                     changed = True
+                    new_facility = client.k_facilities[-1]
+                    if new_facility.id not in self.fac_by_id:
+                        self.facilities.append(new_facility)
+                        self.fac_by_id[new_facility.id] = new_facility
             return changed
 
 

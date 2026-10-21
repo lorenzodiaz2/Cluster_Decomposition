@@ -1,4 +1,5 @@
 import heapq
+import math
 import time
 from abc import ABC, abstractmethod
 
@@ -11,6 +12,7 @@ class General_Critical_Resources(ABC):
         start = time.perf_counter()
         self.elements = elements
         self.current_tol = 0
+        self.released_units = set()   # serve già qui: le risorse rilevanti dipendono anche dagli elementi rilasciati
         self.residuals = self._compute_residuals()
         self.violated_resources = {r for r, res in self.residuals.items() if res < 0}
         self.critical_resources: set = {r for r, res in self.residuals.items() if res < self.current_tol}
@@ -22,7 +24,6 @@ class General_Critical_Resources(ABC):
         self.scores = {}
 
         self.left_caps = None
-        self.released_units = set()
 
         self._heap = []
         self._build_heap()
@@ -81,32 +82,45 @@ class General_Critical_Resources(ABC):
                 return resource
         return None
 
-    def increment_tol(self):
+    def increment_tol(self) -> bool:
+        """
+        Prepara un nuovo giro di rilasci dopo un modello ridotto infeasible. Ritorna False se non c'è più nulla da rilasciare.
+        - le risorse rilevanti si allargano: oltre a quelle degli elementi in violazione, quelle di tutti gli elementi già rilasciati
+          (non si restringono mai);
+        - la tolleranza non cresce di 1 alla volta ma salta al primo valore che rende critica una risorsa con elementi rilasciabili
+          (i valori intermedi non rilascerebbero nulla e farebbero solo risolvere di nuovo lo stesso modello).
+        """
         start = time.perf_counter()
 
-        self.current_tol += 1
         self._update_residuals()
-
         self.violated_resources = {r for r, res in self.residuals.items() if res < 0}
 
-        prev_rel = self.relevant_resources
         new_rel = self._compute_relevant_resources()
-
-        if new_rel is None and prev_rel is not None:
-            new_rel = prev_rel
-
+        if self.relevant_resources is not None and new_rel is not None:
+            new_rel = self.relevant_resources | new_rel
+        elif new_rel is None:
+            new_rel = self.relevant_resources
         self.relevant_resources = new_rel
 
-        base_critical = {r for r, res in self.residuals.items() if res < self.current_tol}
-        self.critical_resources = (
-            base_critical & self.relevant_resources
-            if self.relevant_resources is not None
-            else base_critical
-        )
+        pool = self.relevant_resources if self.relevant_resources is not None else set(self.residuals)
+        releasable = [res for r, res in self.residuals.items() if r in pool and self._get_candidates(r)]
+
+        # se l'allargamento ha reso critiche nuove risorse si resta alla tolleranza attuale, altrimenti si salta alla successiva utile
+        if not any(res < self.current_tol for res in releasable):
+            higher = [res for res in releasable if res >= self.current_tol]
+            if not higher:
+                self.critical_resources = set()
+                self._heap = []
+                self.creation_times.append(time.perf_counter() - start)
+                return False
+            self.current_tol = math.floor(min(higher)) + 1
+
+        self.critical_resources = {r for r, res in self.residuals.items() if r in pool and res < self.current_tol}
 
         self._build_heap()
         self.creation_times.append(time.perf_counter() - start)
         self.critical_resources_per_tol.append(len(self.critical_resources))
+        return True
 
     @abstractmethod
     def _update_residuals(self):

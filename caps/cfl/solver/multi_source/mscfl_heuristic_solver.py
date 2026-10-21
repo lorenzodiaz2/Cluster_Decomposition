@@ -33,9 +33,16 @@ class MSCFL_Heuristic_solver(CFL_Heuristic_Solver):
             self.m.addConstrs(self.x[fid] == 1 for fid in self.x.keys() if self.fac_by_id[fid].is_open)
             self.m.addConstrs(gp.quicksum(self.y[f.id, c.id] for f in c.k_facilities if (f.id, c.id) in self.y) == self.repair_demand[c.id] for c in self.repair_clients)
             self.m.addConstrs(gp.quicksum(self.y[fid, cid] for cid in self.E[fid]) <= self.critical_resources.left_caps[fid] * self.x[fid] for fid in self.E.keys())
+            # vincoli forti (validi, rafforzano il rilassamento LP): y_fc <= min(r_c, capacità residua di f) * x_f, r_c = domanda rilasciata
+            self.m.addConstrs(self.y[fid, cid] <= min(self.repair_demand[cid], self.critical_resources.left_caps[fid]) * self.x[fid]
+                              for (fid, cid) in self.y.keys())
         else:
             self.m.addConstrs(gp.quicksum(self.y[f.id, c.id] for f in c.k_facilities) == c.demand for c in self.clients)
             self.m.addConstrs(gp.quicksum(self.y[fid, cid] for cid in self.E[fid]) <= self.fac_by_id[fid].capacity * self.x[fid] for fid in self.E)
+            # vincoli forti (validi, rafforzano il rilassamento LP): y_fc <= min(d_c, s_f) * x_f
+            demand = {c.id: c.demand for c in self.clients}
+            self.m.addConstrs(self.y[fid, cid] <= min(demand[cid], self.fac_by_id[fid].capacity) * self.x[fid]
+                              for (fid, cid) in self.y.keys())
 
 
     def _assign_solutions(self):
@@ -54,7 +61,7 @@ class MSCFL_Heuristic_solver(CFL_Heuristic_Solver):
 
         for (fid, cid), var in self.y.items():
             q = var.X
-            if q <= 0:
+            if q <= 1e-6:   # zeri numerici del solver: non sono spedizioni
                 continue
 
             f = self.fac_by_id[fid]

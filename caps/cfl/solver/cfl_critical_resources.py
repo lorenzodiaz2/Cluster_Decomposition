@@ -33,20 +33,20 @@ class CFL_Critical_Resources(General_Critical_Resources, ABC):
 
 
     def _compute_relevant_resources(self):
-        if not self.violated_resources:
-            return None
-
         violated_clients_ids = set()
         for fid in self.violated_resources:
             for cid, q in self.fac_by_id[fid].shipment_by_client.items():
                 if q > 0:
                     violated_clients_ids.add(cid)
 
-        violated_clients = [self.client_by_id[cid] for cid in violated_clients_ids]
+        # clienti coinvolti: quelli in violazione e quelli già rilasciati (le risorse rilevanti si allargano)
+        involved_ids = violated_clients_ids | set(self.released_units)
+        if not involved_ids:
+            return None
 
         rel = set()
-        for c in violated_clients:
-            rel.update(f.id for f in c.k_facilities)
+        for cid in involved_ids:
+            rel.update(f.id for f in self.client_by_id[cid].k_facilities)
 
         return rel
 
