@@ -6,7 +6,7 @@
       <excludeFolder url="file://$MODULE_DIR$/isa/test" />
       <excludeFolder url="file://$MODULE_DIR$/results" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.12 (Cluster_Decomposition)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.10 (Thesis)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

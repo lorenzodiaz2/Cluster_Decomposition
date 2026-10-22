@@ -1,0 +1,29 @@
+In the following, we report the optimal solution values for data set Yang in Guastaroba G. and Speranza M.G. A Heuristic for BILP Problems: The Single Source Capacitated Facility Location Problem, currently under review in the European Journal of Operational Research.
+
+The following table is written in LaTex-like language. The first column (Name) shows the name of the instance; the second and the third columns give the number of potential facility locations (|J|) and the number of customers (|I|), respectively; column $z^*$ is the optimal solution value of the instance.
+
+Name & |J| & |I| & $z^*$\\
+\hline
+30_200_1 & 30 & 200 & 30181 \\
+30_200_2 & 30 & 200 & 28923 \\
+30_200_3 & 30 & 200 & 28131 \\
+30_200_4 & 30 & 200 & 28152 \\
+30_200_5 & 30 & 200 & 27646 \\
+\hline
+60_200_1 & 60 & 200 & 27977 \\
+60_200_2 & 60 & 200 & 29704 \\
+60_200_3 & 60 & 200 & 27993 \\
+60_200_4 & 60 & 200 & 27691 \\
+60_200_5 & 60 & 200 & 29195 \\
+\hline
+60_300_1 & 60 & 300 & 35648 \\
+60_300_2 & 60 & 300 & 35474 \\
+60_300_3 & 60 & 300 & 33872 \\
+60_300_4 & 60 & 300 & 33096 \\
+60_300_5 & 60 & 300 & 30918 \\
+\hline
+80_400_1 & 80 & 400 & 39318 \\
+80_400_2 & 80 & 400 & 37076 \\
+80_400_3 & 80 & 400 & 43859 \\
+80_400_4 & 80 & 400 & 37344 \\
+80_400_5 & 80 & 400 & 43508 \\

@@ -1,0 +1,45 @@
+In the following, we report the optimal solution values for data set OR-Library in Guastaroba G. and Speranza M.G. A Heuristic for BILP Problems: The Single Source Capacitated Facility Location Problem, currently under review in the European Journal of Operational Research.
+
+The following table is written in LaTex-like language. The first column (Name) shows the name of the instance; the second and the third columns give the number of potential facility locations (|J|) and the number of customers (|I|), respectively; column $z^*$ is the optimal solution value of the instance.
+
+Name & |J| & |I| & $z^*$\\
+\hline
+cap61 & 16    & 50    & 932615.8 \\
+cap62 & 16    & 50    & 977799.4 \\
+cap63 & 16    & 50    & 1014100 \\
+cap64 & 16    & 50    & 1053197 \\
+cap71 & 16    & 50    & 932615.7 \\
+cap72 & 16    & 50    & 977799.4 \\
+cap73 & 16    & 50    & 1010641 \\
+cap74 & 16    & 50    & 1034977 \\
+\hline
+cap91 & 25    & 50    & 796648.4 \\
+cap92 & 25    & 50    & 858109.3 \\
+cap93 & 25    & 50    & 900760.1 \\
+cap94 & 25    & 50    & 950608.4 \\
+cap101 & 25    & 50    & 796648.4 \\
+cap102 & 25    & 50    & 854704.2 \\
+cap103 & 25    & 50    & 893782.1 \\
+cap104 & 25    & 50    & 928941.8 \\
+\hline
+cap121 & 50    & 50    & 793439.6 \\
+cap122 & 50    & 50    & 854900.5 \\
+cap123 & 50    & 50    & 898266.1 \\
+cap124 & 50    & 50    & 950608.4 \\
+cap131 & 50    & 50    & 793439.6 \\
+cap132 & 50    & 50    & 851495.3 \\
+cap133 & 50    & 50    & 893076.7 \\
+cap134 & 50    & 50    & 928941.8 \\
+\hline
+capa1 & 100   & 1000  & 19241056.93 \\
+capa2 & 100   & 1000  & 18438329.78 \\
+capa3 & 100   & 1000  & 17765201.95 \\
+capa4 & 100   & 1000  & 17160612.23 \\
+capb1 & 100   & 1000  & 13657464.23 \\
+capb2 & 100   & 1000  & 13362529.34 \\
+capb3 & 100   & 1000  & 13199213.19 \\
+capb4 & 100   & 1000  & 13083203.74 \\
+capc1 & 100   & 1000  & 11647410.50 \\
+capc2 & 100   & 1000  & 11570437.68 \\
+capc3 & 100   & 1000  & 11519169.78 \\
+capc4 & 100   & 1000  & 11505861.86 \\

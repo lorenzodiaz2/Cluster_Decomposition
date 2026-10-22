@@ -5,21 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="Modified score computation and minor modifications">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_13_10_2026_17_39_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_13_10_2026_17_39__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/elements/cfl_environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/elements/cfl_environment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/scalability/cfl_stress_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/scalability/cfl_stress_test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/solver/cfl_critical_resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/solver/cfl_critical_resources.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/solver/cfl_heuristic_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/solver/cfl_heuristic_solver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/solver/multi_source/mscfl_heuristic_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/solver/multi_source/mscfl_heuristic_solver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/solver/single_source/sscfl_heuristic_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/solver/single_source/sscfl_heuristic_solver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/general/general_critical_resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/general/general_critical_resources.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/mcpa/scalability/mcpa_stress_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/mcpa/scalability/mcpa_stress_test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/mcpa/solver/mcpa_critical_resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/mcpa/solver/mcpa_critical_resources.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/mcpa/solver/mcpa_heuristic_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/mcpa/solver/mcpa_heuristic_solver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/instance_generators.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/instance_generators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Cluster_Decomposition.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Cluster_Decomposition.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/cfl/ss/big/big_instances_EXP_LIN.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/cfl/ss/big/big_instances_EXP_LIN.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,30 +37,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.main.executor": "Run",
-    "Python.main_cfl.executor": "Run",
-    "Python.test_isa.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "terminal",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main_cfl.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test_isa.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;terminal&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\utente\PycharmProjects\Cluster_Decomposition\clustering" />
@@ -89,12 +76,13 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.12 (Cluster_Decomposition) (2)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />

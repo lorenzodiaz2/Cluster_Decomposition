@@ -1,0 +1,4 @@
+These data files are set Yang in Guastaroba G. and Speranza M.G. A Heuristic for BILP Problems: The Single Source Capacitated Facility Location Problem, currently under review in the European Journal of Operational Research.
+These instances have been introduced in Yang, Z., Chu, F. and Chen, H., ``A Cut-and-Solve Based Algorithm for the Single-Source Capacitated Facility Location Problem'', European Journal of Operational Research, 221(3), 2012, 521--532.
+
+There are currently 20 data files. The format of these data files is described in the file format.pdf created by the authors of the instances.

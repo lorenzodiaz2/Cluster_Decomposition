@@ -1,0 +1,14 @@
+{
+  "stop_reason": "3 dimensioni consecutive in time limit (ultima: 130 coppie OD)",
+  "resources_capacity": 3,
+  "grid_side": 20,
+  "demand": 5,
+  "k": 10,
+  "n_start": 20,
+  "step": 5,
+  "n_seeds": 10,
+  "tl_stop_runs": 4,
+  "consecutive_tl_stop": 3,
+  "time_limit": 1800,
+  "threads": 12
+}
