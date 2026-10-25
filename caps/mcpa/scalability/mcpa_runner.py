@@ -8,6 +8,7 @@ import traceback
 from collections import defaultdict
 from dataclasses import dataclass, asdict, field
 from datetime import datetime
+from typing import Callable
 
 import pandas as pd
 
@@ -236,20 +237,25 @@ class MCPA_Runner:
         self._incumbents = None   # caricati solo quando servono
 
 
-    def run_all(self, settings_list: list[MCPA_Instance_Settings], run_global: bool = True):
-        for settings in settings_list:
-            self.run(settings, run_global)
+    def run_all(self, settings_list: list[MCPA_Instance_Settings], run_global: bool = True,
+                label_fn: Callable[[MCPA_Instance_Settings], str] | None = None):
+        # label_fn (facoltativo) dà il nome del blocco di ogni istanza, stampato a video insieme all'avanzamento
+        n = len(settings_list)
+        for i, settings in enumerate(settings_list, start=1):
+            label = label_fn(settings) if label_fn else ""
+            self.run(settings, run_global, label=f"{label}  {i}/{n}".strip())
 
 
-    def run(self, settings: MCPA_Instance_Settings, run_global: bool = True) -> str:
+    def run(self, settings: MCPA_Instance_Settings, run_global: bool = True, label: str = "") -> str:
         """
         run_global=True: risolve anche il modello globale (e salva l'istanza se è la prima volta).
         run_global=False: solo euristica; globale, incumbent e path estesi vengono presi dal run di riferimento della stessa istanza.
+        label: solo per la stampa a video (es. blocco della campagna e avanzamento).
         """
         run_id, instance_id = settings.run_id, settings.instance_id
         if run_id in self.done_ids:
             if self.verbose:
-                print(f"{run_id} già presente, salto")
+                print(f"[{label}]  {run_id} già presente, salto" if label else f"{run_id} già presente, salto")
             return run_id
 
         row = {"id": run_id, "instance_id": instance_id, **self._settings_columns(settings), "code_version": self.code_version,
@@ -328,11 +334,30 @@ class MCPA_Runner:
         self.done_ids.add(run_id)
 
         if self.verbose:
-            print(f"{datetime.now():%d-%m-%Y %H:%M:%S}  {run_id}  {'global+heur' if run_global else 'heur only'}  "
-                  f"q={settings.n_quadrants} off={settings.offset} cap={settings.resources_capacity} seed={settings.seed} "
-                  f"M={settings.max_cluster_size} part={settings.partitioner}  gap={row.get('gap')}  speedup={row.get('speedup')}"
-                  f"{'  ERROR: ' + row['error'] if row['error'] else ''}")
+            print(self._summary_line(settings, row, run_global, label))
         return run_id
+
+
+    @staticmethod
+    def _summary_line(settings: MCPA_Instance_Settings, row: dict, run_global: bool, label: str) -> str:
+        # una riga per run, stampata alla FINE del run: i tempi sono quelli del run appena concluso
+        def fmt(value, spec):
+            return format(value, spec) if isinstance(value, (int, float)) and value == value else "-"
+
+        if run_global:
+            global_part = f"global {row.get('global_status') or '-'} {fmt(row.get('global_time'), '.1f')}s"
+        else:
+            global_part = "global from reference"
+        if row.get("heuristic_feasible"):
+            heur_part = (f"heur {fmt(row.get('heuristic_time'), '.1f')}s  gap {fmt(row.get('gap'), '.2f')}%  "
+                         f"speedup {fmt(row.get('speedup'), '.2f')}")
+        else:
+            heur_part = f"heur FAILED after {fmt(row.get('heuristic_time'), '.1f')}s"
+        error = f"  ERROR: {row['error']}" if row.get("error") else ""
+        prefix = f"[{label}]  " if label else ""
+        return (f"{datetime.now():%d-%m-%Y %H:%M:%S}  {prefix}q={settings.n_quadrants} off={settings.offset} "
+                f"cap={settings.resources_capacity} pairs={settings.n_pairs_per_quadrant} agents={row.get('n_agents', '-')} "
+                f"M={settings.max_cluster_size} part={settings.partitioner}  |  {global_part}  |  {heur_part}{error}")
 
 
     def _reference_incumbents(self, reference_id: str) -> list[dict]:

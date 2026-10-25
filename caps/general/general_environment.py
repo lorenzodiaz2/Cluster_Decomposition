@@ -315,6 +315,9 @@ class General_Environment(ABC):
             hs = solver_maker(self, cluster)
             hs.solve()
             self.clusters_solvers.append(hs)
+            # come nell'Algoritmo 1: il primo cluster non risolto all'ottimo fa fallire il metodo, inutile risolvere gli altri
+            if hs.status != "OPTIMAL":
+                break
 
         if post_fn is not None:
             post_fn()

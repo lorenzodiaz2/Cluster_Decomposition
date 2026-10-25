@@ -9,8 +9,8 @@ from caps.mcpa.scalability.mcpa_stress_test import run_mcpa_stress_test
 
 # ----- parametri fissi (dallo stress test) -----
 BASE_GRID_SIDE = 20         # lato di un quadrante n0
-N_PAIRS_BASE = 150          # |E_q*|: coppie OD per quadrante a densità rho = 1
-M_STAR = 750                # M* = 5 * |E_q*|
+N_PAIRS_BASE = 140          # |E_q*|: coppie OD per quadrante a densità rho = 1
+M_STAR = 700                # M* = 5 * |E_q*|
 K = 10
 SEEDS = range(5)            # indici di replica: il seed vero di ogni istanza è derivato da parametri + replica (_independent_seeds)
 THREADS = 12
@@ -32,7 +32,7 @@ STRESS_DONE = False
 # ----- similarità -----
 # 1) con TUNING_DONE = False il Run esegue solo la taratura, stampa l'analisi e si ferma
 # 2) scelta la variante, impostare qui SIMILARITY e TUNING_DONE = True: il Run lancia le campagne vere
-TUNING_DONE = False
+TUNING_DONE = True
 SIMILARITY = dict(sim_weighting="exponential", sim_beta=1.0, resource_weights="linear")
 
 TUNING_VARIANTS = [dict(sim_weighting=w, sim_beta=b, resource_weights=r)
@@ -41,6 +41,16 @@ TUNING_VARIANTS = [dict(sim_weighting=w, sim_beta=b, resource_weights=r)
 TUNING_REPLICAS = range(100, 103)   # indici di replica diversi da quelli delle campagne: istanze indipendenti
 TUNING_OFFSETS = [0, 1, 2, 3]
 TUNING_Q = [4, 6]
+
+# taratura della similarità su istanze piccole (copie in scala del blocco A1): stessa densità di coppie per nodo
+# (N_PAIRS_BASE / BASE_GRID_SIDE^2), quadranti di lato 10 e M = massa di un quadrante; il globale chiude all'ottimo,
+# quindi si possono usare molte istanze. Tutte le varianti girano sulle stesse istanze (il seed non dipende dalla similarità)
+TUNING_SMALL_GRID_SIDE = 10
+TUNING_SMALL_N_PAIRS = round(N_PAIRS_BASE * TUNING_SMALL_GRID_SIDE ** 2 / BASE_GRID_SIDE ** 2)   # 38 coppie per quadrante
+TUNING_SMALL_M = 5 * TUNING_SMALL_N_PAIRS                                                      # 190 agenti
+TUNING_SMALL_OFFSETS = [0, 1, 2]                    # 0, 0.1, 0.2 del lato del quadrante (campagna: da -0.05 a 0.25)
+TUNING_SMALL_REPLICAS = range(1000, 1042)           # 2 q x 3 offset x 42 repliche = 252 istanze
+OUT_TUNING_SIMILARITY = "results/mcpa/tuning_similarity"
 
 
 def _quadrant_settings(q: int, offset: int, seed: int, **kw) -> MCPA_Instance_Settings:
@@ -76,10 +86,10 @@ def campaign_A() -> list[MCPA_Instance_Settings]:
     for q in Q_ALL:
         for o in OFFSETS:
             for s in SEEDS:
-                settings += [_quadrant_settings(q, o, s, resources_capacity=c) for c in (3, 7)]          # A2 capacità: 240
+                settings += [_quadrant_settings(q, o, s, resources_capacity=c) for c in (4, 6)]          # A2 capacità: 240
                 settings.append(_quadrant_settings(q, o, s, demand_min=1, demand_max=9))                # A3 domanda: 120
                 settings += [_quadrant_settings(q, o, s, n_pairs_per_quadrant=round(rho * N_PAIRS_BASE))
-                             for rho in (0.5, 1.5)]                                                     # A4 densità: 240
+                             for rho in (0.8, 1.2)]                                                     # A4 densità: 240
     return campaign_A_base() + _independent_seeds(settings)   # 720 istanze
 
 
@@ -129,6 +139,25 @@ def run_tuning(runner: MCPA_Runner):
         runner.run_all([replace(st, **variant) for st in instances], run_global=False)         # 5 x 24 run solo euristica
 
 
+def campaign_tuning_similarity() -> list[MCPA_Instance_Settings]:
+    # istanze piccole: 3 offset x 2 q x 42 repliche = 252, con la prima variante di similarità
+    settings = []
+    for q in TUNING_Q:
+        grid_side = (2 if q <= 4 else 3) * TUNING_SMALL_GRID_SIDE
+        for o in TUNING_SMALL_OFFSETS:
+            for r in TUNING_SMALL_REPLICAS:
+                settings.append(_quadrant_settings(q, o, r, grid_side=grid_side, n_pairs_per_quadrant=TUNING_SMALL_N_PAIRS,
+                                                   max_cluster_size=TUNING_SMALL_M, **TUNING_VARIANTS[0]))
+    return _independent_seeds(settings)
+
+
+def run_tuning_similarity(runner: MCPA_Runner):
+    instances = campaign_tuning_similarity()
+    runner.run_all(instances)                                                                   # 252 run con il globale
+    for variant in TUNING_VARIANTS[1:]:
+        runner.run_all([replace(st, **variant) for st in instances], run_global=False)         # 5 x 252 run solo euristica
+
+
 def run_ablations_A(runner: MCPA_Runner):
     # da lanciare dopo la campagna A, nella stessa cartella (servono i run di riferimento con il globale)
     base = campaign_A_base()
@@ -142,14 +171,84 @@ def run_ablations_A(runner: MCPA_Runner):
     runner.run_all([replace(st, k=k) for st in reduced for k in (5, 15)])                                              # 120, k cambia il modello: serve il globale
 
 
+def block_label_A(st: MCPA_Instance_Settings) -> str:
+    # nome del blocco della campagna A, solo per la stampa a video
+    if st.resources_capacity != 5:
+        return f"A2 c={st.resources_capacity}"
+    if (st.demand_min, st.demand_max) != (5, 5):
+        return f"A3 demand {st.demand_min}-{st.demand_max}"
+    if st.n_pairs_per_quadrant != N_PAIRS_BASE:
+        return f"A4 rho={st.n_pairs_per_quadrant / N_PAIRS_BASE:g}"
+    return "A1"
+
+
+def block_label_B(st: MCPA_Instance_Settings) -> str:
+    # nome della sottofamiglia della campagna B, solo per la stampa a video
+    size = "mass q=4" if st.grid_side == 2 * BASE_GRID_SIDE else "mass q=9"
+    if st.family == "hotspots":
+        return f"B2 hotspots, {size}"
+    if st.remove_rnd_nodes_flag or st.family_params.get("obstacles"):
+        return f"B3 obstacles, {size}"
+    return f"B1 uniform, {size}"
+
+
+def remove_runs_outside_A1():
+    # cancella da OUT_A tutti i run delle istanze che non appartengono al blocco A1 (copia di sicurezza in OUT_A + "_backup");
+    # da eseguire a campagna ferma
+    import csv
+    import os
+    import shutil
+
+    shutil.copytree(OUT_A, OUT_A + "_backup")   # si ferma con un errore se la copia esiste già, così non la sovrascrive
+    keep = {st.instance_id for st in campaign_A_base()}
+
+    results_file = os.path.join(OUT_A, "results.jsonl")
+    with open(results_file, encoding="utf8") as fh:
+        rows = [json.loads(line) for line in fh if line.strip()]
+    removed_runs = {r["id"] for r in rows if r["instance_id"] not in keep}
+    removed_instances = {r["instance_id"] for r in rows if r["instance_id"] not in keep}
+    with open(results_file, "w", encoding="utf8") as fh:
+        for r in rows:
+            if r["id"] not in removed_runs:
+                fh.write(json.dumps(r) + "\n")
+
+    for name in ("clusters.csv", "incumbents.csv"):
+        path = os.path.join(OUT_A, name)
+        if not os.path.isfile(path):
+            continue
+        with open(path, encoding="utf8", newline="") as fh:
+            reader = csv.DictReader(fh)
+            fields = reader.fieldnames
+            kept = [row for row in reader if row["id"] not in removed_runs]
+        with open(path, "w", encoding="utf8", newline="") as fh:
+            writer = csv.DictWriter(fh, fieldnames=fields)
+            writer.writeheader()
+            writer.writerows(kept)
+
+    for instance_id in removed_instances:
+        path = os.path.join(OUT_A, "instances", f"{instance_id}.json.gz")
+        if os.path.isfile(path):
+            os.remove(path)/resume
+
+    print(f"rimossi {len(removed_runs)} run e {len(removed_instances)} istanze; copia di sicurezza in {OUT_A}_backup")
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Campagne MCPA")
     # senza argomenti (es. pulsante Run di PyCharm) lancia A e B; rilanciando riprende dai run non ancora completati
-    parser.add_argument("campaign", nargs="*", default=["A", "B"], help="campagne da lanciare: tuning, A, B, ablations_A (default: A B)")
+    parser.add_argument("campaign", nargs="*", default=["A", "B"],
+                        help="campagne da lanciare: tuning, tuning_similarity, A, B, ablations_A (default: A B)")
     args = parser.parse_args()
-    invalid = [c for c in args.campaign if c not in ("tuning", "A", "B", "ablations_A")]
+    invalid = [c for c in args.campaign if c not in ("tuning", "tuning_similarity", "A", "B", "ablations_A")]
     if invalid:
-        parser.error(f"campagne non valide: {invalid} (scegliere tra tuning, A, B, ablations_A)")
+        parser.error(f"campagne non valide: {invalid} (scegliere tra tuning, tuning_similarity, A, B, ablations_A)")
+
+    # taratura della similarità su istanze piccole: si esegue, si analizza e ci si ferma
+    if "tuning_similarity" in args.campaign:
+        from caps.mcpa.scalability.mcpa_tuning_analysis import analyze_tuning
+        run_tuning_similarity(MCPA_Runner(OUT_TUNING_SIMILARITY, threads=THREADS))
+        analyze_tuning(OUT_TUNING_SIMILARITY)
+        raise SystemExit(0)
 
     # prima di tutto lo stress test per M*: alla fine ci si ferma per scegliere M* dai grafici
     if not STRESS_DONE:
@@ -169,9 +268,9 @@ if __name__ == '__main__':
 
     for campaign in args.campaign:
         if campaign == "A":
-            MCPA_Runner(OUT_A, threads=THREADS).run_all(campaign_A())
+            MCPA_Runner(OUT_A, threads=THREADS).run_all(campaign_A(), label_fn=block_label_A)
         elif campaign == "B":
-            MCPA_Runner(OUT_B, threads=THREADS).run_all(campaign_B())
+            MCPA_Runner(OUT_B, threads=THREADS).run_all(campaign_B(), label_fn=block_label_B)
         elif campaign == "ablations_A":
             run_ablations_A(MCPA_Runner(OUT_A, threads=THREADS))
 
