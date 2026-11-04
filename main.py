@@ -27,7 +27,7 @@ OUT_STRESS = "results/mcpa/stress_test_c3"
 # ----- stress test (c = 3, la capacità più stretta della campagna) -----
 # con STRESS_DONE = False il Run esegue solo lo stress test e si ferma; scelto M* dai grafici, aggiornare N_PAIRS_BASE / M_STAR
 # e impostare STRESS_DONE = True
-STRESS_DONE = False
+STRESS_DONE = True
 
 # ----- similarità -----
 # 1) con TUNING_DONE = False il Run esegue solo la taratura, stampa l'analisi e si ferma
@@ -89,7 +89,7 @@ def campaign_A() -> list[MCPA_Instance_Settings]:
                 settings += [_quadrant_settings(q, o, s, resources_capacity=c) for c in (4, 6)]          # A2 capacità: 240
                 settings.append(_quadrant_settings(q, o, s, demand_min=1, demand_max=9))                # A3 domanda: 120
                 settings += [_quadrant_settings(q, o, s, n_pairs_per_quadrant=round(rho * N_PAIRS_BASE))
-                             for rho in (0.8, 1.2)]                                                     # A4 densità: 240
+                             for rho in (0.95, 1.05)]                                                     # A4 densità: 240
     return campaign_A_base() + _independent_seeds(settings)   # 720 istanze
 
 
@@ -228,7 +228,7 @@ def remove_runs_outside_A1():
     for instance_id in removed_instances:
         path = os.path.join(OUT_A, "instances", f"{instance_id}.json.gz")
         if os.path.isfile(path):
-            os.remove(path)/resume
+            os.remove(path)
 
     print(f"rimossi {len(removed_runs)} run e {len(removed_instances)} istanze; copia di sicurezza in {OUT_A}_backup")
 
