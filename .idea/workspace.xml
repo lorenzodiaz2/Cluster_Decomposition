@@ -4,30 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="Campaign A1 results">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_10_26,_01_49_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_10_26__01_49__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_21_10_26,_19_21_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_21_10_26__19_21__Changes_.xml" beforeDir="false" />
+    <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="Campaign A results">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/clusters.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_A/clusters.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/incumbents.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_A/incumbents.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_0a2ef17e9c36.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_1c203c0043ca.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_245b5d9e6c8b.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_31f9d3504eee.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_4fda3c37dca4.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_53c0737548c8.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_5910fa99d17e.json.gz" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_5910fa99d17e.json.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_60307f7729ab.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_621288376e09.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_7a1ad1eb567e.json.gz" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_7a1ad1eb567e.json.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_8003d29fbd77.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_8d3421bc45d3.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_a85fabd1439e.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_c4c6ada0e5ca.json.gz" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_c4c6ada0e5ca.json.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_c70da4ffb350.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/results.jsonl" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_A/results.jsonl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -159,7 +139,8 @@
       <workItem from="1792582983153" duration="10028000" />
       <workItem from="1793489806137" duration="51000" />
       <workItem from="1793489964392" duration="105000" />
-      <workItem from="1793490086075" duration="10875000" />
+      <workItem from="1793490086075" duration="10973000" />
+      <workItem from="1793789291178" duration="11247000" />
     </task>
     <task id="LOCAL-00001" summary="Major code refactor and new results">
       <option name="closed" value="true" />
@@ -233,7 +214,15 @@
       <option name="project" value="LOCAL" />
       <updated>1792910843091</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Campaign A results">
+      <option name="closed" value="true" />
+      <created>1793779449018</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1793779449018</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -259,12 +248,13 @@
     <MESSAGE value="Added tuning for similarity" />
     <MESSAGE value="tuning results" />
     <MESSAGE value="Campaign A1 results" />
-    <option name="LAST_COMMIT_MESSAGE" value="Campaign A1 results" />
+    <MESSAGE value="Campaign A results" />
+    <option name="LAST_COMMIT_MESSAGE" value="Campaign A results" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$main_cfl.coverage" NAME="main_cfl Coverage Results" MODIFIED="1792590026623" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$main.coverage" NAME="main Coverage Results" MODIFIED="1792231198292" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/Thesis$main.coverage" NAME="main Coverage Results" MODIFIED="1793490100536" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Thesis$main.coverage" NAME="main Coverage Results" MODIFIED="1793791805477" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$test_isa.coverage" NAME="test_isa Coverage Results" MODIFIED="1792159456329" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/isa/IsaInterface" />
   </component>
 </project>
