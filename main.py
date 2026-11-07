@@ -252,7 +252,7 @@ if __name__ == '__main__':
 
     # prima di tutto lo stress test per M*: alla fine ci si ferma per scegliere M* dai grafici
     if not STRESS_DONE:
-        run_mcpa_stress_test(OUT_STRESS, resources_capacity=3, grid_side=BASE_GRID_SIDE, k=K, threads=THREADS)
+        run_mcpa_stress_test(OUT_STRESS, resources_capacity=5, grid_side=BASE_GRID_SIDE, k=K, threads=THREADS)
         print("\nStress test concluso: scegliere M* dai grafici, aggiornare N_PAIRS_BASE e M_STAR, impostare STRESS_DONE = True "
               "in main.py e rilanciare.")
         raise SystemExit(0)

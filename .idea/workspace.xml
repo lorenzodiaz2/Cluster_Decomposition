@@ -6,9 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="Campaign A results">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/clusters.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_A/clusters.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/incumbents.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_A/incumbents.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/results.jsonl" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_A/results.jsonl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/clusters.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_B/clusters.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/incumbents.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_B/incumbents.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/results.jsonl" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_B/results.jsonl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,6 +31,65 @@
     &quot;accountId&quot;: &quot;d207943a-c3d7-4816-9992-914b0446bb0a&quot;
   }
 }</component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.0" />
+      <entry key="S10" value="1.0" />
+      <entry key="S30" value="1.0" />
+      <entry key="S60" value="1.0" />
+      <entry key="M2" value="1.0" />
+      <entry key="M5" value="1.0" />
+      <entry key="M10" value="1.0" />
+      <entry key="M15" value="1.0" />
+      <entry key="M30" value="1.0" />
+      <entry key="H1" value="1.0" />
+      <entry key="H2" value="1.0" />
+      <entry key="H4" value="1.0" />
+      <entry key="D1" value="1.0" />
+      <entry key="W1" value="1.0" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.002506691206177547" />
+      <entry key="MS500" value="0.3018701478716241" />
+      <entry key="S2" value="0.7412335049014176" />
+      <entry key="S5" value="0.8871192774733615" />
+      <entry key="S10" value="0.9418700958589573" />
+      <entry key="S30" value="0.9802352953894228" />
+      <entry key="S60" value="0.9900683286467772" />
+      <entry key="M2" value="0.9950217729511135" />
+      <entry key="M5" value="0.9980057273295131" />
+      <entry key="M10" value="0.9990023660279854" />
+      <entry key="M15" value="0.9993348000503129" />
+      <entry key="M30" value="0.9996673446953807" />
+      <entry key="H1" value="0.9998336585129451" />
+      <entry key="H2" value="0.9999168257974986" />
+      <entry key="H4" value="0.9999584120339698" />
+      <entry key="D1" value="0.999993068552217" />
+      <entry key="W1" value="0.9999990097902323" />
+    </decayedShown>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 4
@@ -140,7 +200,10 @@
       <workItem from="1793489806137" duration="51000" />
       <workItem from="1793489964392" duration="105000" />
       <workItem from="1793490086075" duration="10973000" />
-      <workItem from="1793789291178" duration="11247000" />
+      <workItem from="1793789291178" duration="11428000" />
+      <workItem from="1793897562112" duration="8324000" />
+      <workItem from="1794013628822" duration="370000" />
+      <workItem from="1794014020422" duration="1245000" />
     </task>
     <task id="LOCAL-00001" summary="Major code refactor and new results">
       <option name="closed" value="true" />
@@ -222,7 +285,15 @@
       <option name="project" value="LOCAL" />
       <updated>1793779449018</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Campaign A results">
+      <option name="closed" value="true" />
+      <created>1793897368044</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1793897368044</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -254,7 +325,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$main_cfl.coverage" NAME="main_cfl Coverage Results" MODIFIED="1792590026623" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$main.coverage" NAME="main Coverage Results" MODIFIED="1792231198292" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/Thesis$main.coverage" NAME="main Coverage Results" MODIFIED="1793791805477" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Thesis$main.coverage" NAME="main Coverage Results" MODIFIED="1794014039767" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$test_isa.coverage" NAME="test_isa Coverage Results" MODIFIED="1792159456329" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/isa/IsaInterface" />
   </component>
 </project>
