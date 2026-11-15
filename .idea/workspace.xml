@@ -4,32 +4,232 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="Campaign B results">
+    <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="CPA results">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/big/150_mcpa_results.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/big/big_instances_EXP_LIN.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/big/big_instances_EXP_LIN_results.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/clusters.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_A/clusters.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/incumbents.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_A/incumbents.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/infeasible_attempts.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_A/infeasible_attempts.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_0030d6286424.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_00ae7a502461.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_02cbc764fecb.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_0348f3e6c3ee.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_036213b32497.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_04d4ad0ff8d5.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_04fa733be681.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_0934107a260a.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_0a5fb04be530.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_0a6d48d1b6ab.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_13c27af49fea.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_159cdac1d2d8.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_16cde1896640.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_1a6da5b5cc02.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_1f8cc33034fa.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_27500e3de190.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_29aa04cea772.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_39f7e8b4ff6e.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_3caceea6339a.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_43c7809b8108.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_4430e246f79d.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_4a956d4d271f.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_4c92400c88bc.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_4e94d6256f2f.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_4f366d0d6407.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_56a673b5f122.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_589ddbecca83.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_5a7d35373aca.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_5bad7cff4255.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_60fc51f8d754.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_619474229755.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_65ae7cb7139f.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_6fc2b4f8bede.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_7420e0ec7941.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_77bfb8f1c2ad.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_7e83e29a9a31.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_7f777fc60b5f.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_82b0200fd261.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_87cf291c328d.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_8c6c8cf831fd.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_947cc31b25cc.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_964f1029f941.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_998beb91741b.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_9c3437a18790.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_9d3210dd80e6.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_a11492e0676c.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_aee55bee976a.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_bdbef1cedd09.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_bdd7c0d7fddf.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_c234afdba6db.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_c2c2009c0bbf.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_c4f345c1d542.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_c585cd69fe07.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_c78cc887e542.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_c97a9f96dc78.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_ca279b9edcb9.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_d116063de577.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_d24096bd8e62.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_d4702e73811c.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_d5c5e6bdee4f.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_d70a3cac0770.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_df4ccc61c856.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_e05d4a8a1f7e.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_e0c3beb6db59.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_e0e999b458dc.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_e1e77f7ce289.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_e3fef2cb06a9.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_e91f93e4f684.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_ea42cc386910.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_ee18dba1dff9.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_ee2f91cf7c3d.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_eecbbbded890.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_f7988e1f8296.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_f940b713f5b0.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_f95c67d15a15.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_fe6b0ee18427.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_ff77c4b0609e.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/instances/quadrants_ffa84240e7a3.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A/results.jsonl" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_A/results.jsonl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/clusters.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_B/clusters.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/incumbents.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_B/incumbents.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/hotspots_105a883766d6.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/hotspots_207f06fc40ee.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/hotspots_402ea1883034.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/hotspots_47f4d6e5f67d.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/hotspots_7faefc978f5d.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/hotspots_9f2770b42646.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/hotspots_b477c84a3f27.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/hotspots_ff1128cee7c0.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/uniform_0fba3368eb8b.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/uniform_15ca3328aff0.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/uniform_165b96c05a44.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/uniform_263750bcffe9.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/uniform_567ecbecf1f7.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/uniform_898f25d74412.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/uniform_bb35698c86a9.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/uniform_da85c93fc7e9.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/instances/uniform_ea894ddbd70e.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B/results.jsonl" beforeDir="false" afterPath="$PROJECT_DIR$/results/mcpa/campaign_B/results.jsonl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/clusters.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/incumbents.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_0021bc24a5f5.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_01ad1b587ee1.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_033621706f0f.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_03a7a33c0ad9.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_05851ffda6a4.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_059d0a9b2a3a.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_06f17e7794a2.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_07e0a649640b.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_09aa504f11a8.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_0a2ef17e9c36.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_0c35976e61de.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_0cb8617954ac.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_0dfa1f4568d3.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_0eb416878926.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_1199d5133c24.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_12b19eded3d7.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_158ec64aaed7.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_16c408ae5431.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_175579624871.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_179425b327e5.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_18add68c2d5a.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_1c203c0043ca.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_225846b84479.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_23b4bfabc2f8.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_245b5d9e6c8b.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_247f35123508.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_29ef51c5afe5.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_2c2c9219f5aa.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_2c99725441aa.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_2f6ae7220d01.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_3192e3ace287.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_31f9d3504eee.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_38b665b4bdd2.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_3a4fff7de9dd.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_3a7a72fad408.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_3cb0a1f9dd0f.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_3e0aad5e5d95.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_3ed24b05435d.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_3f7d7a53708d.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_43000c58f7ce.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_47722823367a.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_4958d25ae3eb.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_4c038c7b7573.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_4cc4d4c5332e.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_4cda49f19330.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_4d6782cab9b4.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_4f9d1d6a7284.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_4fda3c37dca4.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_503436777a5e.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_53c0737548c8.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_551e59a07608.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_55289f42dd51.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_554e5a1e659e.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_56daeba86538.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_5910fa99d17e.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_5a2d589641a6.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_5d7a17eb06ef.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_5f49aa9a7e1d.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_60307f7729ab.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_621288376e09.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_630c3bd3ac29.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_6419f58ba41a.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_66005ddb0158.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_67ed49c2596d.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_7116a1ca420c.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_756fc2119fc1.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_764befbd11fa.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_767de07374f2.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_791e151e6142.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_79ddb0a0dd58.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_7a1ad1eb567e.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_8003d29fbd77.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_8410249456b9.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_887380dfe089.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_8c183adcb1d3.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_8c5b779c0b39.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_8d0eb5dd02f1.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_8d3421bc45d3.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_9526738b1e86.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_954184c0137e.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_9825f13e684b.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_a31e7b357954.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_a4d69563fa9f.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_a51ec1e4ee09.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_a56e8cfa8478.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_a85fabd1439e.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_ad727fc65023.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_b0be8e726f16.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_b0f4201c78e6.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_b1b975c7448b.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_b1c861228d82.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_b21755f8eb80.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_b4f8fa3e826b.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_b950878c2a7c.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_b99c54b9706c.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_ba67fd5562d4.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_babc786840a1.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_bd6327532bd3.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_be15f10756f5.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_bea10350478f.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_c20a2d3988a4.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_c3d9a5e3c151.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_c4c6ada0e5ca.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_c55b901f81b4.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_c5c7106e869f.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_c6b2feaf1f56.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_c70da4ffb350.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_c890fd38e910.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_c902ea78bf89.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_ccdad904063d.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_ccfd07ee3c40.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_cdea4bac2a49.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_d19cffea5a3c.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_d25b5158ea99.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_d2a4720f2fad.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_d3e91597aa26.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_d449beabe857.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_d89a6565ed4d.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_d97204b55bc6.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_dbd19a0814ee.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_e51638719a1f.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_e6f41612618f.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_ec46ef95caa7.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_ee3624e81234.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_ef2de1687e08.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_f1389f90af27.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_f2b408829d08.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_f3f3dac61218.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_f5e3ef456a82.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_f76539dbbefe.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_f82a6fd2fde7.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_f9565286a558.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_f95d9e753fe4.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_fc052359ce53.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/instances/quadrants_fcbbbc97020e.json.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_A_backup/results.jsonl" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/clusters.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/incumbents.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_05f624b630b4.json.gz" beforeDir="false" />
@@ -37,29 +237,18 @@
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_0b8ad941fc9e.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_0be39bbb33f3.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_105a883766d6.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_12f82f7f8973.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_19f11a601959.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_1e5b05e3472c.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_207f06fc40ee.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_215d0ec414be.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_26af2c7a6151.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_2b34643fe50c.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_2b9d7e8d99b6.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_2eb6322265b6.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_31f207944b2e.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_360c5d83c27f.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_39be6252df18.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_3af9ccd5493a.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_3dc68f33f07e.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_402ea1883034.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_47f4d6e5f67d.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_499d3f8707dc.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_4a99a1535665.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_4ac96ef846fc.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_4cf462c3887a.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_4df2d0bdd2af.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_51abfbc852e2.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_576d7f78c214.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_5b9cb1e3b3c7.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_5c8dbf3ca211.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_600ecfffbfdb.json.gz" beforeDir="false" />
@@ -68,168 +257,96 @@
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_64541434f17d.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_64d6292a5004.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_6b7f8c0ae1a1.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_6b83d7d12438.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_6beb05bdf47b.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_71be3b218955.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_726cf99147b8.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_72c01c644671.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_73d39506ede8.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_79793d1299d7.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_7ac2aa53f755.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_7faefc978f5d.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_7fd67c86e60c.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_81fe3efa570e.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_8594eb6e92d1.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_8d4c98f6403a.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_96898d1832a5.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_9a582119e1d5.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_9f2770b42646.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_a1bef5365de9.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_a1e99ad36dbe.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_a3fbad490e43.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_a5e62ac0aec1.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_a6fa76c67fe4.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_a8a03207baf4.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_b05662563878.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_b18574a5249d.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_b477c84a3f27.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_b5f8e6573737.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_be6c37437a38.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_c43c250a9a7d.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_c52ebf1281fc.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_cc1bafb05945.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_d14f16b34b2b.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_d3f650928d0f.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_d8c9ee472629.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_dc9e5c40d683.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_dcd4c9910e0c.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_dfe0b0e1fc73.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_e71116403a98.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_e9204062d275.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_ea1c91393806.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_eb4e24ae60aa.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_f2b34b4b465c.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_f457b6b93aa2.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_fe4fac3a6041.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/hotspots_ff1128cee7c0.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_062c06ac8f43.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_0640b1c9f991.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_06ea7b718894.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_08e47d975aa5.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_0b029bb4533d.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_0e45a3804173.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_0fba3368eb8b.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_11620674cd02.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_14d2491ae7aa.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_15ca3328aff0.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_165b96c05a44.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_18c29055e8b5.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_193dc4766a88.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_1a4644d60e57.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_1d0616938873.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_1d8c9394ed7d.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_227d598308a4.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_25be92d18805.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_263750bcffe9.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_2ca821071d33.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_2ed08ffc7acd.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_3135b090667f.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_31a3ebf0a762.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_32c567d3688e.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_339de9f3fc7e.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_35447a3846f2.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_379f05fb9a89.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_37ce83b93f8e.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_3844853bb354.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_386043ded5fc.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_3a9cc42b65d4.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_3ab35e60c9a8.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_3be838dc86ec.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_3d5e76ff38c4.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_4057f84f187a.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_43e0bb359d55.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_483dd61a9f69.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_48b97aebb388.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_4926db2c8635.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_49b268811177.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_4dcc1175ae0a.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_4deee2c28cf6.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_509f7d4ffd2c.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_557465a50629.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_567ecbecf1f7.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_58fad0f376d1.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_5add1d516bfd.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_5b467786a065.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_5c6ea7da354c.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_633cbe531591.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_63a837379881.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_63f04b7a539b.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_6745f933d411.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_675b652101fc.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_6cd73729f5ef.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_6ed423796611.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_6fbcc3b84b51.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_70a28f3b3a97.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_72b9cac50a06.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_73cb1bdf9ed0.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_7692c667b56e.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_78f0051dcaf8.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_7bb6bb2a72b7.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_7c7690e317bf.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_7cef91160ce9.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_809410cb6d5e.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_80c86a06ba2d.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_823ee0aed42e.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_838fbd420da5.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_862438d979c0.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_898f25d74412.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_8ab5d2c194a8.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_8ac579ba1bc2.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_8ec2a370e375.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_949c63326e1c.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_95540a823896.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_9ab3aa45029d.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_9c0ae30a8009.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_9dda1f67f8b7.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_a27cd11f1ce0.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_a28c1a8cc8e2.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_a2be44693e4a.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_a3fb67bbc076.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_ab6c9bae4a5b.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_b03185e6d23b.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_b2e7b1df2bc6.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_b3e6ff15ed15.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_b3ff17ab36f5.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_b9ff4280453d.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_bb35698c86a9.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_bbc7a21132fb.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_bfecbadb0fd9.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_c1da7b91d9cc.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_c5a0f3490722.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_c7183da77a2f.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_ce4260f48ecd.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_cf13c473de8e.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_d11ba891f487.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_d354b7b16093.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_d5ec9882dfda.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_da85c93fc7e9.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_dada3afa4415.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_dae4771f2de4.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_dc91d01ad32f.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_dce69968e1c3.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_ddc214b7f2a2.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_dff23de8e98f.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_e2e9008c14fb.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_e412766a963a.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_e5b99ff3f9dc.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_e899ba66ac50.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_e95aa30399f5.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_ea894ddbd70e.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_ef707318e462.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_ef83f3eefa11.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_f3e83e812e50.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_f80edd5864f4.json.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_f9132727c6e5.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_fe24f27a5e5c.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/instances/uniform_ffe47d2eefdc.json.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/mcpa/campaign_B_backup/results.jsonl" beforeDir="false" />
@@ -263,61 +380,61 @@
 }</component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0" />
-      <entry key="S5" value="1.0000000000057858" />
-      <entry key="S10" value="1.0000024056852663" />
-      <entry key="S30" value="1.0140673766812163" />
-      <entry key="S60" value="1.141618677368773" />
-      <entry key="M2" value="1.5046802823240686" />
-      <entry key="M5" value="2.2915842927972703" />
-      <entry key="M10" value="3.0664015990069093" />
-      <entry key="M15" value="3.5124713943088612" />
-      <entry key="M30" value="4.129427227419132" />
-      <entry key="H1" value="4.526395048939897" />
-      <entry key="H2" value="4.752633061937659" />
-      <entry key="H4" value="4.873540836118002" />
-      <entry key="D1" value="4.978525958595084" />
-      <entry key="W1" value="4.996922384216505" />
+      <entry key="MS100" value="1.0583701356076214" />
+      <entry key="MS500" value="1.785208141910812" />
+      <entry key="S2" value="4.136767965996829" />
+      <entry key="S5" value="7.507670556379466" />
+      <entry key="S10" value="10.810128044874823" />
+      <entry key="S30" value="15.279801734887178" />
+      <entry key="S60" value="16.96540073044386" />
+      <entry key="M2" value="17.933780460750377" />
+      <entry key="M5" value="18.561008711578236" />
+      <entry key="M10" value="18.778553752393286" />
+      <entry key="M15" value="18.85782606900777" />
+      <entry key="M30" value="19.113824393596563" />
+      <entry key="H1" value="20.021295344203807" />
+      <entry key="H2" value="21.499035268868678" />
+      <entry key="H4" value="22.8763508092426" />
+      <entry key="D1" value="24.579143457527703" />
+      <entry key="W1" value="24.93799676287266" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="2.1730643725944435E-115" />
-      <entry key="S2" value="2.159077083901708E-29" />
-      <entry key="S5" value="3.41749005286179E-12" />
-      <entry key="S10" value="1.84864546434999E-6" />
-      <entry key="S30" value="0.012273013441470948" />
-      <entry key="S60" value="0.1107836334549059" />
-      <entry key="M2" value="0.3328417543742159" />
-      <entry key="M5" value="0.6440137220227298" />
-      <entry key="M10" value="0.8025046554523717" />
-      <entry key="M15" value="0.86357164427709" />
-      <entry key="M30" value="0.9292855558315161" />
-      <entry key="H1" value="0.9639945828849436" />
-      <entry key="H2" value="0.9818322580181115" />
-      <entry key="H4" value="0.9908744915568831" />
-      <entry key="D1" value="0.9984732664868097" />
-      <entry key="W1" value="0.9997817523682818" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="7.620814216556903E-265" />
+      <entry key="S30" value="9.134128663210983E-89" />
+      <entry key="S60" value="9.557263553554951E-45" />
+      <entry key="M2" value="9.776125793766642E-23" />
+      <entry key="M5" value="1.5706040481098549E-9" />
+      <entry key="M10" value="3.963084717880572E-5" />
+      <entry key="M15" value="0.0011623999184624569" />
+      <entry key="M30" value="0.034093986544000046" />
+      <entry key="H1" value="0.18464557006329715" />
+      <entry key="H2" value="0.4297040493913192" />
+      <entry key="H4" value="0.6555181533651978" />
+      <entry key="D1" value="0.9320319220963029" />
+      <entry key="W1" value="0.9899949279979952" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.7169776240079136" />
-      <entry key="MS500" value="0.9356234978314001" />
-      <entry key="S2" value="0.9835020740262483" />
-      <entry key="S5" value="0.9933678773233704" />
-      <entry key="S10" value="0.99668196742187" />
-      <entry key="S30" value="1.0235431218124795" />
-      <entry key="S60" value="1.2439442431705134" />
-      <entry key="M2" value="1.8249645509827783" />
-      <entry key="M5" value="2.9255237934343055" />
-      <entry key="M10" value="3.8623607450743433" />
-      <entry key="M15" value="4.3712352130457655" />
-      <entry key="M30" value="5.0560437622891605" />
-      <entry key="H1" value="5.488978340983316" />
-      <entry key="H2" value="5.7337388886629785" />
-      <entry key="H4" value="5.8640466958660555" />
-      <entry key="D1" value="5.976937014487318" />
-      <entry key="W1" value="5.996695230187222" />
+      <entry key="MS100" value="0.905316875567025" />
+      <entry key="MS500" value="1.7022823035818977" />
+      <entry key="S2" value="4.00944371997697" />
+      <entry key="S5" value="7.385024592949659" />
+      <entry key="S10" value="10.708099369032738" />
+      <entry key="S30" value="15.222931395585455" />
+      <entry key="S60" value="16.93197347736937" />
+      <entry key="M2" value="17.9155536448202" />
+      <entry key="M5" value="18.55331407495339" />
+      <entry key="M10" value="18.77467469217105" />
+      <entry key="M15" value="18.856353612679126" />
+      <entry key="M30" value="19.1464972965117" />
+      <entry key="H1" value="20.205005091605166" />
+      <entry key="H2" value="21.928086636383092" />
+      <entry key="H4" value="23.531456907372636" />
+      <entry key="D1" value="25.51108912262149" />
+      <entry key="W1" value="25.92797884053931" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -436,7 +553,7 @@
       <workItem from="1793897562112" duration="8324000" />
       <workItem from="1794013628822" duration="370000" />
       <workItem from="1794014020422" duration="32392000" />
-      <workItem from="1794696053230" duration="6520000" />
+      <workItem from="1794696053230" duration="11456000" />
     </task>
     <task id="LOCAL-00001" summary="Major code refactor and new results">
       <option name="closed" value="true" />
@@ -534,7 +651,15 @@
       <option name="project" value="LOCAL" />
       <updated>1794046197766</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="CPA results">
+      <option name="closed" value="true" />
+      <created>1794746757178</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1794746757178</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -562,10 +687,11 @@
     <MESSAGE value="Campaign A1 results" />
     <MESSAGE value="Campaign A results" />
     <MESSAGE value="Campaign B results" />
-    <option name="LAST_COMMIT_MESSAGE" value="Campaign B results" />
+    <MESSAGE value="CPA results" />
+    <option name="LAST_COMMIT_MESSAGE" value="CPA results" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Thesis$main.coverage" NAME="main Coverage Results" MODIFIED="1794742042221" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Thesis$main.coverage" NAME="main Coverage Results" MODIFIED="1794772869164" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$main_cfl.coverage" NAME="main_cfl Coverage Results" MODIFIED="1792590026623" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$main.coverage" NAME="main Coverage Results" MODIFIED="1792231198292" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$test_isa.coverage" NAME="test_isa Coverage Results" MODIFIED="1792159456329" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/isa/IsaInterface" />
