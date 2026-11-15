@@ -1,16 +1,26 @@
+import math
+
 Coord = tuple[int, int]
 Quadrant = tuple[Coord, Coord]
+
+
+def blocks_per_side(n_quadrants: int) -> int:
+    """Numero m di quadranti per lato della griglia m x m che li contiene: 2 fino a 4, 3 fino a 9, poi ceil(sqrt(q))."""
+    return max(2, math.isqrt(n_quadrants - 1) + 1)
 
 
 def set_replicated_quadrants(grid_side, n_quadrants, off):
     left_up = (0, 0)
     right_down = (grid_side - 1, grid_side - 1)
     quadrants: list[Quadrant] = []
-    
+
     if n_quadrants <= 4:
         quadrants = _divide_by_4(left_up, right_down, off)
     elif n_quadrants <= 9:
         quadrants = _divide_by_9(left_up, right_down, off)
+    else:
+        # m x m quadranti (16, 25, 36, ...): stessa regola di _divide_by_9, per righe; si usano i primi n_quadrants
+        quadrants = _divide_by_m2(left_up, right_down, blocks_per_side(n_quadrants), off)
 
     return quadrants
 
@@ -154,6 +164,25 @@ def _divide_by_9(
 
     row_intervals = _split_interval_3(top, bottom, offset)
     col_intervals = _split_interval_3(left, right, offset)
+
+    return [
+        ((r_start, c_start), (r_end, c_end))
+        for (r_start, r_end) in row_intervals
+        for (c_start, c_end) in col_intervals
+    ]
+
+
+def _divide_by_m2(
+    left_up: Coord,
+    right_down: Coord,
+    m: int,
+    offset: int = 0
+) -> list[Quadrant]:
+    top, left = left_up
+    bottom, right = right_down
+
+    row_intervals = _split_interval_k(top, bottom, m, offset)
+    col_intervals = _split_interval_k(left, right, m, offset)
 
     return [
         ((r_start, c_start), (r_end, c_end))

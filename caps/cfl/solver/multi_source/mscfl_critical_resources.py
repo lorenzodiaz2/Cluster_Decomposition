@@ -16,7 +16,14 @@ class MSCFL_Critical_Resources(CFL_Critical_Resources):
 
 
     def _compute_score(self, candidate: Client):
-        return sum(max(0, self.residuals[f.id]) for f in candidate.k_facilities)
+        fid = self._current_fid
+        dist = candidate.distances_to_facilities
+        free = sum(max(0, self.residuals[f.id]) for f in candidate.k_facilities)
+        # nearest alternative facility with free capacity
+        alt = [dist[f.id] for f in candidate.k_facilities if f.id != fid and self.residuals[f.id] > EPS]
+        if not alt:
+            return free, float("-inf")
+        return free, dist[fid] - min(alt)
 
     def _recompute(self, candidate: Client):
         fid = self._current_fid

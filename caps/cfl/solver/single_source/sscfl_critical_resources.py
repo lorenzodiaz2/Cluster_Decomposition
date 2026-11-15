@@ -15,12 +15,21 @@ class SSCFL_Critical_Resources(CFL_Critical_Resources):
     def _compute_score(self, candidate: Client):
         NEG_INF = float("-inf")
         fid = self._current_fid
-        margins = [
-            self.residuals.get(f.id, NEG_INF) - candidate.demand
-            for f in candidate.k_facilities
-            if f.id != fid and self.residuals.get(f.id, NEG_INF) >= candidate.demand
-        ]
-        return len(margins), max(margins, default=NEG_INF)
+        dist = candidate.distances_to_facilities
+        n_alt = 0
+        best = None  # (margin, -distance) of the best alternative facility
+        for f in candidate.k_facilities:
+            residual = self.residuals.get(f.id, NEG_INF)
+            if f.id == fid or residual < candidate.demand:
+                continue
+            n_alt += 1
+            key = (residual - candidate.demand, -dist[f.id])
+            if best is None or key > best:
+                best = key
+        if best is None:
+            return 0, NEG_INF, NEG_INF
+        # third component: current distance minus distance of the best alternative (larger = smaller increase)
+        return n_alt, best[0], dist[fid] + best[1]
 
 
     def _recompute(self, candidate: Client):

@@ -95,7 +95,7 @@ def campaign_A() -> list[MCPA_Instance_Settings]:
 
 def campaign_B() -> list[MCPA_Instance_Settings]:
     # stesse masse totali di A con q = 4 e q = 9 a rho = 1, stessa densità per area
-    sizes = [(2 * BASE_GRID_SIDE, 4 * N_PAIRS_BASE), (3 * BASE_GRID_SIDE, 9 * N_PAIRS_BASE)]
+    sizes = [(2 * BASE_GRID_SIDE, 4 * N_PAIRS_BASE), (49, 6 * N_PAIRS_BASE)]
     settings = []
     for grid_side, n_pairs in sizes:
         for s in SEEDS:
@@ -166,8 +166,8 @@ def run_ablations_A(runner: MCPA_Runner):
     runner.run_all([replace(st, partitioner="random") for st in base], run_global=False)                              # 120
     runner.run_all([replace(st, max_cluster_size=round(f * M_STAR)) for st in reduced for f in (0.5, 0.75, 1.25, 1.5)],
                    run_global=False)                                                                                   # 240
-    runner.run_all([replace(st, sim_weighting="uniform", sim_beta=None, resource_weights=w) for st in base
-                    for w in ("uniform", "linear")], run_global=False)                                                 # 240
+    # TODO (analisi e ISA): k qui è il valore NOMINALE. Se il modello completo è infeasible le opzioni vengono estese, quindi
+    # nelle analisi va usato il numero effettivo di opzioni per coppia, n_paths_heuristic / n_pairs (vedi isa/IsaInterface/test_isa.py)
     runner.run_all([replace(st, k=k) for st in reduced for k in (5, 15)])                                              # 120, k cambia il modello: serve il globale
 
 
@@ -184,7 +184,7 @@ def block_label_A(st: MCPA_Instance_Settings) -> str:
 
 def block_label_B(st: MCPA_Instance_Settings) -> str:
     # nome della sottofamiglia della campagna B, solo per la stampa a video
-    size = "mass q=4" if st.grid_side == 2 * BASE_GRID_SIDE else "mass q=9"
+    size = "mass q=4" if st.grid_side == 2 * BASE_GRID_SIDE else "mass q=6"
     if st.family == "hotspots":
         return f"B2 hotspots, {size}"
     if st.remove_rnd_nodes_flag or st.family_params.get("obstacles"):
@@ -232,16 +232,166 @@ def remove_runs_outside_A1():
 
     print(f"rimossi {len(removed_runs)} run e {len(removed_instances)} istanze; copia di sicurezza in {OUT_A}_backup")
 
+def remove_runs_B(first: int = 101, last: int = 117):
+  # cancella da OUT_B i run delle istanze di campaign_B() dalla posizione first alla posizione last (incluse, contando da 1,
+  # come nella stampa "i/n" del runner): righe di results.jsonl, clusters.csv, incumbents.csv e file d'istanza.
+  # Copia di sicurezza in OUT_B + "_backup"; da eseguire a campagna ferma
+  import csv
+  import os
+  import shutil
+
+  instances = campaign_B()
+  remove = {st.instance_id for st in instances[first - 1:last]}
+  print(f"istanze da cancellare: {len(remove)}  (dalla {first}: {block_label_B(instances[first - 1])}, "
+        f"alla {last}: {block_label_B(instances[last - 1])})")
+
+  shutil.copytree(OUT_B, OUT_B + "_backup")   # si ferma con un errore se la copia esiste già, così non la sovrascrive
+
+  results_file = os.path.join(OUT_B, "results.jsonl")
+  with open(results_file, encoding="utf8") as fh:
+      rows = [json.loads(line) for line in fh if line.strip()]
+  removed_rows = [r for r in rows if r["instance_id"] in remove]
+  removed_runs = {r["id"] for r in removed_rows}
+  with open(results_file, "w", encoding="utf8") as fh:
+      for r in rows:
+          if r["id"] not in removed_runs:
+              fh.write(json.dumps(r) + "\n")
+
+  for name in ("clusters.csv", "incumbents.csv"):
+      path = os.path.join(OUT_B, name)
+      if not os.path.isfile(path):
+          continue
+      with open(path, encoding="utf8", newline="") as fh:
+          reader = csv.DictReader(fh)
+          fields = reader.fieldnames
+          kept = [row for row in reader if row["id"] not in removed_runs]
+      with open(path, "w", encoding="utf8", newline="") as fh:
+          writer = csv.DictWriter(fh, fieldnames=fields)
+          writer.writeheader()
+          writer.writerows(kept)
+
+  for instance_id in remove:
+      path = os.path.join(OUT_B, "instances", f"{instance_id}.json.gz")
+      if os.path.isfile(path):
+          os.remove(path)
+
+  n_err = sum(1 for r in removed_rows if r.get("global_error") or r.get("error"))
+  print(f"rimossi {len(removed_runs)} run ({n_err} con errore) di {len(remove)} istanze; "
+        f"righe rimaste in results.jsonl: {len(rows) - len(removed_rows)}; copia di sicurezza in {OUT_B}_backup")
+
+
+def expected_runs_A() -> list[MCPA_Instance_Settings]:
+    # tutti i run che il codice attuale prevede nella cartella della campagna A: campagna + ablazioni
+    # (le tre liste delle ablazioni devono restare uguali a quelle di run_ablations_A)
+    base = campaign_A_base()
+    reduced = [st for st in base if st.n_quadrants in Q_REDUCED]
+    return (campaign_A()
+            + [replace(st, partitioner="random") for st in base]
+            + [replace(st, max_cluster_size=round(f * M_STAR)) for st in reduced for f in (0.5, 0.75, 1.25, 1.5)]
+            + [replace(st, k=k) for st in reduced for k in (5, 15)])
+
+
+def remove_unexpected_runs_A(dry_run: bool = True, out_dir: str = OUT_A):
+    """
+    Toglie dalla cartella della campagna A i run che il codice attuale non prevede (vecchi valori del blocco A4, con
+    112, 126, 154 o 168 coppie per blocco): righe di results.jsonl, clusters.csv, incumbents.csv, infeasible_attempts.csv
+    e i file d'istanza che non servono più a nessun run rimasto. Con dry_run=True stampa solo cosa verrebbe tolto.
+    Prima di modificare fa una copia di sicurezza in out_dir + "_backup_before_clean". Da eseguire a campagna ferma.
+
+    Sicurezza: si toglie un run solo se il suo id non è tra quelli previsti; se tra i run da togliere ce n'è uno con un
+    numero di coppie per blocco usato dalla campagna attuale, la funzione si ferma senza toccare nulla.
+    """
+    import csv
+    import os
+    import shutil
+    from collections import Counter
+
+    expected = expected_runs_A()
+    expected_ids = {st.run_id for st in expected}
+    valid_n_pairs = {st.n_pairs_per_quadrant for st in expected}
+
+    results_file = os.path.join(out_dir, "results.jsonl")
+    with open(results_file, encoding="utf8") as fh:
+        rows = [json.loads(line) for line in fh if line.strip()]
+    to_remove = [r for r in rows if r["id"] not in expected_ids]
+    kept = [r for r in rows if r["id"] in expected_ids]
+    removed_ids = {r["id"] for r in to_remove}
+    kept_instances = {r["instance_id"] for r in kept}
+    orphan_instances = {r["instance_id"] for r in to_remove} - kept_instances
+
+    print(f"{out_dir}: {len(rows)} run, previsti {len(expected_ids)} (presenti {len(kept)}, mancanti {len(expected_ids) - len(kept)}), "
+          f"da togliere {len(to_remove)}, file d'istanza da togliere {len(orphan_instances)}")
+    summary = Counter((r["n_quadrants"], r["n_pairs_per_quadrant"], r["resources_capacity"], r["k"], r["max_cluster_size"],
+                       r["partitioner"]) for r in to_remove)
+    for (q, n_pairs, c, k, m, part), count in sorted(summary.items()):
+        print(f"  da togliere: {count:3d} run  q={q} coppie per blocco={n_pairs} c={c} k={k} M={m} part={part}")
+    if to_remove:
+        print(f"  avviati tra {min(r['started_at'] for r in to_remove)} e {max(r['started_at'] for r in to_remove)}")
+
+    suspicious = [r for r in to_remove if r["n_pairs_per_quadrant"] in valid_n_pairs]
+    if suspicious:
+        raise SystemExit(f"FERMO: {len(suspicious)} run da togliere hanno un numero di coppie per blocco usato dalla campagna attuale "
+                         f"({sorted(valid_n_pairs)}): controllare a mano prima di cancellare. Nessun file è stato modificato.")
+    if dry_run or not to_remove:
+        print("nessun file modificato" + (" (prova: usare clean_A per cancellare davvero)" if to_remove else ""))
+        return
+
+    shutil.copytree(out_dir, out_dir + "_backup_before_clean")   # si ferma con un errore se la copia esiste già
+
+    with open(results_file, "w", encoding="utf8") as fh:
+        for r in kept:
+            fh.write(json.dumps(r) + "\n")
+
+    for name in ("clusters.csv", "incumbents.csv", "infeasible_attempts.csv"):
+        path = os.path.join(out_dir, name)
+        if not os.path.isfile(path):
+            continue
+        with open(path, encoding="utf8", newline="") as fh:
+            reader = csv.DictReader(fh)
+            fields = reader.fieldnames
+            all_rows = list(reader)
+        kept_rows = [row for row in all_rows if row["id"] not in removed_ids]
+        with open(path, "w", encoding="utf8", newline="") as fh:
+            writer = csv.DictWriter(fh, fieldnames=fields)
+            writer.writeheader()
+            writer.writerows(kept_rows)
+        print(f"  {name}: tolte {len(all_rows) - len(kept_rows)} righe, rimaste {len(kept_rows)}")
+
+    n_files = 0
+    for instance_id in orphan_instances:
+        path = os.path.join(out_dir, "instances", f"{instance_id}.json.gz")
+        if os.path.isfile(path):
+            os.remove(path)
+            n_files += 1
+    print(f"tolti {len(to_remove)} run e {n_files} file d'istanza; rimasti {len(kept)} run in results.jsonl; "
+          f"copia di sicurezza in {out_dir}_backup_before_clean")
+
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Campagne MCPA")
     # senza argomenti (es. pulsante Run di PyCharm) lancia A e B; rilanciando riprende dai run non ancora completati
     parser.add_argument("campaign", nargs="*", default=["A", "B"],
-                        help="campagne da lanciare: tuning, tuning_similarity, A, B, ablations_A (default: A B)")
+                        help="campagne da lanciare: tuning, tuning_similarity, A, B, ablations_A, infeasible_attempts (default: A B)")
     args = parser.parse_args()
-    invalid = [c for c in args.campaign if c not in ("tuning", "tuning_similarity", "A", "B", "ablations_A")]
+    valid = ("tuning", "tuning_similarity", "A", "B", "ablations_A", "infeasible_attempts", "check_A", "clean_A")
+    invalid = [c for c in args.campaign if c not in valid]
     if invalid:
-        parser.error(f"campagne non valide: {invalid} (scegliere tra tuning, tuning_similarity, A, B, ablations_A)")
+        parser.error(f"campagne non valide: {invalid} (scegliere tra {', '.join(valid)})")
+
+    # run della cartella della campagna A che il codice attuale non prevede: check_A li elenca soltanto, clean_A li toglie
+    # (con copia di sicurezza). Poi ci si ferma
+    if "check_A" in args.campaign or "clean_A" in args.campaign:
+        remove_unexpected_runs_A(dry_run="clean_A" not in args.campaign)
+        raise SystemExit(0)
+
+    # tempo dei tentativi infeasible del modello completo, per le istanze di A e B (ablazioni comprese) in cui le opzioni sono
+    # state estese: non modifica i risultati, scrive infeasible_attempts.csv nelle cartelle delle campagne e si ferma
+    if "infeasible_attempts" in args.campaign:
+        from caps.mcpa.scalability.mcpa_infeasible_attempts import measure_infeasible_attempts
+        for out_dir in (OUT_A, OUT_B):
+            measure_infeasible_attempts(out_dir, threads=THREADS)
+        raise SystemExit(0)
 
     # taratura della similarità su istanze piccole: si esegue, si analizza e ci si ferma
     if "tuning_similarity" in args.campaign:

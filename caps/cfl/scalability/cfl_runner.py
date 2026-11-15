@@ -34,7 +34,7 @@ INDICATORS = [
 METHOD_FIELDS = ("max_cluster_size", "partitioner", "sim_weighting", "sim_beta", "resource_weights")
 
 GLOBAL_COLUMNS = ("global_status", "global_n_resolutions", "global_model_time", "global_resolution_time", "global_time",
-                  "global_time_limit", "global_UB", "global_LB", "global_mip_gap", "global_n_incumbents", "global_error",
+                  "global_infeasible_time", "global_model_times", "global_resolution_times", "global_time_limit", "global_UB", "global_LB", "global_mip_gap", "global_n_incumbents", "global_error",
                   "global_n_open_facilities", "global_opening_cost_share")
 
 # variante -> (solver, risorse critiche)
@@ -403,12 +403,21 @@ class CFL_Runner:
         if solver.m is not None and solver.x is not None and (_attr(solver.m, "SolCount") or 0) > 0:
             open_ids = [fid for fid, var in solver.x.items() if var.X > 0.5]
         opening = sum(f.activation_cost for f in env.facilities if f.id in set(open_ids))
+        # se il modello è infeasible con le opzioni iniziali, le facility candidate vengono estese e il modello viene costruito
+        # e risolto di nuovo: i tentativi infeasible fanno parte della costruzione dell'istanza, quindi il tempo del globale
+        # (e con esso speedup e tempi degli incumbent) è quello dell'ULTIMO tentativo, sull'istanza definitiva.
+        # Il tempo dei tentativi precedenti resta in global_infeasible_time e nelle due liste, un valore per tentativo
+        last_model = solver.model_times[-1] if solver.model_times else None
+        last_resolution = solver.resolution_times[-1] if solver.resolution_times else None
         return {
             "global_status": solver.status,
             "global_n_resolutions": len(solver.resolution_times),
-            "global_model_time": sum(solver.model_times),
-            "global_resolution_time": sum(solver.resolution_times),
-            "global_time": sum(solver.model_times) + sum(solver.resolution_times),
+            "global_model_time": last_model,
+            "global_resolution_time": last_resolution,
+            "global_time": (last_model + last_resolution) if last_model is not None and last_resolution is not None else None,
+            "global_infeasible_time": sum(solver.model_times[:-1]) + sum(solver.resolution_times[:len(solver.model_times) - 1]),
+            "global_model_times": list(solver.model_times),
+            "global_resolution_times": list(solver.resolution_times),
             "global_time_limit": solver.time_limit,
             "global_UB": ub,
             "global_LB": _attr(solver.m, "ObjBound") if solver.m is not None else None,
@@ -422,10 +431,10 @@ class CFL_Runner:
     @staticmethod
     def _incumbent_rows(run_id: str, solver) -> list[dict]:
         # i risolutori precedenti all'ultimo sono infeasible, quindi tutti gli incumbent vengono dall'ultima optimize():
-        # il tempo viene riportato dall'inizio del solver globale (costruzione dei modelli inclusa), come il tempo dell'euristica
+        # il tempo viene riportato dall'inizio dell'ultimo tentativo (costruzione del suo modello inclusa), come global_time
         if not solver.incumbent.solutions:
             return []
-        offset = sum(solver.model_times) + sum(solver.resolution_times[:-1])
+        offset = solver.model_times[-1] if solver.model_times else 0.0
         return [{"id": run_id, "time": offset + t, "obj": obj} for t, obj in zip(solver.incumbent.times, solver.incumbent.solutions)]
 
 

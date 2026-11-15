@@ -57,8 +57,14 @@ class Client:
         raw_weights = {}
         min_dist = min((self.distances_to_facilities[f.id] for f in self.k_facilities), default=0)
 
+        # costo normalizzato (adimensionale): distanza in più rispetto alla facility più vicina, divisa per la distanza in più media
+        # tra le candidate del cliente; così beta ha lo stesso significato a ogni densità e nei benchmark (con candidate tutte
+        # equidistanti la scala è 0 e i pesi diventano uniformi)
+        extra = [self.distances_to_facilities[f.id] - min_dist for f in self.k_facilities]
+        scale = sum(extra) / len(extra) if extra else 0.0
+
         for f in self.k_facilities:
-            c = self.distances_to_facilities[f.id] - min_dist
+            c = (self.distances_to_facilities[f.id] - min_dist) / scale if scale > 0 else 0.0
 
             if weighting == "uniform":
                 w = 1.0

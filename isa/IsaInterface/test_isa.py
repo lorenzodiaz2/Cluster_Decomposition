@@ -11,6 +11,14 @@ def test_isa(df, dir):
 
     df["instance"] = np.array(range(df.shape[0])).astype(str)
 
+    # TODO (numero di opzioni k): quando k entra tra le feature NON usare il k nominale delle impostazioni (colonna "k").
+    # Se il modello completo è infeasible con le opzioni iniziali, le opzioni vengono estese, quindi il k vero è il numero
+    # effettivo di opzioni per entità dell'istanza definitiva:
+    #   CPA: n_paths_heuristic / n_pairs      (opzioni = cammini x attese; con k nominale 5, 10, 15 si parte da circa
+    #                                          10.5, 21.7, 33.7 opzioni per coppia e si arriva in media a 15.6, 25.1, 35.0)
+    #   CFL: n_options_heuristic / numero di clienti
+    # Il valore iniziale è in n_paths_initial (CPA) e n_options_initial (CFL). Vale per tutte le istanze, non solo per
+    # l'ablazione su k: circa il 40% delle istanze del CPA ha le opzioni estese.
     feat_names = [
         'grid side', 'n agents', 'max cluster size', 'mean resource capacity', 'n clusters', 'similarity index',
         'min cluster similarity index', 'global congestion absolute', 'cross congestion absolute', 'global congestion ratio max',

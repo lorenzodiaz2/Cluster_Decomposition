@@ -51,6 +51,7 @@ class CFL_Heuristic_Solver(General_Solver, ABC):
         if critical_resources:
             if not critical_resources.is_initially_feasible:
                 self.critical_resources.release_units()
+                self._close_empty_facilities()
             self.fixed_cost_before = total_solution_cost(self.clients, self.facilities)
 
 
@@ -81,6 +82,13 @@ class CFL_Heuristic_Solver(General_Solver, ABC):
 
         fac_ids = sorted(self.E.keys())
         self.x = self.m.addVars(fac_ids, vtype=GRB.BINARY)
+
+    def _close_empty_facilities(self):
+        # dopo un rilascio, una facility aperta senza più clienti nella parte fissa viene spenta: se la repair la riusa ne
+        # paga di nuovo l'apertura (risorse R^0 del paper), altrimenti resta chiusa e il suo costo non viene pagato
+        for f in self.facilities:
+            if f.is_open and sum(f.shipment_by_client.values()) <= 1e-6:
+                f.is_open = False
 
     def _is_repair_candidate(self, client: Client, fid: int) -> bool:
         # facility utilizzabile nella repair: basta capacità residua positiva (domanda divisibile); il single source lo ridefinisce
@@ -117,6 +125,7 @@ class CFL_Heuristic_Solver(General_Solver, ABC):
             if not self.critical_resources.increment_tol():   # niente più da rilasciare: la repair si ferma (prima ciclava all'infinito)
                 return False
             self.critical_resources.release_units()
+            self._close_empty_facilities()
             self.fixed_cost_before = total_solution_cost(self.clients, self.facilities)
             return sum(self.critical_resources.removed_units_by_client.values()) > before
 

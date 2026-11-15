@@ -77,12 +77,15 @@ class CFL_Environment(General_Environment):
             self._node_set = set(self._nodes)
             self._hotspot_centers, self._hotspot_weights = make_hotspots(self._nodes, self.rng_clients, self.family_params["n_hotspots"])
 
+        # più clienti possono stare sullo stesso nodo (la chiave è l'id, quindi nessuna posizione viene rifiutata): è ciò che si
+        # ottiene discretizzando su griglia punti uniformi nel piano, e permette famiglie concentrate (hotspot) a densità alta.
+        # Lo stesso vale per le facility: anche più facility possono stare sullo stesso nodo.
         seen_positions: set[tuple[int, int]] = set()
         if self.n_elements_per_quadrant:
             self._spawn_in_quadrants(
                 n_per_quadrant=self.n_elements_per_quadrant,
                 maker=lambda q, i: self._make_client(q, i),
-                seen_key=lambda c: c.position,
+                seen_key=lambda c: c.id,
                 target_list=self.elements,
                 quadrant_by_id=self.quadrant_by_element_id,
                 start_id=0,
@@ -94,7 +97,7 @@ class CFL_Environment(General_Environment):
             self._spawn_in_quadrants(
                 n_per_quadrant=self.n_facilities_per_quadrant,
                 maker=lambda q, i: self._make_facility(q, i, self.resources_capacity),
-                seen_key=lambda f: f.position,
+                seen_key=lambda f: f.id,
                 target_list=self.facilities,
                 quadrant_by_id=self.quadrant_by_facility_id,
                 start_id=0,
@@ -138,8 +141,10 @@ class CFL_Environment(General_Environment):
 
     def _apply_cornuejols(self):
         """
-        Riscala le capacità in modo che in ogni quadrante capacità totale / domanda totale = capacity_ratio (capacità intere, almeno 1),
-        poi calcola i costi di apertura f_j = (U[0, 90] + U[100, 110] * sqrt(s_j)) * opening_cost_scale, arrotondati a intero.
+        Come in Cornuéjols, Sridharan e Thizy (1991): i costi di apertura f_j = (U[0, 90] + U[100, 110] * sqrt(s_j)) * opening_cost_scale
+        (arrotondati a intero) si calcolano dalla capacità estratta s_j ~ U[10, 160], PRIMA della riscalatura, quindi non dipendono
+        da capacity_ratio; poi le capacità vengono riscalate in modo che in ogni quadrante capacità totale / domanda totale =
+        capacity_ratio (capacità intere, almeno 1). Il raddoppio dei costi che il paper applica a r = 1.5 e r = 2 non viene fatto.
         """
         demand_by_quadrant = defaultdict(float)
         for c in self.elements:
@@ -154,9 +159,9 @@ class CFL_Environment(General_Environment):
             target = self.capacity_ratio * demand_by_quadrant.get(q, 0.0)
             factor = target / raw_total if raw_total > 0 else 0.0
             for f in facs:
-                f.capacity = max(1, round(f.capacity * factor))
                 a, b = self._opening_cost_draws[f.id]
-                f.activation_cost = round((a + b * math.sqrt(f.capacity)) * self.opening_cost_scale)
+                f.activation_cost = round((a + b * math.sqrt(f.capacity)) * self.opening_cost_scale)   # capacità estratta
+                f.capacity = max(1, round(f.capacity * factor))
 
     def _choose_position(self, quadrant: Quadrant, rng: random.Random) -> Coord:
         top, left = quadrant[0]
