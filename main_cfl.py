@@ -19,13 +19,11 @@ CLIENTS_PER_FACILITY = 3                  # come le classi 25x8 e 50x16 di Cornu
 K = 10
 SEEDS = range(5)                          # indici di replica: il seed vero di ogni istanza è derivato da parametri + replica
 
-# TODO IMPORTANTE: scegliere gli offset (come frazione del lato del quadrante n0) DOPO lo stress test, quando M* è noto.
-# Devono coprire gli stessi regimi di MCPA (blocchi separati, a contatto, sovrapposti fino a un quarto del lato; in MCPA
-# le frazioni sono -0.05, 0, 0.05, 0.1, 0.15, 0.25). Le 10 facility candidate di un cliente stanno entro circa
-# sqrt(K * CLIENTS_PER_FACILITY / (2 * M*)) volte n0: gli offset negativi vanno scelti rispetto a questa distanza.
-# Valori precedenti (scelti con densità 0.07 e 5 clienti per facility): [-0.3, -0.14, 0.0, 0.1, 0.2, 0.3]
-# Finché è None le campagne non partono (lo stress test sì).
-OFFSET_FRACTIONS = None
+# offset in righe/colonne della griglia, uguali per SS e MS (deciso il 16-11-2026). Si parte da -6 e non da -1 come in
+# MCPA: le 10 facility candidate di un cliente arrivano a 7-9 righe di distanza, quindi con -1 un terzo dei clienti ha
+# candidate in un altro blocco (blocchi del tutto separati solo da -9 in giu'). La griglia NON viene allargata, come in
+# MCPA: con offset negativo i blocchi perdono righe e colonne (con -6 e n0 = 18 diventano 15 x 15).
+OFFSETS = [-6, -4, -2, 0, 2, 5]
 Q_ALL = [2, 4, 6, 9]
 Q_REDUCED = [4, 9]                        # per gli sweep su M e k delle ablazioni
 
@@ -45,7 +43,7 @@ STRESS = {
 STRESS_DONE = False
 
 # ----- M* (numero di clienti per cluster), da scegliere dai grafici dello stress test -----
-M_STAR = {"ss": None, "sd": None}
+M_STAR = {"ss": 150, "sd": None}   # SS: scelto il 16-11-2026 dallo stress test (mediana circa 2 s a 150 clienti)
 
 # ----- similarità -----
 # scelta di progetto, uguale per tutti i problemi (stessa di MCPA): pesi esponenziali sulle opzioni con beta = 1 e pesi
@@ -77,11 +75,11 @@ def _independent_seeds(settings_list: list[CFL_Instance_Settings]) -> list[CFL_I
     return out
 
 
-def _quadrant_settings(variant: str, q: int, offset_fraction: float, replica: int, **kw) -> CFL_Instance_Settings:
+def _quadrant_settings(variant: str, q: int, offset: int, replica: int, **kw) -> CFL_Instance_Settings:
     n0 = quadrant_side(variant)
     params = dict(variant=variant, grid_side=2 * n0 if q <= 4 else 3 * n0, n_quadrants=q,
                   n_clients_per_quadrant=M_STAR[variant], n_facilities_per_quadrant=_n_facilities(M_STAR[variant]),
-                  offset=round(offset_fraction * n0), seed=replica, max_cluster_size=M_STAR[variant], k=K,
+                  offset=offset, seed=replica, max_cluster_size=M_STAR[variant], k=K,
                   capacity_ratio=BASE_CAPACITY_RATIO, opening_cost_scale=OPENING_COST_SCALE, **SIMILARITY[variant])
     params.update(kw)
     return CFL_Instance_Settings(**params)
@@ -89,13 +87,13 @@ def _quadrant_settings(variant: str, q: int, offset_fraction: float, replica: in
 
 def campaign_A_base(variant: str) -> list[CFL_Instance_Settings]:
     # A1: r = 3, scala dei costi di apertura 1, rho = 1  ->  6 offset x 4 q x 5 seed = 120
-    return _independent_seeds([_quadrant_settings(variant, q, f, s) for q in Q_ALL for f in OFFSET_FRACTIONS for s in SEEDS])
+    return _independent_seeds([_quadrant_settings(variant, q, f, s) for q in Q_ALL for f in OFFSETS for s in SEEDS])
 
 
 def campaign_A(variant: str) -> list[CFL_Instance_Settings]:
     settings = []
     for q in Q_ALL:
-        for f in OFFSET_FRACTIONS:
+        for f in OFFSETS:
             for s in SEEDS:
                 settings += [_quadrant_settings(variant, q, f, s, capacity_ratio=r) for r in (2.0, 5.0)]             # A2 tensione: 240
                 settings += [_quadrant_settings(variant, q, f, s, opening_cost_scale=c) for c in (0.25, 0.1)]        # A3 costi di apertura: 240
@@ -180,8 +178,6 @@ if __name__ == '__main__':
     missing = [v for v, m in M_STAR.items() if not m]
     if missing:
         raise SystemExit(f"Impostare M_STAR per {missing} (dai grafici dello stress test) prima di proseguire.")
-    if OFFSET_FRACTIONS is None:
-        raise SystemExit("Impostare OFFSET_FRACTIONS (vedi il TODO in cima al file) prima di lanciare le campagne.")
 
     # 2) campagne
     for variant in args.variant:
