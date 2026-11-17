@@ -4,19 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="CPA results">
-      <change beforePath="$PROJECT_DIR$/caps/cfl/elements/cfl_environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/elements/cfl_environment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/elements/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/elements/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/instances/SS/solutions/Yang_Solution_Values.txt" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/instances/SS/solutions/Yang_Solution_Values.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/scalability/cfl_runner.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/scalability/cfl_runner.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/solver/cfl_heuristic_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/solver/cfl_heuristic_solver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/solver/multi_source/mscfl_critical_resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/solver/multi_source/mscfl_critical_resources.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/cfl/solver/single_source/sscfl_critical_resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/cfl/solver/single_source/sscfl_critical_resources.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/caps/mcpa/scalability/mcpa_tuning_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/caps/mcpa/scalability/mcpa_tuning_analysis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/isa/IsaInterface/test_isa.py" beforeDir="false" afterPath="$PROJECT_DIR$/isa/IsaInterface/test_isa.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_cfl.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_cfl.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/grid_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/grid_utils.py" afterDir="false" />
+    <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="SSCFL stress test">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/cfl/ss/stress_test_r3/stress_runs.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/cfl/ss/stress_test_r3/stress_runs.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,61 +37,61 @@
 }</component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0583701356076214" />
-      <entry key="MS500" value="1.785208141910812" />
-      <entry key="S2" value="4.136767965996829" />
-      <entry key="S5" value="7.507670556379466" />
-      <entry key="S10" value="10.810128044874823" />
-      <entry key="S30" value="15.279801734887178" />
-      <entry key="S60" value="16.96540073044386" />
-      <entry key="M2" value="17.933780460750377" />
-      <entry key="M5" value="18.561008711578236" />
-      <entry key="M10" value="18.778553752393286" />
-      <entry key="M15" value="18.85782606900777" />
-      <entry key="M30" value="19.113824393596563" />
-      <entry key="H1" value="20.021295344203807" />
-      <entry key="H2" value="21.499035268868678" />
-      <entry key="H4" value="22.8763508092426" />
-      <entry key="D1" value="24.579143457527703" />
-      <entry key="W1" value="24.93799676287266" />
+      <entry key="MS100" value="1.0533127377892926" />
+      <entry key="MS500" value="2.143214772402814" />
+      <entry key="S2" value="5.43317810556525" />
+      <entry key="S5" value="9.698404143924492" />
+      <entry key="S10" value="13.767476951966273" />
+      <entry key="S30" value="19.310371727364686" />
+      <entry key="S60" value="21.425946567388447" />
+      <entry key="M2" value="22.648283385194826" />
+      <entry key="M5" value="23.44271690458045" />
+      <entry key="M10" value="23.71869746812322" />
+      <entry key="M15" value="23.8177507219388" />
+      <entry key="M30" value="24.09353094090083" />
+      <entry key="H1" value="25.01070936726694" />
+      <entry key="H2" value="26.4933859058623" />
+      <entry key="H4" value="27.873360162623246" />
+      <entry key="D1" value="29.578610826964507" />
+      <entry key="W1" value="29.937919643560566" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
       <entry key="MS500" value="0.0" />
       <entry key="S2" value="0.0" />
       <entry key="S5" value="0.0" />
-      <entry key="S10" value="7.620814216556903E-265" />
-      <entry key="S30" value="9.134128663210983E-89" />
-      <entry key="S60" value="9.557263553554951E-45" />
-      <entry key="M2" value="9.776125793766642E-23" />
-      <entry key="M5" value="1.5706040481098549E-9" />
-      <entry key="M10" value="3.963084717880572E-5" />
-      <entry key="M15" value="0.0011623999184624569" />
-      <entry key="M30" value="0.034093986544000046" />
-      <entry key="H1" value="0.18464557006329715" />
-      <entry key="H2" value="0.4297040493913192" />
-      <entry key="H4" value="0.6555181533651978" />
-      <entry key="D1" value="0.9320319220963029" />
-      <entry key="W1" value="0.9899949279979952" />
+      <entry key="S10" value="6.407871180839244E-265" />
+      <entry key="S30" value="8.621270217995081E-89" />
+      <entry key="S60" value="9.285079546237113E-45" />
+      <entry key="M2" value="9.63591176082321E-23" />
+      <entry key="M5" value="1.5615544264813026E-9" />
+      <entry key="M10" value="3.951650827795014E-5" />
+      <entry key="M15" value="0.0011601630831159654" />
+      <entry key="M30" value="0.03406116679029015" />
+      <entry key="H1" value="0.1845566763633602" />
+      <entry key="H2" value="0.42960060098114417" />
+      <entry key="H4" value="0.6554392427839091" />
+      <entry key="D1" value="0.9320132216556367" />
+      <entry key="W1" value="0.9899920903421829" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.905316875567025" />
-      <entry key="MS500" value="1.7022823035818977" />
-      <entry key="S2" value="4.00944371997697" />
-      <entry key="S5" value="7.385024592949659" />
-      <entry key="S10" value="10.708099369032738" />
-      <entry key="S30" value="15.222931395585455" />
-      <entry key="S60" value="16.93197347736937" />
-      <entry key="M2" value="17.9155536448202" />
-      <entry key="M5" value="18.55331407495339" />
-      <entry key="M10" value="18.77467469217105" />
-      <entry key="M15" value="18.856353612679126" />
-      <entry key="M30" value="19.1464972965117" />
-      <entry key="H1" value="20.205005091605166" />
-      <entry key="H2" value="21.928086636383092" />
-      <entry key="H4" value="23.531456907372636" />
-      <entry key="D1" value="25.51108912262149" />
-      <entry key="W1" value="25.92797884053931" />
+      <entry key="MS100" value="0.9432381269124005" />
+      <entry key="MS500" value="2.094097848104368" />
+      <entry key="S2" value="5.346817509191627" />
+      <entry key="S5" value="9.593286654094438" />
+      <entry key="S10" value="13.671295639981984" />
+      <entry key="S30" value="19.252929547375118" />
+      <entry key="S60" value="21.39154863577076" />
+      <entry key="M2" value="22.629346410487006" />
+      <entry key="M5" value="23.434675487739586" />
+      <entry key="M10" value="23.714633625138262" />
+      <entry key="M15" value="23.81615035691684" />
+      <entry key="M30" value="24.126106974559892" />
+      <entry key="H1" value="25.19429795115927" />
+      <entry key="H2" value="26.922317619022895" />
+      <entry key="H4" value="28.52837921751291" />
+      <entry key="D1" value="30.5105364295372" />
+      <entry key="W1" value="30.927898688775606" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -113,40 +103,41 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main_cfl.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test_isa.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;git.auto.fetch.suggestion.counter&quot;: &quot;1&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;python.packages.toolwindow.project.migrated.to.right.top.v2&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;terminal&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.main.executor": "Run",
+    "Python.main_cfl.executor": "Run",
+    "Python.test_isa.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "master",
+    "git.auto.fetch.suggestion.counter": "2",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/home/diazavalos/PycharmProjects/Thesis/main_cfl.py",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "python.packages.toolwindow.project.migrated.to.right.top.v2": "true",
+    "settings.editor.selected.configurable": "terminal",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\utente\PycharmProjects\Cluster_Decomposition\clustering" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.main_cfl">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python">
       <module name="Cluster_Decomposition" />
       <option name="ENV_FILES" value="" />
@@ -156,11 +147,14 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.10 (Thesis)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="RUN_AS_SCRIPT" value="false" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
       <option name="PARAMETERS" value="infeasible_attempts" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -170,6 +164,36 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="main_cfl" type="PythonConfigurationType" factoryName="Python">
+      <module name="Cluster_Decomposition" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.10 (Thesis)" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="RUN_AS_SCRIPT" value="false" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main_cfl.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.main" />
+      <item itemvalue="Python.main_cfl" />
+    </list>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -218,6 +242,9 @@
       <workItem from="1794013628822" duration="370000" />
       <workItem from="1794014020422" duration="32392000" />
       <workItem from="1794696053230" duration="11456000" />
+      <workItem from="1794774068328" duration="8747000" />
+      <workItem from="1794833463408" duration="103000" />
+      <workItem from="1794845046868" duration="6329000" />
     </task>
     <task id="LOCAL-00001" summary="Major code refactor and new results">
       <option name="closed" value="true" />
@@ -323,7 +350,15 @@
       <option name="project" value="LOCAL" />
       <updated>1794746757178</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="SSCFL stress test">
+      <option name="closed" value="true" />
+      <created>1794833513610</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1794833513610</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -352,10 +387,12 @@
     <MESSAGE value="Campaign A results" />
     <MESSAGE value="Campaign B results" />
     <MESSAGE value="CPA results" />
-    <option name="LAST_COMMIT_MESSAGE" value="CPA results" />
+    <MESSAGE value="SSCFL stress test" />
+    <option name="LAST_COMMIT_MESSAGE" value="SSCFL stress test" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Thesis$main.coverage" NAME="main Coverage Results" MODIFIED="1794772869164" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Thesis$main_cfl.coverage" NAME="main_cfl Coverage Results" MODIFIED="1794845229032" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Thesis$main.coverage" NAME="main Coverage Results" MODIFIED="1794773109327" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$main_cfl.coverage" NAME="main_cfl Coverage Results" MODIFIED="1792590026623" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$main.coverage" NAME="main Coverage Results" MODIFIED="1792231198292" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$test_isa.coverage" NAME="test_isa Coverage Results" MODIFIED="1792159456329" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/isa/IsaInterface" />

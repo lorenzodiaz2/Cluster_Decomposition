@@ -1,0 +1,16 @@
+{
+  "variant": "ss",
+  "m_star_clients": 425,
+  "stop_reason": "almeno 3 delle ultime 3 dimensioni difficili (prima difficile della finestra: 450)",
+  "density": 0.5,
+  "clients_per_facility": 3,
+  "capacity_ratio": 3.0,
+  "opening_cost_scale": 1.0,
+  "k": 10,
+  "n_seeds": 10,
+  "time_limit": 1800,
+  "window": 3,
+  "window_bad": 3,
+  "p90_bad_frac": Infinity,
+  "tl_bad_share": 0.4
+}
