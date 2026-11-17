@@ -43,7 +43,8 @@ STRESS = {
 STRESS_DONE = False
 
 # ----- M* (numero di clienti per cluster), da scegliere dai grafici dello stress test -----
-M_STAR = {"ss": 150, "sd": None}   # SS: scelto il 16-11-2026 dallo stress test (mediana circa 2 s a 150 clienti)
+M_STAR = {"ss": 150, "sd": 400}    # scelti dallo stress test: SS il 16-11-2026 (mediana circa 2 s a 150 clienti),
+                                    # SD il 17-11-2026 (mediana circa 4 s e massimo 9 s a 400 clienti)
 
 # ----- similarità -----
 # scelta di progetto, uguale per tutti i problemi (stessa di MCPA): pesi esponenziali sulle opzioni con beta = 1 e pesi
@@ -165,15 +166,15 @@ if __name__ == '__main__':
     if invalid:
         parser.error(f"campagne non valide: {invalid} (scegliere tra A, B, ablations_A)")
 
-    # 1) stress test: con STRESS_DONE = False si eseguono solo gli stress test (prima SS, poi SD) e ci si ferma per scegliere M*
-    #    dai grafici; rilanciando si riprende dai run non ancora completati
+    # 1) stress test: con STRESS_DONE = False si eseguono gli stress test (prima SS, poi SD), riprendendo dai run non ancora
+    #    completati. Se M_STAR e' gia' impostato per entrambe le varianti si prosegue subito con le campagne, altrimenti ci si
+    #    ferma qui sotto per scegliere M* dai grafici. Con STRESS_DONE = True gli stress test vengono saltati.
     if not STRESS_DONE:
         for variant, cfg in STRESS.items():
             run_cfl_stress_test(variant, cfg["out_dir"], opening_cost_scale=OPENING_COST_SCALE, capacity_ratio=BASE_CAPACITY_RATIO,
                                 density=DENSITY, clients_per_facility=CLIENTS_PER_FACILITY, k=K,
                                 n_start=cfg["n_start"], step=cfg["step"], n_max=cfg["n_max"], threads=THREADS, **STRESS_STOP)
-        print("\nStress test conclusi: scegliere M*_SS e M*_SD dai grafici, impostarli in M_STAR e impostare STRESS_DONE = True.")
-        raise SystemExit(0)
+        print("\nStress test conclusi.")
 
     missing = [v for v, m in M_STAR.items() if not m]
     if missing:
