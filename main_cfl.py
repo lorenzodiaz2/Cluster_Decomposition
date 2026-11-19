@@ -40,7 +40,7 @@ STRESS = {
     "ss": dict(out_dir="results/cfl/ss/stress_test_r3", n_start=50, step=25, n_max=10000),
     "sd": dict(out_dir="results/cfl/sd/stress_test_r3", n_start=50, step=25, n_max=10000),
 }
-STRESS_DONE = False
+STRESS_DONE = True
 
 # ----- M* (numero di clienti per cluster), da scegliere dai grafici dello stress test -----
 M_STAR = {"ss": 150, "sd": 400}    # scelti dallo stress test: SS il 16-11-2026 (mediana circa 2 s a 150 clienti),
