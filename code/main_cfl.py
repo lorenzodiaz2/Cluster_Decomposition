@@ -1,6 +1,7 @@
 import argparse
 import hashlib
 import json
+import os
 import math
 from dataclasses import replace
 
@@ -157,6 +158,8 @@ def run_ablations_A(variant: str, runner: CFL_Runner):
 
 
 if __name__ == '__main__':
+    # i percorsi dei risultati (results/...) sono relativi a code/: si lavora sempre da qui, da qualunque cartella si lanci
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
     parser = argparse.ArgumentParser(description="Campagne CFL")
     # senza argomenti (es. pulsante Run di PyCharm) lancia A e B per SS e SD; rilanciando riprende dai run non ancora completati
     parser.add_argument("campaign", nargs="*", default=["A", "B"], help="campagne da lanciare: A, B, ablations_A (default: A B)")

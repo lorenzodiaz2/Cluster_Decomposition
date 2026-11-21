@@ -1,6 +1,7 @@
 import argparse
 import hashlib
 import json
+import os
 from dataclasses import replace
 
 from caps.mcpa.scalability.mcpa_runner import MCPA_Runner, MCPA_Instance_Settings
@@ -369,6 +370,8 @@ def remove_unexpected_runs_A(dry_run: bool = True, out_dir: str = OUT_A):
 
 
 if __name__ == '__main__':
+    # i percorsi dei risultati (results/...) sono relativi a code/: si lavora sempre da qui, da qualunque cartella si lanci
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
     parser = argparse.ArgumentParser(description="Campagne MCPA")
     # senza argomenti (es. pulsante Run di PyCharm) lancia A e B; rilanciando riprende dai run non ancora completati
     parser.add_argument("campaign", nargs="*", default=["A", "B"],
