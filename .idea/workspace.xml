@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="Restructure repository">
+    <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="minor modifications">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/results/cfl/ss/campaign_A/clusters.csv" beforeDir="false" afterPath="$PROJECT_DIR$/code/results/cfl/ss/campaign_A/clusters.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/results/cfl/ss/campaign_A/incumbents.csv" beforeDir="false" afterPath="$PROJECT_DIR$/code/results/cfl/ss/campaign_A/incumbents.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/results/cfl/ss/campaign_A/results.jsonl" beforeDir="false" afterPath="$PROJECT_DIR$/code/results/cfl/ss/campaign_A/results.jsonl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/caps/cfl/scalability/cfl_runner.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/caps/cfl/scalability/cfl_runner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/main_cfl.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/main_cfl.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,6 +107,8 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;LaTeX.Unnamed.executor&quot;: &quot;Run&quot;,
+    &quot;LaTeX.tex.executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;Python.main.executor&quot;: &quot;Run&quot;,
     &quot;Python.main_cfl.executor&quot;: &quot;Run&quot;,
@@ -139,7 +141,31 @@
       <recent name="C:\Users\utente\PycharmProjects\Cluster_Decomposition\clustering" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main_cfl">
+  <component name="RunManager" selected="LaTeX.tex">
+    <configuration name="tex" type="LATEX_RUN_CONFIGURATION" factoryName="LaTeX configuration factory">
+      <texify>
+        <compiler>PDFLATEX</compiler>
+        <compiler-path />
+        <pdf-viewer>SumatraPDF</pdf-viewer>
+        <require-focus>true</require-focus>
+        <viewer-command />
+        <compiler-arguments />
+        <envs />
+        <expand-macros-in-environment-variables>false</expand-macros-in-environment-variables>
+        <before-run-command />
+        <main-file>$PROJECT_DIR$/paper/main.tex</main-file>
+        <output-path>$PROJECT_DIR$/paper/build/out</output-path>
+        <auxil-path>$PROJECT_DIR$/paper/build/aux</auxil-path>
+        <working-directory>{mainFileParent}</working-directory>
+        <compile-twice>false</compile-twice>
+        <output-format>PDF</output-format>
+        <latex-distribution>MIKTEX</latex-distribution>
+        <has-been-run>true</has-been-run>
+        <bib-run-config>[]</bib-run-config>
+        <makeindex-run-config>[]</makeindex-run-config>
+      </texify>
+      <method v="2" />
+    </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python">
       <module name="Cluster_Decomposition" />
       <option name="ENV_FILES" value="" />
@@ -149,13 +175,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12 (Cluster_Decomposition) (2)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
-      <option name="RUN_AS_SCRIPT" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/code/main.py" />
       <option name="PARAMETERS" value="infeasible_attempts" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -174,13 +199,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12 (Cluster_Decomposition) (2)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
-      <option name="RUN_AS_SCRIPT" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/code/main_cfl.py" />
       <option name="PARAMETERS" value="A B ablations_A" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -191,6 +215,7 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="LaTeX.tex" />
       <item itemvalue="Python.main" />
       <item itemvalue="Python.main_cfl" />
     </list>
@@ -198,8 +223,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-56aff7b04f6f-JavaScript-PY-263.7307.206" />
-        <option value="bundled-python-sdk-34611be1ca5a-e0583fc556d1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-263.7307.206" />
+        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-PY-251.26094.141" />
+        <option value="bundled-python-sdk-9f8e2b94138c-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.26094.141" />
       </set>
     </attachedChunks>
   </component>
@@ -251,6 +276,7 @@
       <workItem from="1795009175183" duration="6633000" />
       <workItem from="1795023951073" duration="16644000" />
       <workItem from="1795196975193" duration="5361000" />
+      <workItem from="1795296440210" duration="378000" />
     </task>
     <task id="LOCAL-00001" summary="Major code refactor and new results">
       <option name="closed" value="true" />
@@ -404,7 +430,15 @@
       <option name="project" value="LOCAL" />
       <updated>1795269475270</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="minor modifications">
+      <option name="closed" value="true" />
+      <created>1795270396240</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1795270396240</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -439,10 +473,11 @@
     <MESSAGE value="SSCFL campaign A1 results" />
     <MESSAGE value="SSCFL campaign A results" />
     <MESSAGE value="Restructure repository" />
-    <option name="LAST_COMMIT_MESSAGE" value="Restructure repository" />
+    <MESSAGE value="minor modifications" />
+    <option name="LAST_COMMIT_MESSAGE" value="minor modifications" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Thesis$main_cfl.coverage" NAME="main_cfl Coverage Results" MODIFIED="1795270466105" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Thesis$main_cfl.coverage" NAME="main_cfl Coverage Results" MODIFIED="1795220253691" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Thesis$main.coverage" NAME="main Coverage Results" MODIFIED="1794773109327" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$main_cfl.coverage" NAME="main_cfl Coverage Results" MODIFIED="1792590026623" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$main.coverage" NAME="main Coverage Results" MODIFIED="1792231198292" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />

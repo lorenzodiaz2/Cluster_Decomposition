@@ -157,6 +157,27 @@ def run_ablations_A(variant: str, runner: CFL_Runner):
     runner.run_all([replace(st, k=k) for st in reduced for k in (5, 15)])                                              # 120, k cambia il modello: serve il globale
 
 
+def block_label_A(st: CFL_Instance_Settings) -> str:
+    # nome del blocco della campagna A, solo per la stampa a video
+    if st.capacity_ratio != BASE_CAPACITY_RATIO:
+        return f"A2 r={st.capacity_ratio:g}"
+    if st.opening_cost_scale != OPENING_COST_SCALE:
+        return f"A3 opening cost x{st.opening_cost_scale:g}"
+    if st.n_clients_per_quadrant != M_STAR[st.variant]:
+        return f"A4 rho={st.n_clients_per_quadrant / M_STAR[st.variant]:.2f}"   # .2f: con l'arrotondamento dei clienti rho non è esatto
+    return "A1"
+
+
+def block_label_B(st: CFL_Instance_Settings) -> str:
+    # nome della sottofamiglia della campagna B, solo per la stampa a video
+    size = "mass q=4" if st.grid_side == 2 * quadrant_side(st.variant) else "mass q=6"
+    if st.family == "hotspots":
+        return f"B2 hotspots, {size}"
+    if st.remove_rnd_nodes_flag or st.family_params.get("obstacles"):
+        return f"B3 obstacles, {size}"
+    return f"B1 uniform, {size}"
+
+
 if __name__ == '__main__':
     # i percorsi dei risultati (results/...) sono relativi a code/: si lavora sempre da qui, da qualunque cartella si lanci
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -187,8 +208,8 @@ if __name__ == '__main__':
     for variant in args.variant:
         for campaign in args.campaign:
             if campaign == "A":
-                CFL_Runner(OUT_A[variant], threads=THREADS).run_all(campaign_A(variant))
+                CFL_Runner(OUT_A[variant], threads=THREADS).run_all(campaign_A(variant), label_fn=block_label_A)
             elif campaign == "B":
-                CFL_Runner(OUT_B[variant], threads=THREADS).run_all(campaign_B(variant))
+                CFL_Runner(OUT_B[variant], threads=THREADS).run_all(campaign_B(variant), label_fn=block_label_B)
             elif campaign == "ablations_A":
                 run_ablations_A(variant, CFL_Runner(OUT_A[variant], threads=THREADS))

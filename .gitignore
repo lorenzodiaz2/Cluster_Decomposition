@@ -16,3 +16,7 @@ paper/references/*
 
 # Workflow con Claude (diario, specs, letteratura): privato, resta solo in locale
 workflow/
+
+# Configurazione di Claude: privata, resta solo in locale
+CLAUDE.md
+.claude/

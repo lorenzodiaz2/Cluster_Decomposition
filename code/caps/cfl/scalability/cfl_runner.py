@@ -8,6 +8,7 @@ import traceback
 from collections import defaultdict
 from dataclasses import dataclass, asdict, field
 from datetime import datetime
+from typing import Callable
 
 import pandas as pd
 
@@ -262,20 +263,26 @@ class CFL_Runner:
         self._incumbents = None   # caricati solo quando servono
 
 
-    def run_all(self, settings_list: list[CFL_Instance_Settings], run_global: bool = True):
-        for settings in settings_list:
-            self.run(settings, run_global)
+    def run_all(self, settings_list: list[CFL_Instance_Settings], run_global: bool = True,
+                label_fn: Callable[[CFL_Instance_Settings], str] | None = None):
+        # label_fn (facoltativo) dà il nome del blocco di ogni istanza, stampato a video insieme all'avanzamento
+        n = len(settings_list)
+        for i, settings in enumerate(settings_list, start=1):
+            label = label_fn(settings) if label_fn else ""
+            self.run(settings, run_global, label=f"{label}  {i}/{n}".strip())
 
 
-    def run(self, settings: CFL_Instance_Settings, run_global: bool = True) -> str:
+    def run(self, settings: CFL_Instance_Settings, run_global: bool = True, label: str = "") -> str:
         """
         run_global=True: risolve anche il modello globale (e salva l'istanza se è la prima volta).
         run_global=False: solo euristica; globale, incumbent e facility candidate estese vengono presi dal run di riferimento.
+        label: solo per la stampa a video (es. blocco della campagna e avanzamento).
         """
         run_id, instance_id = settings.run_id, settings.instance_id
+        prefix = f"[{label}]  " if label else ""
         if run_id in self.done_ids:
             if self.verbose:
-                print(f"{run_id} già presente, salto")
+                print(f"{prefix}{run_id} già presente, salto")
             return run_id
 
         Solver, Critical = VARIANTS[settings.variant]
@@ -355,7 +362,7 @@ class CFL_Runner:
         self.done_ids.add(run_id)
 
         if self.verbose:
-            print(f"{datetime.now():%d-%m-%Y %H:%M:%S}  {run_id}  {'global+heur' if run_global else 'heur only'}  "
+            print(f"{datetime.now():%d-%m-%Y %H:%M:%S}  {prefix}{run_id}  {'global+heur' if run_global else 'heur only'}  "
                   f"{settings.variant} {settings.family} q={settings.n_quadrants} off={settings.offset} r={settings.capacity_ratio} "
                   f"M={settings.max_cluster_size} part={settings.partitioner}  gap={row.get('gap')}  speedup={row.get('speedup')}"
                   f"{'  ERROR: ' + row['error'] if row['error'] else ''}")
