@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="SSCFL and MSCFL stress test results">
+    <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="SSCFL campaign A1 results">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_cfl.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_cfl.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/cfl/ss/campaign_A/clusters.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/cfl/ss/campaign_A/clusters.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/cfl/ss/campaign_A/incumbents.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/cfl/ss/campaign_A/incumbents.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/cfl/ss/campaign_A/results.jsonl" beforeDir="false" afterPath="$PROJECT_DIR$/results/cfl/ss/campaign_A/results.jsonl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,61 +39,61 @@
 }</component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0076517210748979" />
-      <entry key="MS500" value="1.37735649213014" />
-      <entry key="S2" value="1.7837687734420304" />
-      <entry key="S5" value="1.9071431125488472" />
-      <entry key="S10" value="1.9578439610719922" />
-      <entry key="S30" value="3.546179485221956" />
-      <entry key="S60" value="8.57150760743546" />
-      <entry key="M2" value="15.550485059263645" />
-      <entry key="M5" value="22.93865461196763" />
-      <entry key="M10" value="26.212192531591214" />
-      <entry key="M15" value="27.419260749091734" />
-      <entry key="M30" value="28.855082751803376" />
-      <entry key="H1" value="30.364017067193608" />
-      <entry key="H2" value="32.15156133736548" />
-      <entry key="H4" value="33.694192992982515" />
-      <entry key="D1" value="35.54707476127187" />
-      <entry key="W1" value="35.93336435447862" />
+      <entry key="MS100" value="1.00000000000028" />
+      <entry key="MS500" value="1.0030860988744663" />
+      <entry key="S2" value="1.2356961339795598" />
+      <entry key="S5" value="1.5609717402652423" />
+      <entry key="S10" value="1.7489804672120912" />
+      <entry key="S30" value="1.9081484177215096" />
+      <entry key="S60" value="1.9529682144339913" />
+      <entry key="M2" value="1.9762009088471446" />
+      <entry key="M5" value="1.990411639846978" />
+      <entry key="M10" value="1.9960415520435575" />
+      <entry key="M15" value="2.0130566218830515" />
+      <entry key="M30" value="2.3106906677960293" />
+      <entry key="H1" value="3.3679664753140335" />
+      <entry key="H2" value="4.865650384043644" />
+      <entry key="H4" value="6.259216326179372" />
+      <entry key="D1" value="22.34093122145349" />
+      <entry key="W1" value="41.871547499448184" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
       <entry key="MS500" value="0.0" />
       <entry key="S2" value="0.0" />
       <entry key="S5" value="0.0" />
-      <entry key="S10" value="1.879214082508914E-268" />
-      <entry key="S30" value="5.727855933509384E-90" />
-      <entry key="S60" value="2.3932939505019822E-45" />
-      <entry key="M2" value="4.8921303646795626E-23" />
-      <entry key="M5" value="1.1906913773770493E-9" />
-      <entry key="M10" value="3.450639618066554E-5" />
-      <entry key="M15" value="0.0010599036869228665" />
-      <entry key="M30" value="0.03255616204227499" />
-      <entry key="H1" value="0.1804332620174975" />
-      <entry key="H2" value="0.42477436600799906" />
-      <entry key="H4" value="0.6517471641733463" />
-      <entry key="D1" value="0.9311361583026836" />
-      <entry key="W1" value="0.9898589475085695" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="3.1017498388149904E-130" />
+      <entry key="M10" value="1.7611785368936874E-65" />
+      <entry key="M15" value="6.769172624751133E-44" />
+      <entry key="M30" value="2.6017633683237086E-22" />
+      <entry key="H1" value="1.6129982542841458E-11" />
+      <entry key="H2" value="4.016214952270541E-6" />
+      <entry key="H4" value="0.0020040496381752973" />
+      <entry key="D1" value="0.3550733511995693" />
+      <entry key="W1" value="0.862501234950982" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.908439428631337" />
-      <entry key="MS500" value="1.3520978942866568" />
-      <entry key="S2" value="1.776142765673739" />
-      <entry key="S5" value="1.9039346810450541" />
-      <entry key="S10" value="1.9561290049615216" />
-      <entry key="S30" value="3.538243514965821" />
-      <entry key="S60" value="8.555653120903184" />
-      <entry key="M2" value="15.534223032182153" />
-      <entry key="M5" value="22.928592788938555" />
-      <entry key="M10" value="26.206404279019708" />
-      <entry key="M15" value="27.4162389869857" />
-      <entry key="M30" value="28.88540474804951" />
-      <entry key="H1" value="30.543087545433064" />
-      <entry key="H2" value="32.57546388368154" />
-      <entry key="H4" value="34.34541653677074" />
-      <entry key="D1" value="36.47810566927096" />
-      <entry key="W1" value="36.923207726114356" />
+      <entry key="MS100" value="0.03983001960376051" />
+      <entry key="MS500" value="0.526877542468268" />
+      <entry key="S2" value="1.0631386586683107" />
+      <entry key="S5" value="1.47524374926236" />
+      <entry key="S10" value="1.7015442036209392" />
+      <entry key="S30" value="1.8910640875560991" />
+      <entry key="S60" value="1.9442478831224432" />
+      <entry key="M2" value="1.9717946316307116" />
+      <entry key="M5" value="1.9886378550692976" />
+      <entry key="M10" value="1.9951524489631705" />
+      <entry key="M15" value="2.0124596769479264" />
+      <entry key="M30" value="2.3103558538365965" />
+      <entry key="H1" value="3.3677347919621683" />
+      <entry key="H2" value="4.865493134983149" />
+      <entry key="H4" value="6.261118707165306" />
+      <entry key="D1" value="22.695943472831374" />
+      <entry key="W1" value="42.7340319620131" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -249,7 +251,8 @@
       <workItem from="1794937171818" duration="40000" />
       <workItem from="1794998402312" duration="2907000" />
       <workItem from="1795009175183" duration="6633000" />
-      <workItem from="1795023951073" duration="4237000" />
+      <workItem from="1795023951073" duration="16644000" />
+      <workItem from="1795196975193" duration="2230000" />
     </task>
     <task id="LOCAL-00001" summary="Major code refactor and new results">
       <option name="closed" value="true" />
@@ -379,7 +382,15 @@
       <option name="project" value="LOCAL" />
       <updated>1795023842988</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="SSCFL campaign A1 results">
+      <option name="closed" value="true" />
+      <created>1795084356137</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1795084356137</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -411,10 +422,11 @@
     <MESSAGE value="SSCFL stress test" />
     <MESSAGE value="SSCFL and MSCFL stress test" />
     <MESSAGE value="SSCFL and MSCFL stress test results" />
-    <option name="LAST_COMMIT_MESSAGE" value="SSCFL and MSCFL stress test results" />
+    <MESSAGE value="SSCFL campaign A1 results" />
+    <option name="LAST_COMMIT_MESSAGE" value="SSCFL campaign A1 results" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Thesis$main_cfl.coverage" NAME="main_cfl Coverage Results" MODIFIED="1795023974552" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Thesis$main_cfl.coverage" NAME="main_cfl Coverage Results" MODIFIED="1795204824884" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Thesis$main.coverage" NAME="main Coverage Results" MODIFIED="1794773109327" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$main_cfl.coverage" NAME="main_cfl Coverage Results" MODIFIED="1792590026623" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$main.coverage" NAME="main Coverage Results" MODIFIED="1792231198292" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
