@@ -141,7 +141,7 @@
       <recent name="C:\Users\utente\PycharmProjects\Cluster_Decomposition\clustering" />
     </key>
   </component>
-  <component name="RunManager" selected="LaTeX.tex">
+  <component name="RunManager" selected="Python.main_cfl">
     <configuration name="tex" type="LATEX_RUN_CONFIGURATION" factoryName="LaTeX configuration factory">
       <texify>
         <compiler>PDFLATEX</compiler>
@@ -175,12 +175,13 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.12 (Cluster_Decomposition) (2)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="RUN_AS_SCRIPT" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/code/main.py" />
       <option name="PARAMETERS" value="infeasible_attempts" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -199,12 +200,13 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.12 (Cluster_Decomposition) (2)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="RUN_AS_SCRIPT" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/code/main_cfl.py" />
       <option name="PARAMETERS" value="A B ablations_A" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -215,7 +217,6 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="LaTeX.tex" />
       <item itemvalue="Python.main" />
       <item itemvalue="Python.main_cfl" />
     </list>
