@@ -274,7 +274,8 @@ class CFL_Runner:
 
     def run(self, settings: CFL_Instance_Settings, run_global: bool = True, label: str = "") -> str:
         """
-        run_global=True: risolve anche il modello globale (e salva l'istanza se è la prima volta).
+        run_global=True: risolve anche il modello globale (e salva l'istanza se è la prima volta); se l'istanza ha già un run di
+        riferimento con il globale, questo viene riusato come con run_global=False.
         run_global=False: solo euristica; globale, incumbent e facility candidate estese vengono presi dal run di riferimento.
         label: solo per la stampa a video (es. blocco della campagna e avanzamento).
         """
@@ -284,6 +285,10 @@ class CFL_Runner:
             if self.verbose:
                 print(f"{prefix}{run_id} già presente, salto")
             return run_id
+
+        # il globale non dipende dal metodo: se l'istanza ha già un run di riferimento lo si riusa invece di risolverlo di nuovo
+        if run_global and instance_id in self.global_references:
+            run_global = False
 
         Solver, Critical = VARIANTS[settings.variant]
         row = {"id": run_id, "instance_id": instance_id, **self._settings_columns(settings), "code_version": self.code_version,

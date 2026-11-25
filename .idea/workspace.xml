@@ -4,15 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="SSCFL results">
+    <list default="true" id="78a00ca3-0ef7-4ca6-964d-30ff4dbae609" name="Changes" comment="minor modifications in runner cfl">
       <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_11_2026_21_08_[Changes]/shelved.patch" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_11_2026_21_08__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_11_26,_21_18_[Changes]/shelved.patch" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_11_26__21_18__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/results/cfl/ss/campaign_A/clusters.csv" beforeDir="false" afterPath="$PROJECT_DIR$/code/results/cfl/ss/campaign_A/clusters.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/results/cfl/ss/campaign_A/incumbents.csv" beforeDir="false" afterPath="$PROJECT_DIR$/code/results/cfl/ss/campaign_A/incumbents.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/results/cfl/ss/campaign_A/results.jsonl" beforeDir="false" afterPath="$PROJECT_DIR$/code/results/cfl/ss/campaign_A/results.jsonl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/caps/cfl/elements/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/caps/cfl/elements/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/caps/cfl/scalability/cfl_runner.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/caps/cfl/scalability/cfl_runner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/caps/mcpa/scalability/mcpa_runner.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/caps/mcpa/scalability/mcpa_runner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/main_cfl.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/main_cfl.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,23 +44,23 @@
 }</component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.000000014946835" />
-      <entry key="MS500" value="1.042524945935336" />
-      <entry key="S2" value="2.2485413959197764" />
-      <entry key="S5" value="3.7664583257822106" />
-      <entry key="S10" value="4.689886000207518" />
-      <entry key="S30" value="5.509621984431761" />
-      <entry key="S60" value="5.747274593371829" />
-      <entry key="M2" value="5.871683967976492" />
-      <entry key="M5" value="5.948195713253743" />
-      <entry key="M10" value="5.974860639428846" />
-      <entry key="M15" value="5.998871466883281" />
-      <entry key="M30" value="6.303117780398147" />
-      <entry key="H1" value="7.363334376407032" />
-      <entry key="H2" value="8.862735809260766" />
-      <entry key="H4" value="10.257480615717125" />
-      <entry key="D1" value="26.340106634309308" />
-      <entry key="W1" value="45.87133683036206" />
+      <entry key="MS100" value="1.00000000000028" />
+      <entry key="MS500" value="1.0030860988744663" />
+      <entry key="S2" value="1.2356961339795598" />
+      <entry key="S5" value="1.5609717402652423" />
+      <entry key="S10" value="1.7489804672120912" />
+      <entry key="S30" value="1.9081484177215096" />
+      <entry key="S60" value="1.9529682144339913" />
+      <entry key="M2" value="1.9762009088471446" />
+      <entry key="M5" value="1.990411639846978" />
+      <entry key="M10" value="1.9960415520435575" />
+      <entry key="M15" value="2.0130566218830515" />
+      <entry key="M30" value="2.3106906677960293" />
+      <entry key="H1" value="3.3679664753140335" />
+      <entry key="H2" value="4.865650384043644" />
+      <entry key="H4" value="6.259216326179372" />
+      <entry key="D1" value="22.34093122145349" />
+      <entry key="W1" value="41.871547499448184" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -70,34 +71,34 @@
       <entry key="S30" value="0.0" />
       <entry key="S60" value="0.0" />
       <entry key="M2" value="0.0" />
-      <entry key="M5" value="3.072157829843533E-130" />
-      <entry key="M10" value="1.752757207899466E-65" />
-      <entry key="M15" value="6.747576874988642E-44" />
-      <entry key="M30" value="2.597609838868925E-22" />
-      <entry key="H1" value="1.611710221742394E-11" />
-      <entry key="H2" value="4.014611091677991E-6" />
-      <entry key="H4" value="0.002003649443310378" />
-      <entry key="D1" value="0.3550615326003749" />
-      <entry key="W1" value="0.8624971337051086" />
+      <entry key="M5" value="3.1017498388149904E-130" />
+      <entry key="M10" value="1.7611785368936874E-65" />
+      <entry key="M15" value="6.769172624751133E-44" />
+      <entry key="M30" value="2.6017633683237086E-22" />
+      <entry key="H1" value="1.6129982542841458E-11" />
+      <entry key="H2" value="4.016214952270541E-6" />
+      <entry key="H4" value="0.0020040496381752973" />
+      <entry key="D1" value="0.3550733511995693" />
+      <entry key="W1" value="0.862501234950982" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.781559574693096E-6" />
-      <entry key="MS500" value="0.11071271880855224" />
-      <entry key="S2" value="1.7116651517052577" />
-      <entry key="S5" value="3.4752041307121533" />
-      <entry key="S10" value="4.5235160362980364" />
-      <entry key="S30" value="5.448223992443451" />
-      <entry key="S60" value="5.715724782137563" />
-      <entry key="M2" value="5.855687065385486" />
-      <entry key="M5" value="5.941742427373749" />
-      <entry key="M10" value="5.971624490099128" />
-      <entry key="M15" value="5.996708207946135" />
-      <entry key="M30" value="6.301999048136253" />
-      <entry key="H1" value="7.362710565714676" />
-      <entry key="H2" value="8.862382445332036" />
-      <entry key="H4" value="10.259284522604624" />
-      <entry key="D1" value="26.695090719340957" />
-      <entry key="W1" value="46.7338148560596" />
+      <entry key="MS100" value="0.03983001960376051" />
+      <entry key="MS500" value="0.526877542468268" />
+      <entry key="S2" value="1.0631386586683107" />
+      <entry key="S5" value="1.47524374926236" />
+      <entry key="S10" value="1.7015442036209392" />
+      <entry key="S30" value="1.8910640875560991" />
+      <entry key="S60" value="1.9442478831224432" />
+      <entry key="M2" value="1.9717946316307116" />
+      <entry key="M5" value="1.9886378550692976" />
+      <entry key="M10" value="1.9951524489631705" />
+      <entry key="M15" value="2.0124596769479264" />
+      <entry key="M30" value="2.3103558538365965" />
+      <entry key="H1" value="3.3677347919621683" />
+      <entry key="H2" value="4.865493134983149" />
+      <entry key="H4" value="6.261118707165306" />
+      <entry key="D1" value="22.695943472831374" />
+      <entry key="W1" value="42.7340319620131" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -145,7 +146,7 @@
       <recent name="C:\Users\utente\PycharmProjects\Cluster_Decomposition\clustering" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main_cfl">
+  <component name="RunManager" selected="LaTeX.tex">
     <configuration name="tex" type="LATEX_RUN_CONFIGURATION" factoryName="LaTeX configuration factory">
       <texify>
         <compiler>PDFLATEX</compiler>
@@ -179,13 +180,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12 (Cluster_Decomposition) (2)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
-      <option name="RUN_AS_SCRIPT" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/code/main.py" />
       <option name="PARAMETERS" value="infeasible_attempts" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -204,13 +204,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12 (Cluster_Decomposition) (2)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
-      <option name="RUN_AS_SCRIPT" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/code/main_cfl.py" />
       <option name="PARAMETERS" value="A B ablations_A" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -221,6 +220,7 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="LaTeX.tex" />
       <item itemvalue="Python.main" />
       <item itemvalue="Python.main_cfl" />
     </list>
@@ -228,8 +228,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-56aff7b04f6f-JavaScript-PY-263.7307.351" />
-        <option value="bundled-python-sdk-342d7f33e45b-e0583fc556d1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-263.7307.351" />
+        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-PY-251.26094.141" />
+        <option value="bundled-python-sdk-9f8e2b94138c-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.26094.141" />
       </set>
     </attachedChunks>
   </component>
@@ -281,8 +281,13 @@
       <workItem from="1795009175183" duration="6633000" />
       <workItem from="1795023951073" duration="16644000" />
       <workItem from="1795196975193" duration="5361000" />
-      <workItem from="1795296440210" duration="378000" />
-      <workItem from="1795557382793" duration="3023000" />
+      <workItem from="1795296440210" duration="1972000" />
+      <workItem from="1795355746169" duration="13944000" />
+      <workItem from="1795428872193" duration="22426000" />
+      <workItem from="1795477633891" duration="4746000" />
+      <workItem from="1795517680477" duration="17407000" />
+      <workItem from="1795557295744" duration="158000" />
+      <workItem from="1795595419810" duration="14243000" />
     </task>
     <task id="LOCAL-00001" summary="Major code refactor and new results">
       <option name="closed" value="true" />
@@ -444,13 +449,13 @@
       <option name="project" value="LOCAL" />
       <updated>1795270396240</updated>
     </task>
-    <task id="LOCAL-00021" summary="SSCFL results">
+    <task id="LOCAL-00021" summary="minor modifications in runner cfl">
       <option name="closed" value="true" />
-      <created>1795422705372</created>
+      <created>1795296978023</created>
       <option name="number" value="00021" />
       <option name="presentableId" value="LOCAL-00021" />
       <option name="project" value="LOCAL" />
-      <updated>1795422705372</updated>
+      <updated>1795296978023</updated>
     </task>
     <option name="localTasksCounter" value="22" />
     <servers />
@@ -488,12 +493,12 @@
     <MESSAGE value="SSCFL campaign A results" />
     <MESSAGE value="Restructure repository" />
     <MESSAGE value="minor modifications" />
-    <MESSAGE value="SSCFL results" />
-    <option name="LAST_COMMIT_MESSAGE" value="SSCFL results" />
+    <MESSAGE value="minor modifications in runner cfl" />
+    <option name="LAST_COMMIT_MESSAGE" value="minor modifications in runner cfl" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Thesis$main_cfl.coverage" NAME="main_cfl Coverage Results" MODIFIED="1795561764774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/Thesis$main.coverage" NAME="main Coverage Results" MODIFIED="1795297017236" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Thesis$main_cfl.coverage" NAME="main_cfl Coverage Results" MODIFIED="1795220253691" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Thesis$main.coverage" NAME="main Coverage Results" MODIFIED="1794773109327" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$main_cfl.coverage" NAME="main_cfl Coverage Results" MODIFIED="1792590026623" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$main.coverage" NAME="main Coverage Results" MODIFIED="1792231198292" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Cluster_Decomposition$test_isa.coverage" NAME="test_isa Coverage Results" MODIFIED="1792159456329" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/isa/IsaInterface" />

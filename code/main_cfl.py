@@ -50,8 +50,11 @@ M_STAR = {"ss": 150, "sd": 400}    # scelti dallo stress test: SS il 16-11-2026 
 # ----- similarità -----
 # scelta di progetto, uguale per tutti i problemi (stessa di MCPA): pesi esponenziali sulle opzioni con beta = 1 e pesi
 # lineari sulle risorse. Nessuna taratura per i CFL: la similarità è un componente sostituibile del metodo
-SIMILARITY = {"ss": dict(sim_weighting="exponential", sim_beta=1.0, resource_weights="linear"),
-              "sd": dict(sim_weighting="exponential", sim_beta=1.0, resource_weights="linear")}
+# Dal 25-11-2026 "exponential_unscaled": costo extra in passi di griglia senza la scala per cliente (kappa_e = 1, come in
+# MCPA). I run fatti prima con "exponential" (scala = distanza in più media del cliente) restano in results.jsonl; rilanciando,
+# le istanze che hanno già il globale vengono rifatte solo per l'euristica (CFL_Runner.run riusa il riferimento)
+SIMILARITY = {"ss": dict(sim_weighting="exponential_unscaled", sim_beta=1.0, resource_weights="linear"),
+              "sd": dict(sim_weighting="exponential_unscaled", sim_beta=1.0, resource_weights="linear")}
 
 
 def quadrant_side(variant: str) -> int:

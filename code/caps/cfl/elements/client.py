@@ -57,11 +57,15 @@ class Client:
         raw_weights = {}
         min_dist = min((self.distances_to_facilities[f.id] for f in self.k_facilities), default=0)
 
-        # costo normalizzato (adimensionale): distanza in più rispetto alla facility più vicina, divisa per la distanza in più media
-        # tra le candidate del cliente; così beta ha lo stesso significato a ogni densità e nei benchmark (con candidate tutte
-        # equidistanti la scala è 0 e i pesi diventano uniformi)
+        # "exponential_unscaled" (metodo del paper dal 25-11-2026, come in MCPA): costo = distanza in più rispetto alla facility
+        # più vicina, in passi di griglia, senza scala (kappa_e = 1).
+        # "exponential", "inverse" (metodo precedente, resta per leggere i run vecchi): la distanza in più è divisa per la distanza
+        # in più media tra le candidate del cliente (con candidate tutte equidistanti la scala è 0 e i pesi diventano uniformi)
         extra = [self.distances_to_facilities[f.id] - min_dist for f in self.k_facilities]
-        scale = sum(extra) / len(extra) if extra else 0.0
+        if weighting == "exponential_unscaled":
+            scale = 1.0
+        else:
+            scale = sum(extra) / len(extra) if extra else 0.0
 
         for f in self.k_facilities:
             c = (self.distances_to_facilities[f.id] - min_dist) / scale if scale > 0 else 0.0
@@ -70,7 +74,7 @@ class Client:
                 w = 1.0
             elif weighting == "inverse":
                 w = 1.0 / (c + 1.0)
-            elif weighting == "exponential":
+            elif weighting in ("exponential", "exponential_unscaled"):
                 w = math.exp(-beta * c) if beta else math.exp(-c)
             else:
                 raise ValueError(f"Weighting '{weighting}' non supportato")

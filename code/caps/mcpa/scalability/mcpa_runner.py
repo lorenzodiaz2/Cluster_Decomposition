@@ -52,7 +52,7 @@ class MCPA_Instance_Settings:
     capacity_delta: int = 0
     partitioner: str = "nj"
     sim_weighting: str = "exponential"
-    sim_beta: float | None = 0.95
+    sim_beta: float | None = 1.0
     resource_weights: str = "linear"
     family: str = "quadrants"
     family_params: dict = field(default_factory=dict)   # parametri specifici della famiglia (L_min, L_max, n_hotspots, sigma, noise, obstacles, ...)
