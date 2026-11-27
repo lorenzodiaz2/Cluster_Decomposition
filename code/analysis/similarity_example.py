@@ -1,7 +1,7 @@
 """
 Numeri dell'esempio della Sezione 3.3 del paper (similarità tra entità, figura fig:sim-example).
 
-Calcola con le formule del paper (eq:sim:cost, eq:sim:optweight, eq:sim:usage, eq:sim:resweight, eq:sim:sigma):
+Calcola con le formule del paper (eq:sim:optweight, eq:sim:usage, eq:sim:resweight, eq:sim:sigma):
 - i pesi delle opzioni delle entità dei pannelli a (CPA) e b (CFL), dove l'opzione costosa ha costo extra 2 (due passi di
   tempo nel CPA, due unità di distanza nel CFL), con beta = 1 e con pesi uniformi (beta -> 0);
 - le similarità sigma(e1, e2) e sigma(e2, e3), e nel CFL anche sigma(e2, e4) e sigma(e3, e4), con domande unitarie e
@@ -19,7 +19,7 @@ BETA = 1.0
 
 
 def option_weights(costs, beta=BETA):
-    # pesi esponenziali normalizzati (eq:sim:optweight) sul costo extra (eq:sim:cost)
+    # pesi esponenziali normalizzati (eq:sim:optweight); sottrarre il costo minimo non cambia i pesi
     c_min = min(costs)
     raw = [math.exp(-beta * (c - c_min)) for c in costs]
     tot = sum(raw)
@@ -63,7 +63,7 @@ def main():
     print("== Pannello (c): carichi stimati b_e a_e(r) per entità, capacità, peso w_r")
     resources = {
         "r_a": ([1.0, 0.8, 0.7, 0.5], 2.0),
-        "r_b": ([0.5], 2.0),
+        "r_b": ([0.25, 0.25], 2.0),     # due entità con poca domanda
         "r_c": ([1.0, 0.8, 0.7, 0.5], 6.0),
     }
     for r, (loads, cap) in resources.items():
