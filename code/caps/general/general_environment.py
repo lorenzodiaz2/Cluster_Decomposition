@@ -11,7 +11,9 @@ from caps.general.general_cluster import General_Cluster
 from clustering.nj.tree_partition import TreePartition
 from clustering.random.random_partition import RandomPartition
 from utils.grid_utils import set_replicated_quadrants, walls_with_gates, city_blocks
-from utils.parallel import init_similarity, compute_similarity_row
+from utils.parallel import (init_similarity, compute_similarity_row, build_resource_index, init_similarity_indexed,
+                            compute_similarity_row_indexed)
+from utils import implementation
 
 Coord = tuple[int, int]
 Quadrant = tuple[Coord, Coord]
@@ -219,16 +221,33 @@ class General_Environment(ABC):
         self.similarity_matrix = np.zeros((n, n), dtype=float)
         self._cluster_elements_index = {el.id: i for i, el in enumerate(self.elements)}
 
-        with mp.Pool(
-            processes=mp.cpu_count(),
-            initializer=init_similarity,
-            initargs=(self.elements, sim_fn, resource_weights),
-        ) as pool:
-            results = pool.map(compute_similarity_row, range(n - 1))
+        if implementation.FAST_SIMILARITY:
+            # solo le coppie con almeno una risorsa in comune (utils/implementation.py): stessi valori della versione
+            # completa, perché le altre coppie hanno similarità 0 e per le coppie valutate la funzione è la stessa.
+            # Attenzione: le risorse indicizzate sono quelle su cui somma compute_similarity del tipo di entità; con
+            # un'altra sim_fn (es. negli script di tuning) le coppie senza risorse in comune varrebbero 0 comunque
+            keys_fn = type(self.elements[0]).similarity_resource_keys
+            resources_of, entities_of = build_resource_index(self.elements, keys_fn)
+            with mp.Pool(
+                processes=mp.cpu_count(),
+                initializer=init_similarity_indexed,
+                initargs=(self.elements, sim_fn, resource_weights, resources_of, entities_of),
+            ) as pool:
+                results = pool.map(compute_similarity_row_indexed, range(n - 1))
+            for i, cols, vals in results:
+                self.similarity_matrix[i, cols] = vals
+                self.similarity_matrix[cols, i] = vals
+        else:
+            with mp.Pool(
+                processes=mp.cpu_count(),
+                initializer=init_similarity,
+                initargs=(self.elements, sim_fn, resource_weights),
+            ) as pool:
+                results = pool.map(compute_similarity_row, range(n - 1))
 
-        for i, row in results:
-            self.similarity_matrix[i, i + 1:] = row[i + 1:]
-            self.similarity_matrix[i + 1:, i] = row[i + 1:]
+            for i, row in results:
+                self.similarity_matrix[i, i + 1:] = row[i + 1:]
+                self.similarity_matrix[i + 1:, i] = row[i + 1:]
 
         self.matrix_time = time.perf_counter() - start
 

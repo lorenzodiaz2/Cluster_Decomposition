@@ -2,6 +2,8 @@ import networkx as nx
 import torch
 from matplotlib import pyplot as plt
 
+from utils import implementation
+
 
 class Node:
     def __init__(self, idx, is_leaf=False, is_cherry=False, mass=0):
@@ -53,7 +55,11 @@ class NjTree:
         self.clusters = self.nodes[:self.n_taxa]  # prende solo le foglie
 
         self.root = self.nodes[self.n_taxa]
-        self.nj_torch()
+        # implementazione scelta in utils/implementation.py: di default quella originale, usata nelle campagne
+        if implementation.nj_implementation_in_use() == "lean":
+            self.nj_torch_lean()
+        else:
+            self.nj_torch()
 
     def nj_torch(self):
         # Prepara la matrice di distanza
@@ -103,6 +109,72 @@ class NjTree:
             self.cherries.append(self.root)
 
         # self.draw() ------------- STAMPA L'ALBERO
+
+    def nj_torch_lean(self):
+        """
+        Stesso algoritmo di nj_torch, con le stesse operazioni aritmetiche nello stesso ordine, ma:
+        - Q viene calcolata in un buffer allocato una volta sola (in nj_torch ogni passo crea tre matrici m x m nuove:
+          (m-2)*d, poi - s, poi - s.T);
+        - la riga e la colonna del nodo rimosso si tolgono con una sola selezione per indici (in nj_torch due torch.cat,
+          cioè due copie complete della matrice).
+        La matrice delle distanze resta contigua e con gli stessi indici di nj_torch a ogni passo, quindi somme di riga,
+        Q, argmin (primo indice in caso di pareggio) e distanze aggiornate sono identiche: stesso albero.
+        Con implementation.NJ_DTYPE = "float32" lavora in precisione singola: NON identico (arrotondamenti diversi).
+        """
+        dtype = torch.float32 if implementation.NJ_DTYPE == "float32" else torch.double
+        # trasformazione similarità -> distanza in doppia precisione come in nj_torch; in float32 si converte solo dopo,
+        # così l'arrotondamento riguarda le distanze e non anche la sottrazione da max + 1
+        d = torch.tensor(self.d, device=self.device, dtype=torch.double)
+        d = torch.max(d) + 1 - d
+        d.fill_diagonal_(0)
+        if dtype != torch.double:
+            d = d.to(dtype)
+
+        max_val = d.max() * d.shape[0]
+        adj_idxs = [i for i in range(self.n_taxa)]
+        int_node = self.n_taxa + 1
+
+        n = d.shape[0]
+        q_buffer = torch.empty(n * n, device=self.device, dtype=dtype)   # riusato a ogni passo
+        all_idx = torch.arange(n, device=self.device)
+
+        while d.shape[0] > 3:
+            m = d.shape[0]
+            s = d.sum(dim=-1).unsqueeze(0)
+
+            # come q = (m - 2) * d - s - s.T, nello stesso ordine: ((m - 2) * d - s) - s.T
+            q = q_buffer[:m * m].view(m, m)
+            torch.mul(d, m - 2, out=q)
+            q.sub_(s)
+            q.sub_(s.T)
+            q.fill_diagonal_(max_val)
+            idxs = torch.argmin(q).item()
+            minI, minJ = idxs // m, idxs % m
+
+            self.link(minI, minJ, int_node, adj_idxs)
+
+            adj_idxs.pop(max(minI, minJ))
+            adj_idxs[min(minI, minJ)] = int_node
+            int_node += 1
+
+            hi, lo = max(minI, minJ), min(minI, minJ)
+            new_dist = torch.empty(m - 1, device=self.device, dtype=dtype)
+            new_dist[: hi] = (d[minI, : hi] + d[minJ, : hi] - d[minI, minJ]) / 2
+            new_dist[hi:] = (d[minI, hi + 1:] + d[minJ, hi + 1:] - d[minI, minJ]) / 2
+
+            # tolgo riga e colonna hi con una sola selezione (stesso risultato dei due torch.cat di nj_torch)
+            keep = torch.cat([all_idx[:hi], all_idx[hi + 1:m]])
+            d = d[keep.unsqueeze(1), keep.unsqueeze(0)]
+            d[lo, :] = new_dist
+            d[:, lo] = new_dist
+
+        # chiusura con 3 taxa rimasti, come in nj_torch
+        for i in range(3):
+            self.nodes[adj_idxs[i]].adj_nodes.append(self.nodes[self.n_taxa])
+        self.nodes[self.n_taxa].adj_nodes += [self.nodes[adj_idxs[i]] for i in range(3)]
+        if sum(self.root.adj_nodes[i].is_leaf for i in range(3)) == 2:
+            self.root.is_cherry = True
+            self.cherries.append(self.root)
 
     def link(self, minI, minJ, int_node, adj_idxs):
         self.nodes[adj_idxs[minI]].adj_nodes.append(self.nodes[int_node])

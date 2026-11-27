@@ -16,7 +16,8 @@ m x m con m = ceil(sqrt(q)). D8 (specs): con offset negativo la griglia si allar
 adiacenti, così ogni blocco resta esattamente n0 x n0 come nello stress test. A q = 9 e offset 0 l'istanza coincide
 con quella della campagna A (replica 0).
 
-Non scrive in results/: l'output va in una cartella fuori dal repository (default: ~/scale_probe).
+Non scrive in results/: l'output va in code/scale_probe/ (decisione del leader del 27/11/2026: così viaggia con git
+come i risultati delle campagne), oppure nella cartella data con --out-dir.
 
 Uso, dalla cartella code/:
     python scale_probe.py                                  # SS-CFL, poi CPA, poi MS-CFL, con le taglie di default
@@ -24,6 +25,7 @@ Uso, dalla cartella code/:
     python scale_probe.py --parts heur                     # solo similarità, NJ e metriche
 """
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -34,6 +36,8 @@ import time
 import traceback
 from dataclasses import replace
 from datetime import datetime
+
+import numpy as np
 
 try:
     import resource   # solo Linux/macOS: picco di memoria del processo
@@ -51,7 +55,7 @@ DEFAULT_OFFSET = 0
 DEFAULT_REPLICA = 0
 DEFAULT_GLOBAL_TIME_LIMIT = 300
 DEFAULT_WORKER_TIMEOUT_H = 6.0
-DEFAULT_OUT_DIR = os.path.join(os.path.expanduser("~"), "scale_probe")
+DEFAULT_OUT_DIR = os.path.join(CODE_DIR, "scale_probe")
 
 
 # ------------------------------------------------------------------ misure e ambiente
@@ -84,6 +88,11 @@ def _gpu_peak_mb() -> dict:
 def _environment_info() -> dict:
     """Macchina e versioni, per sapere cosa si è misurato (in particolare se NJ ha usato la GPU)."""
     info = {"python": platform.python_version(), "cpu_count": os.cpu_count(), "host": platform.node()}
+    try:
+        from utils import implementation
+        info.update(implementation.describe())   # implementazione di similarità e NJ usata (Task 2)
+    except Exception as exc:
+        info["impl_error"] = repr(exc)
     try:
         from caps.cfl.scalability.cfl_runner import _git_version
         info["code_version"] = _git_version()   # come nei runner: commit corrente, con "-dirty" se ci sono modifiche
@@ -257,6 +266,11 @@ def worker_heur(problem: str, q: int, offset: int, replica: int, out_file: str) 
     out["peak_mb_after_nj"] = marks.get("peak_mb_after_nj")
     out["peak_mb_end"] = _peak_mb()
     out["peak_mb_children_max"] = _peak_mb("children")   # vedi _peak_mb: non va sommato al picco del padre
+    # impronte di matrice di similarità e partizione, calcolate dopo le misure di tempo: confrontando due sonde con
+    # implementazioni diverse (Task 2) si verifica che i risultati coincidano, o si conta quante partizioni cambiano
+    out["similarity_sha1"] = hashlib.sha1(np.ascontiguousarray(env.similarity_matrix).tobytes()).hexdigest()
+    partition = sorted(sorted(int(i) for i in env._cluster_element_indices(c)) for c in env.clusters)
+    out["partition_sha1"] = hashlib.sha1(json.dumps(partition).encode()).hexdigest()
     out.update(_gpu_peak_mb())   # picco della GPU (NJ); le metriche girano su CPU, quindi coincide con quello dopo NJ
     return out
 
@@ -329,7 +343,8 @@ def worker_global(problem: str, q: int, offset: int, replica: int, time_limit: i
 def run_worker_subprocess(problem: str, part: str, q: int, args, out_file: str) -> dict:
     cmd = [sys.executable, os.path.join(CODE_DIR, "scale_probe.py"), "--worker", part, "--problem", problem,
            "--q", str(q), "--offset", str(args.offset), "--replica", str(args.replica),
-           "--global-time-limit", str(args.global_time_limit), "--out-file", out_file]
+           "--global-time-limit", str(args.global_time_limit), "--out-file", out_file,
+           "--nj-impl", args.nj_impl, "--nj-dtype", args.nj_dtype] + (["--fast-similarity"] if args.fast_similarity else [])
     start = time.perf_counter()
     try:
         proc = subprocess.run(cmd, cwd=CODE_DIR, timeout=args.worker_timeout_h * 3600)
@@ -373,6 +388,9 @@ def print_summary(out_file: str):
     ok_keys = {key(r) for r in rows if r.get("status") == "ok"}
     final_keys = {key(r) for r in rows if r.get("status") in ("ok", "failed")}
     print("\n=== Riepilogo ===")
+    if rows:
+        print(f"implementazione: similarità veloce={rows[0].get('impl_fast_similarity')}  NJ={rows[0].get('impl_nj')}  "
+              f"precisione NJ={rows[0].get('impl_nj_dtype')}")
     for problem in PROBLEMS:
         prows = [r for r in rows if r.get("problem") == problem]
         if not prows:
@@ -420,6 +438,13 @@ def main():
     parser.add_argument("--global-time-limit", type=int, default=DEFAULT_GLOBAL_TIME_LIMIT)
     parser.add_argument("--worker-timeout-h", type=float, default=DEFAULT_WORKER_TIMEOUT_H, help="ore massime per ogni misura")
     parser.add_argument("--out-dir", default=DEFAULT_OUT_DIR, help="cartella di output, fuori da code/results/")
+    # implementazione (utils/implementation.py, Task 2): di default quella delle campagne
+    parser.add_argument("--fast-similarity", action="store_true",
+                        help="similarità solo sulle coppie con risorse in comune (risultato identico)")
+    parser.add_argument("--nj-impl", default="original", choices=["original", "lean"],
+                        help="NJ originale o 'lean' (stesse operazioni, meno copie: risultato identico)")
+    parser.add_argument("--nj-dtype", default="float64", choices=["float64", "float32"],
+                        help="precisione di NJ (float32 NON è identico)")
     # argomenti interni, usati dai processi figli
     parser.add_argument("--worker", choices=["heur", "global"], help=argparse.SUPPRESS)
     parser.add_argument("--problem", choices=list(PROBLEMS), help=argparse.SUPPRESS)
@@ -429,6 +454,10 @@ def main():
 
     if CODE_DIR not in sys.path:   # i moduli del progetto (caps, utils, main, main_cfl) stanno in code/
         sys.path.insert(0, CODE_DIR)
+
+    from utils import implementation
+    implementation.configure(fast_similarity=args.fast_similarity, nj_implementation=args.nj_impl,
+                             nj_dtype=args.nj_dtype)
 
     if args.worker:
         try:

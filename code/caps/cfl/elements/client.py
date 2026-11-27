@@ -97,6 +97,11 @@ class Client:
 
 
     @staticmethod
+    def similarity_resource_keys(c):
+        # risorse su cui somma compute_similarity: le facility candidate del cliente (indice inverso della similarità)
+        return [f.id for f in c.k_facilities]
+
+    @staticmethod
     def compute_similarity(c1, c2):
         ids1 = {f.id for f in c1.k_facilities}
         ids2 = {f.id for f in c2.k_facilities}

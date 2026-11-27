@@ -91,6 +91,12 @@ class OD_Pair:
 
 
     @staticmethod
+    def similarity_resource_keys(od):
+        # risorse su cui somma compute_similarity: le coppie (tempo, nodo) dei cammini candidati (indice inverso della
+        # similarità); una coppia senza cammini non condivide nulla e ha similarità 0, come in compute_similarity
+        return list(od.visit_counts.keys()) if od.visit_counts and od.all_paths else []
+
+    @staticmethod
     def compute_similarity(od1, od2) -> float:
         vc1 = od1.visit_counts
         vc2 = od2.visit_counts
