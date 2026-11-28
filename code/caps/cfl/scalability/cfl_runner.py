@@ -18,6 +18,7 @@ from caps.cfl.solver.single_source.sscfl_heuristic_solver import SSCFL_Heuristic
 from caps.cfl.solver.single_source.sscfl_critical_resources import SSCFL_Critical_Resources
 from caps.cfl.solver.multi_source.mscfl_heuristic_solver import MSCFL_Heuristic_solver
 from caps.cfl.solver.multi_source.mscfl_critical_resources import MSCFL_Critical_Resources
+from utils import implementation
 
 
 # indicatori scalari calcolati dall'environment durante il clustering (quelli per cluster vanno in clusters.csv)
@@ -292,7 +293,7 @@ class CFL_Runner:
 
         Solver, Critical = VARIANTS[settings.variant]
         row = {"id": run_id, "instance_id": instance_id, **self._settings_columns(settings), "code_version": self.code_version,
-               "threads": self.threads, "started_at": datetime.now().isoformat(timespec="seconds"),
+               "threads": self.threads, **implementation.describe(), "started_at": datetime.now().isoformat(timespec="seconds"),
                "global_reference": run_id if run_global else None, "global_error": None, "error": None,
                "k_extended_by_clusters": None}
         cluster_rows, incumbent_rows = [], []
@@ -314,6 +315,10 @@ class CFL_Runner:
                     row["global_error"] = traceback.format_exc(limit=3).strip().splitlines()[-1]
                 row.update(self._global_columns(env, global_solver))
                 incumbent_rows = self._incumbent_rows(run_id, global_solver)
+                # il modello completo non serve più: si libera prima dell'euristica (alle taglie grandi sono molti GB)
+                if global_solver.m is not None:
+                    global_solver.m.dispose()
+                del global_solver
                 k_after_global = _changed_k(env, initial_k)
                 _refresh_option_weights(env, k_after_global)
                 data_to_save = self._instance_data(settings, env, k_after_global)

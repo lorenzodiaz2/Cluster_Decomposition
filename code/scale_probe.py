@@ -90,7 +90,7 @@ def _environment_info() -> dict:
     info = {"python": platform.python_version(), "cpu_count": os.cpu_count(), "host": platform.node()}
     try:
         from utils import implementation
-        info.update(implementation.describe())   # implementazione di similarità e NJ usata (Task 2)
+        info.update(implementation.describe())   # implementazione della similarità usata (Task 2)
     except Exception as exc:
         info["impl_error"] = repr(exc)
     try:
@@ -343,8 +343,8 @@ def worker_global(problem: str, q: int, offset: int, replica: int, time_limit: i
 def run_worker_subprocess(problem: str, part: str, q: int, args, out_file: str) -> dict:
     cmd = [sys.executable, os.path.join(CODE_DIR, "scale_probe.py"), "--worker", part, "--problem", problem,
            "--q", str(q), "--offset", str(args.offset), "--replica", str(args.replica),
-           "--global-time-limit", str(args.global_time_limit), "--out-file", out_file,
-           "--nj-impl", args.nj_impl, "--nj-dtype", args.nj_dtype] + (["--fast-similarity"] if args.fast_similarity else [])
+           "--global-time-limit", str(args.global_time_limit), "--out-file", out_file] + \
+          (["--fast-similarity"] if args.fast_similarity else [])
     start = time.perf_counter()
     try:
         proc = subprocess.run(cmd, cwd=CODE_DIR, timeout=args.worker_timeout_h * 3600)
@@ -389,8 +389,7 @@ def print_summary(out_file: str):
     final_keys = {key(r) for r in rows if r.get("status") in ("ok", "failed")}
     print("\n=== Riepilogo ===")
     if rows:
-        print(f"implementazione: similarità veloce={rows[0].get('impl_fast_similarity')}  NJ={rows[0].get('impl_nj')}  "
-              f"precisione NJ={rows[0].get('impl_nj_dtype')}")
+        print(f"implementazione: similarità veloce={rows[0].get('impl_fast_similarity')}")
     for problem in PROBLEMS:
         prows = [r for r in rows if r.get("problem") == problem]
         if not prows:
@@ -441,10 +440,6 @@ def main():
     # implementazione (utils/implementation.py, Task 2): di default quella delle campagne
     parser.add_argument("--fast-similarity", action="store_true",
                         help="similarità solo sulle coppie con risorse in comune (risultato identico)")
-    parser.add_argument("--nj-impl", default="original", choices=["original", "lean"],
-                        help="NJ originale o 'lean' (stesse operazioni, meno copie: risultato identico)")
-    parser.add_argument("--nj-dtype", default="float64", choices=["float64", "float32"],
-                        help="precisione di NJ (float32 NON è identico)")
     # argomenti interni, usati dai processi figli
     parser.add_argument("--worker", choices=["heur", "global"], help=argparse.SUPPRESS)
     parser.add_argument("--problem", choices=list(PROBLEMS), help=argparse.SUPPRESS)
@@ -456,8 +451,7 @@ def main():
         sys.path.insert(0, CODE_DIR)
 
     from utils import implementation
-    implementation.configure(fast_similarity=args.fast_similarity, nj_implementation=args.nj_impl,
-                             nj_dtype=args.nj_dtype)
+    implementation.configure(fast_similarity=args.fast_similarity)
 
     if args.worker:
         try:

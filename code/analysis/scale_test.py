@@ -12,6 +12,13 @@ Per ogni run:
 I Γ sono calcolati rispetto alla migliore soluzione nota del run: il migliore incumbent del modello completo o la
 soluzione dell'euristica.
 
+Tempi del modello completo: euristica e modello completo si confrontano sulla stessa istanza definitiva, quella con le
+opzioni già estese se il modello completo era infeasible con le opzioni iniziali (l'euristica parte da lì senza
+pagarne il tempo). Il CFL registra già gli incumbent così (solo l'ultimo tentativo); nel CPA i tempi degli incumbent
+includono i tentativi infeasible, che qui si tolgono: dalla colonna global_infeasible_time (run dal 28/11/2026) o,
+se manca, da infeasible_attempts.csv della cartella. I run del CPA senza nessuna delle due restano non corretti e
+vengono contati nella stampa.
+
 Per ogni configurazione (gruppo di run) stampa le mediane e la quota di vittorie: la configurazione è un regime utile
 se le vittorie sono almeno la metà dei run (criterio di successo delle specifiche).
 
@@ -63,6 +70,33 @@ def load_incumbents(folder: str) -> dict[str, list[tuple[float, float]]]:
     return {run_id: sorted(runs[-1]) for run_id, runs in series.items()}
 
 
+def load_infeasible_times(folder: str) -> dict[str, float]:
+    """Tempo dei tentativi infeasible per id del run con il globale, da infeasible_attempts.csv (CPA), se c'è."""
+    path = os.path.join(folder, "infeasible_attempts.csv")
+    if not os.path.isfile(path):
+        return {}
+    out = {}
+    with open(path, encoding="utf-8") as f:
+        for rec in csv.DictReader(f):
+            if not rec.get("error") and rec.get("infeasible_time") not in (None, ""):
+                out[rec["id"]] = float(rec["infeasible_time"])
+    return out
+
+
+def infeasible_shift(r: dict, infeasible_times: dict[str, float]) -> float | None:
+    """
+    Secondi da togliere ai tempi degli incumbent del modello completo: 0 nel CFL (già esclusi), il tempo dei tentativi
+    infeasible nel CPA; None se nel CPA non è noto (run non corretto).
+    """
+    if "variant" in r:   # CFL
+        return 0.0
+    if r.get("global_infeasible_time") is not None:
+        return float(r["global_infeasible_time"])
+    if (r.get("global_n_resolutions") or 1) <= 1:
+        return 0.0       # un solo tentativo: nessun tempo da togliere
+    return infeasible_times.get(r.get("global_reference") or r["id"])
+
+
 def heuristic_ok(r: dict) -> bool:
     if r.get("error") or r.get("heuristic_UB") is None:
         return False
@@ -71,9 +105,10 @@ def heuristic_ok(r: dict) -> bool:
     return bool(r.get("heuristic_feasible"))  # CPA
 
 
-def analyse_run(r: dict, incumbents: dict) -> dict | None:
+def analyse_run(r: dict, incumbents: dict, infeasible_times: dict[str, float]) -> dict | None:
     ref = r.get("global_reference") or r["id"]
-    seq = incumbents.get(ref, [])
+    shift = infeasible_shift(r, infeasible_times)
+    seq = [(t - (shift or 0.0), obj) for t, obj in incumbents.get(ref, [])]
     ok = heuristic_ok(r)
     ub_h = r["heuristic_UB"] if ok else None
     t_h = r.get("heuristic_time") if ok else None
@@ -95,7 +130,8 @@ def analyse_run(r: dict, incumbents: dict) -> dict | None:
     t_f_good = next((t for t, obj in seq if primal_gap(obj, best) <= GOOD), None)
     win = bool(ok and not slower_than_tl and g_h <= GOOD and g_h < g_f_th)
     return {"ok": ok, "g_h": g_h, "g_f_th": g_f_th, "win": win, "slower_than_tl": slower_than_tl,
-            "t_h": t_h, "t_f_good": t_f_good, "f_good_before_th": (ok and t_f_good is not None and t_f_good <= t_h)}
+            "t_h": t_h, "t_f_good": t_f_good, "f_good_before_th": (ok and t_f_good is not None and t_f_good <= t_h),
+            "uncorrected": shift is None}
 
 
 def median_or_none(values):
@@ -141,24 +177,27 @@ def main():
 
     runs = load_runs(args.folder)
     incumbents = load_incumbents(args.folder)
+    infeasible_times = load_infeasible_times(args.folder)
 
     groups = defaultdict(list)
-    skipped = 0
+    skipped = uncorrected = 0
     for r in runs:
         if args.partitioner != "all" and r.get("partitioner") != args.partitioner:
             continue
         if args.sim_weighting and r.get("sim_weighting") != args.sim_weighting:
             continue
-        res = analyse_run(r, incumbents)
+        res = analyse_run(r, incumbents, infeasible_times)
         if res is None:
             skipped += 1
             continue
+        uncorrected += res["uncorrected"]
         groups[tuple(r.get(k) for k in args.by)].append(res)
 
     rows = summarise(groups)
     header = ("config", "n", "succ%", "good%", "Γ_H med", "Γ_F(tH) med", "F buona prima di tH %", "vittorie %",
               "tH>TL %", "tH med (s)", "t_F_buona med (s)", "regime utile")
-    print(f"{args.folder}  (configurazione = {', '.join(args.by)}; run senza alcuna soluzione esclusi: {skipped})")
+    print(f"{args.folder}  (configurazione = {', '.join(args.by)}; run senza alcuna soluzione esclusi: {skipped}; "
+          f"run del CPA con tentativi infeasible di durata non nota, tempi non corretti: {uncorrected})")
     print(" | ".join(header))
     for x in rows:
         print(" | ".join([str(x["config"]), str(x["n"]), fmt(x["succ_pct"], ".0f"), fmt(x["good_pct"], ".0f"),

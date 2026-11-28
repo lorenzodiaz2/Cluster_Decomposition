@@ -15,6 +15,7 @@ import pandas as pd
 from caps.mcpa.elements.mcpa_environment import MCPA_Environment
 from caps.mcpa.solver.mcpa_critical_resources import MCPA_Critical_Resources
 from caps.mcpa.solver.mcpa_heuristic_solver import MCPA_Heuristic_Solver
+from utils import implementation
 
 
 # indicatori scalari calcolati dall'environment durante il clustering (quelli per cluster vanno in clusters.csv)
@@ -32,6 +33,7 @@ INDICATORS = [
 METHOD_FIELDS = ("max_cluster_size", "partitioner", "sim_weighting", "sim_beta", "resource_weights")
 
 GLOBAL_COLUMNS = ("global_status", "global_n_resolutions", "global_model_time", "global_resolution_time", "global_time",
+                  "global_infeasible_time", "global_model_times", "global_resolution_times",
                   "global_time_limit", "global_UB", "global_LB", "global_mip_gap", "global_n_incumbents", "global_error")
 
 
@@ -259,7 +261,7 @@ class MCPA_Runner:
             return run_id
 
         row = {"id": run_id, "instance_id": instance_id, **self._settings_columns(settings), "code_version": self.code_version,
-               "threads": self.threads, "started_at": datetime.now().isoformat(timespec="seconds"),
+               "threads": self.threads, **implementation.describe(), "started_at": datetime.now().isoformat(timespec="seconds"),
                "global_reference": run_id if run_global else None, "global_error": None, "error": None,
                "T_extended_by_clusters": None}
         cluster_rows, incumbent_rows = [], []
@@ -281,6 +283,10 @@ class MCPA_Runner:
                     row["global_error"] = traceback.format_exc(limit=3).strip().splitlines()[-1]
                 row.update(self._global_columns(global_solver))
                 incumbent_rows = self._incumbent_rows(run_id, global_solver)
+                # il modello completo non serve più: si libera prima dell'euristica (a q = 81 sono oltre 10 GB)
+                if global_solver.m is not None:
+                    global_solver.m.dispose()
+                del global_solver
                 T_after_global = _changed_horizons(env, initial_T)
                 _refresh_footprints(env, T_after_global)
                 data_to_save = self._instance_data(settings, env, T_after_global)
@@ -397,6 +403,12 @@ class MCPA_Runner:
             "global_model_time": sum(solver.model_times),
             "global_resolution_time": sum(solver.resolution_times),
             "global_time": sum(solver.model_times) + sum(solver.resolution_times),
+            # tentativi infeasible (prima dell'estensione degli orizzonti): già inclusi in global_time e nei tempi degli
+            # incumbent; registrati a parte, con un valore per tentativo nelle due liste, come nel CFL, così l'analisi può
+            # confrontare euristica e modello completo sulla stessa istanza definitiva
+            "global_infeasible_time": sum(solver.model_times[:-1]) + sum(solver.resolution_times[:len(solver.model_times) - 1]),
+            "global_model_times": list(solver.model_times),
+            "global_resolution_times": list(solver.resolution_times),
             "global_time_limit": solver.time_limit,
             "global_UB": _attr(solver.m, "ObjVal") if solver.m is not None else None,
             "global_LB": _attr(solver.m, "ObjBound") if solver.m is not None else None,

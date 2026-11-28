@@ -6,6 +6,8 @@ from dataclasses import replace
 
 from caps.mcpa.scalability.mcpa_runner import MCPA_Runner, MCPA_Instance_Settings
 from caps.mcpa.scalability.mcpa_stress_test import run_mcpa_stress_test
+from utils import implementation
+from utils.grid_utils import blocks_per_side
 
 
 # ----- parametri fissi (dallo stress test) -----
@@ -52,6 +54,15 @@ TUNING_SMALL_M = 5 * TUNING_SMALL_N_PAIRS                                       
 TUNING_SMALL_OFFSETS = [0, 1, 2]                    # 0, 0.1, 0.2 del lato del quadrante (campagna: da -0.05 a 0.25)
 TUNING_SMALL_REPLICAS = range(1000, 1042)           # 2 q x 3 offset x 42 repliche = 252 istanze
 OUT_TUNING_SIMILARITY = "results/mcpa/tuning_similarity"
+
+# ----- prova di scala (workflow/specs/scale-test.md, Task 4) -----
+# blocco base della campagna A (c = 5, rho = 1, M*, k) con molti più blocchi; con offset negativo la griglia si allarga
+# (D8), così ogni blocco resta BASE_GRID_SIDE x BASE_GRID_SIDE. Similarità con l'indice inverso (identica, più veloce)
+SCALE_Q = [25, 49, 81]
+SCALE_OFFSETS = [-1, 0, 1]
+SCALE_SEEDS = range(3)
+OUT_SCALE = "results/mcpa/scale_test"
+SCALE_NODEFILE_GB = 10      # soglia di Gurobi (NodefileStart) per spostare su disco i nodi dell'albero
 
 
 def _quadrant_settings(q: int, offset: int, seed: int, **kw) -> MCPA_Instance_Settings:
@@ -125,6 +136,25 @@ def campaign_B() -> list[MCPA_Instance_Settings]:
                                                        family_params={**medium, "obstacles": "walls", "n_gates": gates}))
             settings.append(MCPA_Instance_Settings(**base, family="uniform", family_params={**medium, "obstacles": "blocks"}))
     return _independent_seeds(settings)   # 200 istanze
+
+
+def scale_grid_side(q: int, offset: int) -> int:
+    """D8: lato m * n0, più |offset| righe tra blocchi adiacenti se l'offset è negativo (blocchi sempre n0 x n0)."""
+    if blocks_per_side(q) ** 2 != q:
+        raise ValueError(f"q = {q} non è un quadrato perfetto: la griglia avrebbe blocchi vuoti")
+    m = blocks_per_side(q)
+    return m * BASE_GRID_SIDE + (m - 1) * abs(offset) if offset < 0 else m * BASE_GRID_SIDE
+
+
+def campaign_scale() -> list[MCPA_Instance_Settings]:
+    # 3 q x 3 offset x 3 seed = 27 istanze; seed all'esterno, così ogni seed completo copre già tutte le configurazioni
+    settings = [replace(_quadrant_settings(q, o, s), grid_side=scale_grid_side(q, o))
+                for s in SCALE_SEEDS for q in SCALE_Q for o in SCALE_OFFSETS]
+    return _independent_seeds(settings)
+
+
+def block_label_scale(st: MCPA_Instance_Settings) -> str:
+    return f"scale q={st.n_quadrants} offset={st.offset}"
 
 
 def campaign_tuning() -> list[MCPA_Instance_Settings]:
@@ -375,9 +405,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Campagne MCPA")
     # senza argomenti (es. pulsante Run di PyCharm) lancia A e B; rilanciando riprende dai run non ancora completati
     parser.add_argument("campaign", nargs="*", default=["A", "B"],
-                        help="campagne da lanciare: tuning, tuning_similarity, A, B, ablations_A, infeasible_attempts (default: A B)")
+                        help="campagne da lanciare: tuning, tuning_similarity, A, B, ablations_A, infeasible_attempts, "
+                             "scale (default: A B)")
     args = parser.parse_args()
-    valid = ("tuning", "tuning_similarity", "A", "B", "ablations_A", "infeasible_attempts", "check_A", "clean_A")
+    valid = ("tuning", "tuning_similarity", "A", "B", "ablations_A", "infeasible_attempts", "check_A", "clean_A", "scale")
     invalid = [c for c in args.campaign if c not in valid]
     if invalid:
         parser.error(f"campagne non valide: {invalid} (scegliere tra {', '.join(valid)})")
@@ -426,6 +457,16 @@ if __name__ == '__main__':
             MCPA_Runner(OUT_B, threads=THREADS).run_all(campaign_B(), label_fn=block_label_B)
         elif campaign == "ablations_A":
             run_ablations_A(MCPA_Runner(OUT_A, threads=THREADS))
+        elif campaign == "scale":
+            # solo per questa campagna: le altre restano con l'implementazione con cui sono state fatte
+            import gurobipy as gp
+            implementation.configure(fast_similarity=True)
+            # oltre SCALE_NODEFILE_GB di memoria per i nodi dell'albero Gurobi li scrive su disco (nella cartella
+            # corrente) invece di esaurire la RAM: a q = 81 il modello completo usava già 13.5 GB dopo 300 s
+            gp.setParam("NodefileStart", SCALE_NODEFILE_GB)
+            MCPA_Runner(OUT_SCALE, threads=THREADS).run_all(campaign_scale(), label_fn=block_label_scale)
+            gp.setParam("NodefileStart", gp.GRB.INFINITY)
+            implementation.configure(fast_similarity=False)
 
 
 
